@@ -137,7 +137,7 @@ public class StudyBook {
         baum = new JTree(wurzel);
         DefaultTreeCellRenderer tree_renderer = new DefaultTreeCellRenderer() {
             {
-                setLeafIcon(new ImageIcon(getClass().getResource("/bilder/schreibblock-icon.gif"))); //Icon von Blaettern
+                setLeafIcon(new ImageIcon(getClass().getResource("/bilder/schreibblock_icon.gif"))); //Icon von Blaettern
                 setOpenIcon(new ImageIcon(getClass().getResource("/bilder/sb_icon.gif"))); //Icon, wenn aufgeklappt
                 setClosedIcon(new ImageIcon(getClass().getResource("/bilder/sb_icon.gif"))); //Icon, wenn zugeklappt
             }
