@@ -55,7 +55,8 @@ public class StudyBook {
     }
 
     private void neues_profil(String name) {
-        SQL sqltest = new SQL(name + ".profile"); //Speichere Datenbank unter name.profile
+        SBModel sqltest = new SBModel();
+        sqltest.connect(name + ".profile"); //Speichere Datenbank unter name.profile
         sqltest.query("CREATE TABLE IF NOT EXISTS studiengaenge (name);"); //Erstelle Tabelle fuer Studiengaenge
         sqltest.query("INSERT INTO studiengaenge (name) VALUES ('testname')"); //Fuege Teststudiengang hinzu
         try {
@@ -68,7 +69,7 @@ public class StudyBook {
         }
 
     }
-    
+
     MouseAdapter ma = new MouseAdapter() { //MouseListener, vielleicht auch in eigene Klasse auslagern?
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -78,7 +79,7 @@ public class StudyBook {
                 System.out.println(row + "" + e.getComponent() + "" + e.getX() + e.getY());
                 JPopupMenu popup = new JPopupMenu();
                 popup.add(new JMenuItem("popup: " + row));
-                popup.show(baum, e.getX(), e.getY()); //Problem: Wie Blatt von Baum eindeutig identifizieren?? 
+                popup.show(baum, e.getX(), e.getY()); //Problem: Wie Blatt von Baum eindeutig identifizieren??
                 //row aendert sich, jenachdem, wie weit der Baum ausgeklappt ist
             }
         }
@@ -113,47 +114,47 @@ public class StudyBook {
         mainframe.setSize(800, 600); //Groesse des Hauptfensters auf 800x600 setzen
         mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Bei Klick auf X, Programm beenden
         mainframe.setLayout(new BorderLayout()); //BorderLayout zur Anordnung
-        
+
         menubar.add(menubar_datei);
         menubar_datei.add(menubar_datei_neues_profil);
         menubar_datei.add(menubar_datei_beenden);
         menubar_datei_beenden.setActionCommand("beenden");
         menubar_datei_beenden.addActionListener(alistener);
-        
+
         menubar.add(menubar_bearbeiten);
-        
+
         menubar.add(menubar_hilfe);
         menubar_hilfe.add(menubar_hilfe_ueber);
         menubar_hilfe_ueber.setActionCommand("ueber");
         menubar_hilfe_ueber.addActionListener(alistener);
-        
+
         menubar_datei.setMnemonic('D');
         menubar_bearbeiten.setMnemonic('B');
         menubar_hilfe.setMnemonic('H');
-        
+
         mainframe.add(menubar, BorderLayout.NORTH);
 
         wurzel = createTree(); //Baum erstellen
         baum = new JTree(wurzel);
         DefaultTreeCellRenderer tree_renderer = new DefaultTreeCellRenderer() {
             {
-                setLeafIcon(new ImageIcon(getClass().getResource("/bilder/schreibblock_icon.gif"))); //Icon von Blaettern
-                setOpenIcon(new ImageIcon(getClass().getResource("/bilder/sb_icon.gif"))); //Icon, wenn aufgeklappt
-                setClosedIcon(new ImageIcon(getClass().getResource("/bilder/sb_icon.gif"))); //Icon, wenn zugeklappt
+                setLeafIcon(new ImageIcon(getClass().getResource("/pics/schreibblock_icon.gif"))); //Icon von Blaettern
+                setOpenIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn aufgeklappt
+                setClosedIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn zugeklappt
             }
         };
         baum.setCellRenderer(tree_renderer); //Renderer dem Baum hinzufuegen
         baum.addMouseListener(ma); //MouseListener dem Baum hinzufuegen
-        
+
         splitpane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, baum, main);
         splitpane.setContinuousLayout(true);
         splitpane.setDividerLocation(200);
-        
+
         mainframe.add(splitpane, BorderLayout.CENTER);
         mainframe.setVisible(true);
 
         try {
-            Image img = ImageIO.read(getClass().getResource("/bilder/sb_icon.gif"));
+            Image img = ImageIO.read(getClass().getResource("/pics/sb_icon.gif"));
             mainframe.setIconImage(img);
         } catch (IOException e) {
             System.err.println(e.toString());

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package studybook;
 
 import java.sql.Connection;
@@ -14,11 +10,13 @@ import java.sql.Statement;
  *
  * @author Admin
  */
-public class SQL {
-    
+public class SBModel {
     private Connection conn = null;
-    
-    public SQL(String profile) {
+
+    public SBModel() {
+    }
+
+    public void connect(String profile) {
         try {
             Class.forName("org.sqlite.JDBC");
             this.conn = DriverManager.getConnection("jdbc:sqlite:"+profile);
@@ -35,7 +33,7 @@ public class SQL {
             System.err.println(e);
         }
     }
-    
+
     public ResultSet get(String query) throws SQLException {
         Statement stat = conn.createStatement();
         return stat.executeQuery(query);
