@@ -22,11 +22,12 @@ public class SBSemesterPanel extends JPanel {
         this.layoutSemesterPanel();
     }
 
+
     /**
      * Hier wird das Panel erstellt, über das der Benutzer seinen Semester-
      * stundenplan einsehen und verwalten kann.
      */
-    public void createSemesterPanel() {
+    private void createSemesterPanel() {
         timetablemodel = new DefaultTableModel(5, 6);
         timetable = new JTable(timetablemodel);
 
@@ -50,7 +51,7 @@ public class SBSemesterPanel extends JPanel {
      * Der Semesterstundenplan in Form in einer JTable wird an seinen rechten
      * Platz verpflanzt.
      */
-    public void layoutSemesterPanel() {
+    private void layoutSemesterPanel() {
         this.setLayout(new BorderLayout());
         this.add(timetable);
     }
