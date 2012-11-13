@@ -44,7 +44,7 @@ public class SBStudyPanel extends JPanel{
     * Erstellt das Panel zur Studiengangverwaltung, das dem Benutzer unter
     * anderem einen Einblick in seinen Studienfortschritt gewährt.
     */
-    public void createStudyPanel() {
+    private void createStudyPanel() {
         studentstudypanel = new JPanel();
 
         margin = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -84,7 +84,7 @@ public class SBStudyPanel extends JPanel{
     /**
      * Damit die GUI-Komponenten an die richtige Stelle kommen.
      */
-    public void layoutStudyPanel() {
+    private void layoutStudyPanel() {
         // momentan noch GridLayout mit 5 Pixeln zum nächsten GUI-Element hin
         studentpanel.setLayout(new GridLayout(3, 2, 5, 5));
         studentpanel.add(studentnamel);
