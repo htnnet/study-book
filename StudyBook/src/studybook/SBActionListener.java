@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package studybook;
 
 import java.awt.Dimension;
@@ -16,8 +12,8 @@ import javax.swing.JMenuItem;
  * @author Admin
  */
 public class SBActionListener implements ActionListener {
-    StudyBook mainframe;
-    public SBActionListener(StudyBook mainframe) {
+    SBView mainframe;
+    public SBActionListener(SBView mainframe) {
         this.mainframe = mainframe;
     }
     @Override
@@ -35,9 +31,9 @@ public class SBActionListener implements ActionListener {
                 //---Hilfe---
                 //      Über
                 case "ueber":
-                    JLabel mainlabel = new JLabel(new ImageIcon(getClass().getResource("/bilder/transp.gif")));
-                    mainlabel.setMinimumSize(new Dimension(20,20));
-                    mainframe.setMainFrame(mainlabel);
+                    //JLabel mainlabel = new JLabel(new ImageIcon(getClass().getResource("/bilder/transp.gif")));
+                    //mainlabel.setMinimumSize(new Dimension(20,20));
+                    //mainframe.setMainFrame(mainlabel);
                     break;
             }
         }

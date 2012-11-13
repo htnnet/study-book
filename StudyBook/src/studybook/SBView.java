@@ -4,8 +4,14 @@ import java.awt.BorderLayout;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeNode;
 
 
 /**
@@ -21,6 +27,23 @@ public class SBView extends JFrame {
     private JPanel rpanel;
     private JLabel statusbar;
     private JSplitPane splitpane;
+    private MenuBar menuBar;
+    private JMenu menu;
+    //private JMenuItem newProfile;
+    //private JMenuItem openProfile;
+    //private JMenuItem saveProfile;
+    //private JMenuItem saveAsProfile;
+    //private JMenuItem exit;
+    private JMenuBar menubar = new JMenuBar(); //Menue
+    private JMenu menubar_datei = new JMenu("Datei"); //Datei
+    private JMenuItem menubar_datei_neues_profil = new JMenuItem("Neues Profil"); //Datei --> Neues Profil
+    private JMenuItem menubar_datei_beenden = new JMenuItem("Beenden"); //Datei --> Beenden
+    private JMenu menubar_bearbeiten = new JMenu("Bearbeiten"); //Bearbeiten
+    private JMenu menubar_hilfe = new JMenu("Hilfe"); //Hilfe
+    private JMenuItem menubar_hilfe_ueber = new JMenuItem("Über"); //Hilfe --> Ueber
+    private JTree baum; //Baum, linke Seite
+    private TreeNode wurzel; //Wurzel des JTree's !!!Muss datenbankbasiert werden, da mehrere Studiengaenge moeglich
+    private ActionListener alistener; //ActionListener fuer Fenster
 
     /**
      * Konstruktor der Klasse "SBView"
@@ -28,15 +51,71 @@ public class SBView extends JFrame {
      * @param controller das Controller-Objekt
      */
     public SBView(SBController controller) {
+        alistener = new SBActionListener(this); //ActionListener initialisieren
         this.controller = controller;
-        // Falls möglich, Windows Look and Feel setzen, sonst Standard
-        if (System.getProperty("os.name").indexOf("Windows") != -1) {
-            try {
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            } catch (Exception e) {
-                System.err.println(e.toString());
+    }
+
+
+    MouseAdapter ma = new MouseAdapter() { //MouseListener, vielleicht auch in eigene Klasse auslagern?
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (SwingUtilities.isRightMouseButton(e)) {
+                int row = baum.getClosestRowForLocation(e.getX(), e.getY());
+                baum.setSelectionRow(row);
+                System.out.println(row + "" + e.getComponent() + "" + e.getX() + e.getY());
+                JPopupMenu popup = new JPopupMenu();
+                popup.add(new JMenuItem("popup: " + row));
+                popup.show(baum, e.getX(), e.getY()); //Problem: Wie Blatt von Baum eindeutig identifizieren??
+                //row aendert sich, jenachdem, wie weit der Baum ausgeklappt ist
             }
         }
+    };
+
+    private static TreeNode createTree() { //Baum erstellen
+        DefaultMutableTreeNode wurzel = new DefaultMutableTreeNode("Technische Informatik B.Sc.");
+
+        for (int i = 1; i < 8; i++) {
+            DefaultMutableTreeNode semester = new DefaultMutableTreeNode(i + ". Semester");
+            DefaultMutableTreeNode modul1 = new DefaultMutableTreeNode("MATHE1");
+            DefaultMutableTreeNode modul2 = new DefaultMutableTreeNode("GELEK1");
+            DefaultMutableTreeNode modul3 = new DefaultMutableTreeNode("INFORM");
+            DefaultMutableTreeNode modul4 = new DefaultMutableTreeNode("PROG1");
+            DefaultMutableTreeNode modul5 = new DefaultMutableTreeNode("ENGL1");
+            semester.add(modul1);
+            semester.add(modul2);
+            semester.add(modul3);
+            semester.add(modul4);
+            semester.add(modul5);
+            wurzel.add(semester);
+        }
+        return wurzel;
+    }
+
+/**
+
+    private Object[][] menuData() {
+        return {{"Datei",{"Neues Profil", }};
+    }
+    }
+    **/
+
+    public void createMenuBar() {
+        menubar.add(menubar_datei);
+        menubar_datei.add(menubar_datei_neues_profil);
+        menubar_datei.add(menubar_datei_beenden);
+        menubar_datei_beenden.setActionCommand("beenden");
+        menubar_datei_beenden.addActionListener(alistener);
+
+        menubar.add(menubar_bearbeiten);
+
+        menubar.add(menubar_hilfe);
+        menubar_hilfe.add(menubar_hilfe_ueber);
+        menubar_hilfe_ueber.setActionCommand("ueber");
+        menubar_hilfe_ueber.addActionListener(alistener);
+
+        menubar_datei.setMnemonic('D');
+        menubar_bearbeiten.setMnemonic('B');
+        menubar_hilfe.setMnemonic('H');
     }
 
     /**
@@ -58,6 +137,19 @@ public class SBView extends JFrame {
         cpanel = new JPanel();
         splitpane = new JSplitPane();
         splitpane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+
+        wurzel = createTree(); //Baum erstellen
+        baum = new JTree(wurzel);
+        DefaultTreeCellRenderer tree_renderer = new DefaultTreeCellRenderer() {
+            {
+                setLeafIcon(new ImageIcon(getClass().getResource("/pics/schreibblock_icon.gif"))); //Icon von Blaettern
+                setOpenIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn aufgeklappt
+                setClosedIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn zugeklappt
+            }
+        };
+        baum.setCellRenderer(tree_renderer); //Renderer dem Baum hinzufuegen
+        baum.addMouseListener(ma); //MouseListener dem Baum hinzufuegen
+
 
         lpanel = new JPanel();
 
@@ -85,14 +177,19 @@ public class SBView extends JFrame {
     public void layoutMainFrame() {
         frame.setLayout(new BorderLayout());
 
+        lpanel.setLayout(new BorderLayout());
+        lpanel.add(baum);
+
         splitpane.setLeftComponent(lpanel);
         splitpane.setRightComponent(rpanel);
 
+        frame.add(menubar, BorderLayout.NORTH);
         frame.add(statusbar, BorderLayout.SOUTH);
         frame.add(splitpane, BorderLayout.CENTER);
 
         frame.pack();
         frame.setSize(800, 600);
+        frame.setResizable(true);
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);  // Zentrieren
     }
