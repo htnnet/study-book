@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
@@ -44,15 +43,19 @@ public class SBView extends JFrame {
     private JTree baum; //Baum, linke Seite
     private TreeNode wurzel; //Wurzel des JTree's !!!Muss datenbankbasiert werden, da mehrere Studiengaenge moeglich
     private ActionListener alistener; //ActionListener fuer Fenster
-
+    
+    private SBStudyPanel sbstudypanel;
+    private SBHelpPanel sbhelppanel;
     /**
      * Konstruktor der Klasse "SBView"
      *
      * @param controller das Controller-Objekt
      */
-    public SBView(SBController controller) {
-        alistener = new SBActionListener(this); //ActionListener initialisieren
+    public SBView(SBController controller,SBStudyPanel sbstudypanel,SBHelpPanel sbhelppanel) {
+        alistener = new SBActionListener(this,controller); //ActionListener initialisieren
         this.controller = controller;
+        this.sbstudypanel = sbstudypanel;
+        this.sbhelppanel = sbhelppanel;
     }
 
 
@@ -65,6 +68,7 @@ public class SBView extends JFrame {
                 System.out.println(row + "" + e.getComponent() + "" + e.getX() + e.getY());
                 JPopupMenu popup = new JPopupMenu();
                 popup.add(new JMenuItem("popup: " + row));
+                
                 popup.show(baum, e.getX(), e.getY()); //Problem: Wie Blatt von Baum eindeutig identifizieren??
                 //row aendert sich, jenachdem, wie weit der Baum ausgeklappt ist
             }
@@ -154,7 +158,7 @@ public class SBView extends JFrame {
         lpanel = new JPanel();
 
         // Hier wird das Aussehen des rechten Panels mit folgenden Befehlen bestimmt
-        rpanel = new SBStudyPanel();
+        //rpanel = sbstudypanel;
         //rpanel = new SBSemesterPanel();
         //rpanel = new SBModulePanel();
         //rpanel = new SBHelpPanel();
@@ -167,7 +171,27 @@ public class SBView extends JFrame {
         statusbar = new JLabel("Ich bin eine Statusbar, die rot werden kann, wenn Fehler auftreten");
         statusbar.setOpaque(true);  // für das Setzen der Hintergrundfarbe
         statusbar.setBackground(Color.red);
+        statusbar.setForeground(Color.white);
         statusbar.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+    
+    public void showError(String message) {
+        statusbar.setText(message);
+        statusbar.setVisible(true);
+    }
+    
+    public void safe() {
+        //Speichern der veränderten Daten
+        switch(controller.getActivePanel()) {
+            case "sbstudypanel":
+                sbstudypanel.safe(controller);
+                break;
+        }
+    }
+    
+    public void setRightPanel(JPanel panel) {
+        rpanel = panel;
+        layoutMainFrame();
     }
 
     /**
@@ -185,6 +209,7 @@ public class SBView extends JFrame {
 
         frame.add(menubar, BorderLayout.NORTH);
         frame.add(statusbar, BorderLayout.SOUTH);
+        statusbar.setVisible(false);
         frame.add(splitpane, BorderLayout.CENTER);
 
         frame.pack();
