@@ -6,7 +6,9 @@ import javax.swing.*;
 import javax.swing.border.Border;
 /**
  * Enthält das Panel für die Studiengangverwaltung.
- *
+ * @author StudyBook-Crew
+ * @version 0.1
+ * @since 2012-10-14
  */
 public class SBStudyPanel extends JPanel{
     private JPanel studentstudypanel;
@@ -80,8 +82,8 @@ public class SBStudyPanel extends JPanel{
         studyacadt = new JTextField();
         studystartt = new JTextField();
     }
-    
-    public void safe(SBController controller) {
+
+    public void save(SBController controller) {
         SBModel db = controller.dbconnect();
         if(db != null) {
         db.query("UPDATE allgemeindaten SET studentname = '"+studentnamet.getText()+"',"
@@ -92,12 +94,12 @@ public class SBStudyPanel extends JPanel{
                 + "studystart='"+studystartt.getText()+"';");
         }
     }
-    
+
     public void setFields(String studentname, String studentbirth, String studentmatnum, String studyname, String studyacad, String studystart) {
         this.studentnamet.setText(studentname);
         this.studentbirtht.setText(studentbirth);
         this.studentmatnumt.setText(studentmatnum);
-        
+
         this.studynamet.setText(studyname);
         this.studyacadt.setText(studyacad);
         this.studystartt.setText(studystart);

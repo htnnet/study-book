@@ -12,8 +12,8 @@ import javax.swing.UIManager;
 public class SBStart {
 
     /**
-     * Erstellt ein Backend-Objekt und übergibt es zur weiteren Verarbeitung
-     * dem Controller-Objekt.
+     * Erstellt ein Backend-Objekt und übergibt es zur weiteren Verarbeitung dem
+     * Controller-Objekt.
      *
      * @param args Kommandozeilenparameter
      */

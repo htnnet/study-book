@@ -7,9 +7,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
+ * Enthält die Logik des Programms und die von der grafischen Oberfläche
+ * darzustellenden Daten, die mittels einer SQL-Datenbankverbindung angefordert
+ * werden können.
  *
- * @author Admin
+ * @author StudyBook-Crew
+ * @version 0.1
+ * @since 2012-10-14
  */
+
 public class SBModel {
     private Connection conn = null;
 

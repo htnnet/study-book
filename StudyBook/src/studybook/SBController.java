@@ -5,8 +5,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
+ * Ist für die reibungslose Interkommunikation zwischen der grafischen
+ * Oberfläche und der Logik verantwortlich.
  *
- * @author Alex
+ * @author StudyBook-Crew
+ * @version 0.1
+ * @since 2012-10-14
  */
 public class SBController {
     private SBModel model;
@@ -23,26 +27,25 @@ public class SBController {
         this.createProfile(profilname); //Testaufruf createProfile
         this.initialize();
     }
-    
+
     private void initialize() {
         view = new SBView(this,sbstudypanel,sbhelppanel);
         view.createMainFrame();
-        view.createMenuBar();
         view.layoutMainFrame();
         this.setStudyPanel();
         initialize = false;
     }
-    
+
     public void setHelpPanel() {
-        view.safe();
+        view.save();
         view.setRightPanel(sbhelppanel);
         activePanel = "sbhelppanel";
     }
-    
+
     public void setStudyPanel() {
         SBModel db = this.dbconnect();
         if(db != null) {
-            if(!initialize) view.safe();
+            if(!initialize) view.save();
             try {
                 ResultSet rs = db.get("SELECT * FROM allgemeindaten"); //Alles von der Tabelle Studiengaenge holen
                 while (rs.next()) {
@@ -62,22 +65,22 @@ public class SBController {
             view.showError("Fehler bei dem Lesen des Profils! Profil erstellt?");
         }
     }
-    
+
     public String getActivePanel() {
         return activePanel;
     }
-    
+
     public SBModel dbconnect() {
-        if(!new File(profilname+".profile").exists()) {
+        if(!new File(profilname+".sb").exists()) {
             view.showError("Noch kein Profil erstellt!");
             return null;
         } else {
             SBModel sqltest = this.model;
-            sqltest.connect(profilname + ".profile");
+            sqltest.connect(profilname + ".sb");
             return sqltest;
         }
     }
-    
+
     private void createProfile(String name) {
         SBModel db = this.model;
         db.connect(name + ".profile");
