@@ -21,13 +21,13 @@ public class SBStudyPanel extends JPanel{
     private Border progresstborder;
     private Border progresscborder;
     private JLabel studentnamel;
-    private JLabel studentbirthdl;
+    private JLabel studentbirthl;
     private JLabel studentmatnuml;
     private JLabel studynamel;
     private JLabel studyacadl;
     private JLabel studystartl;
     private JTextField studentnamet;
-    private JTextField studentbirthdt;
+    private JTextField studentbirtht;
     private JTextField studentmatnumt;
     private JTextField studynamet;
     private JTextField studyacadt;
@@ -65,7 +65,7 @@ public class SBStudyPanel extends JPanel{
         progresspanel.setBorder(progresscborder);
 
         studentnamel = new JLabel("Name:");
-        studentbirthdl = new JLabel("Geburtsdatum:");
+        studentbirthl = new JLabel("Geburtsdatum:");
         studentmatnuml = new JLabel("Matrikelnummer:");
 
         studynamel = new JLabel("Name:");
@@ -73,12 +73,34 @@ public class SBStudyPanel extends JPanel{
         studystartl = new JLabel("Studienbeginn:");
 
         studentnamet = new JTextField();
-        studentbirthdt = new JTextField();
+        studentbirtht = new JTextField();
         studentmatnumt = new JTextField();
 
         studynamet = new JTextField();
         studyacadt = new JTextField();
         studystartt = new JTextField();
+    }
+    
+    public void safe(SBController controller) {
+        SBModel db = controller.dbconnect();
+        if(db != null) {
+        db.query("UPDATE allgemeindaten SET studentname = '"+studentnamet.getText()+"',"
+                + "studentbirth='"+studentbirtht.getText()+"',"
+                + "studentmatnum='"+studentmatnumt.getText()+"',"
+                + "studyname='"+studynamet.getText()+"',"
+                + "studyacad='"+studyacadt.getText()+"',"
+                + "studystart='"+studystartt.getText()+"';");
+        }
+    }
+    
+    public void setFields(String studentname, String studentbirth, String studentmatnum, String studyname, String studyacad, String studystart) {
+        this.studentnamet.setText(studentname);
+        this.studentbirtht.setText(studentbirth);
+        this.studentmatnumt.setText(studentmatnum);
+        
+        this.studynamet.setText(studyname);
+        this.studyacadt.setText(studyacad);
+        this.studystartt.setText(studystart);
     }
 
     /**
@@ -89,8 +111,8 @@ public class SBStudyPanel extends JPanel{
         studentpanel.setLayout(new GridLayout(3, 2, 5, 5));
         studentpanel.add(studentnamel);
         studentpanel.add(studentnamet);
-        studentpanel.add(studentbirthdl);
-        studentpanel.add(studentbirthdt);
+        studentpanel.add(studentbirthl);
+        studentpanel.add(studentbirtht);
         studentpanel.add(studentmatnuml);
         studentpanel.add(studentmatnumt);
 

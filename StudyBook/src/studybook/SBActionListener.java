@@ -12,9 +12,11 @@ import javax.swing.JMenuItem;
  * @author Admin
  */
 public class SBActionListener implements ActionListener {
-    SBView mainframe;
-    public SBActionListener(SBView mainframe) {
+    private SBView mainframe;
+    private SBController controller;
+    public SBActionListener(SBView mainframe,SBController controller) {
         this.mainframe = mainframe;
+        this.controller = controller;
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -26,11 +28,12 @@ public class SBActionListener implements ActionListener {
                 //---Datei---
                 //      Beenden
                 case "beenden":
-                    System.exit(0);
+                    controller.setStudyPanel();
                     break;
                 //---Hilfe---
                 //      Über
                 case "ueber":
+                    controller.setHelpPanel();
                     //JLabel mainlabel = new JLabel(new ImageIcon(getClass().getResource("/bilder/transp.gif")));
                     //mainlabel.setMinimumSize(new Dimension(20,20));
                     //mainframe.setMainFrame(mainlabel);
