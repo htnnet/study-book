@@ -12,10 +12,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 
-
 /**
- * Die grafischen Oberfläche bildet das Herzstück des Programms. Hierüber
- * kann der Benutzer sein Studium verwalten.
+ * Die grafischen Oberfläche bildet das Herzstück des Programms. Hierüber kann
+ * der Benutzer sein Studium verwalten.
+ *
+ * @author StudyBook-Crew
+ * @version 0.1
+ * @since 2012-10-14
  */
 public class SBView extends JFrame {
 
@@ -24,102 +27,28 @@ public class SBView extends JFrame {
     private JPanel cpanel;
     private JPanel lpanel;
     private JPanel rpanel;
-    private JLabel statusbar;
+    private JLabel statusBar;
     private JSplitPane splitpane;
-    private MenuBar menuBar;
+    private JMenuBar menuBar;
     private JMenu menu;
-    //private JMenuItem newProfile;
-    //private JMenuItem openProfile;
-    //private JMenuItem saveProfile;
-    //private JMenuItem saveAsProfile;
-    //private JMenuItem exit;
-    private JMenuBar menubar = new JMenuBar(); //Menue
-    private JMenu menubar_datei = new JMenu("Datei"); //Datei
-    private JMenuItem menubar_datei_neues_profil = new JMenuItem("Neues Profil"); //Datei --> Neues Profil
-    private JMenuItem menubar_datei_beenden = new JMenuItem("Beenden"); //Datei --> Beenden
-    private JMenu menubar_bearbeiten = new JMenu("Bearbeiten"); //Bearbeiten
-    private JMenu menubar_hilfe = new JMenu("Hilfe"); //Hilfe
-    private JMenuItem menubar_hilfe_ueber = new JMenuItem("Über"); //Hilfe --> Ueber
-    private JTree baum; //Baum, linke Seite
-    private TreeNode wurzel; //Wurzel des JTree's !!!Muss datenbankbasiert werden, da mehrere Studiengaenge moeglich
+    private ImageIcon itemIcon;
+    private JMenuItem menuItem;
+    private JTree tree; //Baum, linke Seite
+    private TreeNode root; //Wurzel des JTree's !!!Muss datenbankbasiert werden, da mehrere Studiengaenge moeglich
     private ActionListener alistener; //ActionListener fuer Fenster
-    
     private SBStudyPanel sbstudypanel;
     private SBHelpPanel sbhelppanel;
+
     /**
      * Konstruktor der Klasse "SBView"
      *
      * @param controller das Controller-Objekt
      */
-    public SBView(SBController controller,SBStudyPanel sbstudypanel,SBHelpPanel sbhelppanel) {
-        alistener = new SBActionListener(this,controller); //ActionListener initialisieren
+    public SBView(SBController controller, SBStudyPanel sbstudypanel, SBHelpPanel sbhelppanel) {
+        alistener = new SBActionListener(this, controller); //ActionListener initialisieren
         this.controller = controller;
         this.sbstudypanel = sbstudypanel;
         this.sbhelppanel = sbhelppanel;
-    }
-
-
-    MouseAdapter ma = new MouseAdapter() { //MouseListener, vielleicht auch in eigene Klasse auslagern?
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (SwingUtilities.isRightMouseButton(e)) {
-                int row = baum.getClosestRowForLocation(e.getX(), e.getY());
-                baum.setSelectionRow(row);
-                System.out.println(row + "" + e.getComponent() + "" + e.getX() + e.getY());
-                JPopupMenu popup = new JPopupMenu();
-                popup.add(new JMenuItem("popup: " + row));
-                
-                popup.show(baum, e.getX(), e.getY()); //Problem: Wie Blatt von Baum eindeutig identifizieren??
-                //row aendert sich, jenachdem, wie weit der Baum ausgeklappt ist
-            }
-        }
-    };
-
-    private static TreeNode createTree() { //Baum erstellen
-        DefaultMutableTreeNode wurzel = new DefaultMutableTreeNode("Technische Informatik B.Sc.");
-
-        for (int i = 1; i < 8; i++) {
-            DefaultMutableTreeNode semester = new DefaultMutableTreeNode(i + ". Semester");
-            DefaultMutableTreeNode modul1 = new DefaultMutableTreeNode("MATHE1");
-            DefaultMutableTreeNode modul2 = new DefaultMutableTreeNode("GELEK1");
-            DefaultMutableTreeNode modul3 = new DefaultMutableTreeNode("INFORM");
-            DefaultMutableTreeNode modul4 = new DefaultMutableTreeNode("PROG1");
-            DefaultMutableTreeNode modul5 = new DefaultMutableTreeNode("ENGL1");
-            semester.add(modul1);
-            semester.add(modul2);
-            semester.add(modul3);
-            semester.add(modul4);
-            semester.add(modul5);
-            wurzel.add(semester);
-        }
-        return wurzel;
-    }
-
-/**
-
-    private Object[][] menuData() {
-        return {{"Datei",{"Neues Profil", }};
-    }
-    }
-    **/
-
-    public void createMenuBar() {
-        menubar.add(menubar_datei);
-        menubar_datei.add(menubar_datei_neues_profil);
-        menubar_datei.add(menubar_datei_beenden);
-        menubar_datei_beenden.setActionCommand("beenden");
-        menubar_datei_beenden.addActionListener(alistener);
-
-        menubar.add(menubar_bearbeiten);
-
-        menubar.add(menubar_hilfe);
-        menubar_hilfe.add(menubar_hilfe_ueber);
-        menubar_hilfe_ueber.setActionCommand("ueber");
-        menubar_hilfe_ueber.addActionListener(alistener);
-
-        menubar_datei.setMnemonic('D');
-        menubar_bearbeiten.setMnemonic('B');
-        menubar_hilfe.setMnemonic('H');
     }
 
     /**
@@ -141,57 +70,14 @@ public class SBView extends JFrame {
         cpanel = new JPanel();
         splitpane = new JSplitPane();
         splitpane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-
-        wurzel = createTree(); //Baum erstellen
-        baum = new JTree(wurzel);
-        DefaultTreeCellRenderer tree_renderer = new DefaultTreeCellRenderer() {
-            {
-                setLeafIcon(new ImageIcon(getClass().getResource("/pics/schreibblock_icon.gif"))); //Icon von Blaettern
-                setOpenIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn aufgeklappt
-                setClosedIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn zugeklappt
-            }
-        };
-        baum.setCellRenderer(tree_renderer); //Renderer dem Baum hinzufuegen
-        baum.addMouseListener(ma); //MouseListener dem Baum hinzufuegen
-
-
-        lpanel = new JPanel();
-
-        // Hier wird das Aussehen des rechten Panels mit folgenden Befehlen bestimmt
-        //rpanel = sbstudypanel;
-        //rpanel = new SBSemesterPanel();
-        //rpanel = new SBModulePanel();
-        //rpanel = new SBHelpPanel();
-        // Später soll es über SBController wahlweise bestimmt werden
-
         splitpane.setDividerLocation(200);
 
-        frame.setContentPane(cpanel);
+        lpanel = new JPanel();
+        this.createTree();
+        this.createMenuBar();
+        this.createStatusBar();
 
-        statusbar = new JLabel("Ich bin eine Statusbar, die rot werden kann, wenn Fehler auftreten");
-        statusbar.setOpaque(true);  // für das Setzen der Hintergrundfarbe
-        statusbar.setBackground(Color.red);
-        statusbar.setForeground(Color.white);
-        statusbar.setHorizontalAlignment(SwingConstants.CENTER);
-    }
-    
-    public void showError(String message) {
-        statusbar.setText(message);
-        statusbar.setVisible(true);
-    }
-    
-    public void safe() {
-        //Speichern der veränderten Daten
-        switch(controller.getActivePanel()) {
-            case "sbstudypanel":
-                sbstudypanel.safe(controller);
-                break;
-        }
-    }
-    
-    public void setRightPanel(JPanel panel) {
-        rpanel = panel;
-        layoutMainFrame();
+        frame.setContentPane(cpanel);
     }
 
     /**
@@ -202,14 +88,12 @@ public class SBView extends JFrame {
         frame.setLayout(new BorderLayout());
 
         lpanel.setLayout(new BorderLayout());
-        lpanel.add(baum);
+        lpanel.add(tree);
 
         splitpane.setLeftComponent(lpanel);
         splitpane.setRightComponent(rpanel);
 
-        frame.add(menubar, BorderLayout.NORTH);
-        frame.add(statusbar, BorderLayout.SOUTH);
-        statusbar.setVisible(false);
+        frame.add(statusBar, BorderLayout.SOUTH);
         frame.add(splitpane, BorderLayout.CENTER);
 
         frame.pack();
@@ -217,5 +101,176 @@ public class SBView extends JFrame {
         frame.setResizable(true);
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);  // Zentrieren
+    }
+
+
+    /**
+     * Hier wird die MenuBar mitsamt ihren Menus und MenuItems erzeugt, die dem
+     * Benutzer Interaktionsmögichkeiten mit dem Programm ermöglichen.
+     */
+    private void createMenuBar() {
+        menuBar = new JMenuBar();
+
+        // Datei
+        menu = new JMenu("Datei");
+        menu.setMnemonic('D');
+
+        menuItem = new JMenuItem("Neues Profil", 'N');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/new16x16.png"));
+        KeyStroke ctrlNKeyStroke = KeyStroke.getKeyStroke("control N");
+        menuItem.setIcon(itemIcon);
+        menuItem.setAccelerator(ctrlNKeyStroke);
+        menuItem.setActionCommand("new");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menu.addSeparator();
+
+        menuItem = new JMenuItem("Profil öffnen", 'ö');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/open16x16.png"));
+        KeyStroke ctrlOKeyStroke = KeyStroke.getKeyStroke("control O");
+        menuItem.setIcon(itemIcon);
+        menuItem.setAccelerator(ctrlOKeyStroke);
+        menuItem.setActionCommand("open");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menu.addSeparator();
+
+        menuItem = new JMenuItem("Profil speichern", 's');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/save16x16.png"));
+        KeyStroke ctrlSKeyStroke = KeyStroke.getKeyStroke("control S");
+        menuItem.setIcon(itemIcon);
+        menuItem.setAccelerator(ctrlSKeyStroke);
+        menuItem.setActionCommand("save");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Profil speichern unter...", 'u');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/saveas16x16.png"));
+        menuItem.setIcon(itemIcon);
+        menuItem.setActionCommand("saveas");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menu.addSeparator();
+
+        menuItem = new JMenuItem("Beenden", 'e');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/exit16x16.png"));
+        menuItem.setIcon(itemIcon);
+        menuItem.setActionCommand("exit");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menuBar.add(menu);
+
+        // Bearbeiten
+        menu = new JMenu("Bearbeiten");
+        menu.setMnemonic('B');
+
+        menuItem = new JMenuItem("Knoten hinzufügen", 'h');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/add16x16.png"));
+        KeyStroke ctrlAKeyStroke = KeyStroke.getKeyStroke("control A");
+        menuItem.setIcon(itemIcon);
+        menuItem.setAccelerator(ctrlAKeyStroke);
+        menuItem.setActionCommand("add");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Knoten entfernen", 'e');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/remove16x16.png"));
+        KeyStroke ctrlRKeyStroke = KeyStroke.getKeyStroke("control R");
+        menuItem.setIcon(itemIcon);
+        menuItem.setAccelerator(ctrlRKeyStroke);
+        menuItem.setActionCommand("remove");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menuBar.add(menu);
+
+        // Hilfe
+        menu = new JMenu("Hilfe");
+        menu.setMnemonic('H');
+
+        menuItem = new JMenuItem("Hilfe", 'H');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/help16x16.png"));
+        menuItem.setIcon(itemIcon);
+        menuItem.setActionCommand("help");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Über", 'Ü');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/about16x16.png"));
+        menuItem.setIcon(itemIcon);
+        menuItem.setActionCommand("about");
+        menuItem.addActionListener(alistener);
+        menu.add(menuItem);
+
+        menuBar.add(menu);
+        frame.setJMenuBar(menuBar);
+    }
+
+    /**
+     * Die StatusBar fungiert in erster Linie dazu dem Benutzer über
+     * aufgetretene Fehler zu unterrichten. Hierbei wird sie rot, um die Blicke
+     * des Benutzers auf sich zu lenken.
+     */
+    private void createStatusBar() {
+        statusBar = new JLabel("Ich bin eine Statusbar, die rot werden kann, wenn Fehler auftreten");
+        statusBar.setOpaque(true);  // für das Setzen der Hintergrundfarbe
+        statusBar.setBackground(Color.red);
+        statusBar.setForeground(Color.white);
+        statusBar.setVisible(false);
+        statusBar.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    private void createTree() { //Baum erstellen
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Technische Informatik B.Sc.");
+
+        for (int i = 1; i < 8; i++) {
+            DefaultMutableTreeNode semester = new DefaultMutableTreeNode(i + ". Semester");
+            DefaultMutableTreeNode modul1 = new DefaultMutableTreeNode("MATHE1");
+            DefaultMutableTreeNode modul2 = new DefaultMutableTreeNode("GELEK1");
+            DefaultMutableTreeNode modul3 = new DefaultMutableTreeNode("INFORM");
+            DefaultMutableTreeNode modul4 = new DefaultMutableTreeNode("PROG1");
+            DefaultMutableTreeNode modul5 = new DefaultMutableTreeNode("ENGL1");
+            semester.add(modul1);
+            semester.add(modul2);
+            semester.add(modul3);
+            semester.add(modul4);
+            semester.add(modul5);
+            root.add(semester);
+        }
+
+        tree = new JTree(root);
+        DefaultTreeCellRenderer tree_renderer = new DefaultTreeCellRenderer() {
+            {
+                setLeafIcon(new ImageIcon(getClass().getResource("/pics/schreibblock_icon.gif"))); //Icon von Blaettern
+                setOpenIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn aufgeklappt
+                setClosedIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn zugeklappt
+            }
+        };
+        tree.setCellRenderer(tree_renderer); //Renderer dem Baum hinzufuegen
+        tree.addMouseListener(new SBMouseListener(controller, tree)); //MouseListener dem Baum hinzufuegen
+
+    }
+
+    public void showError(String message) {
+        statusBar.setText(message);
+        statusBar.setVisible(true);
+    }
+
+    public void save() {
+        //Speichern der veränderten Daten
+        switch (controller.getActivePanel()) {
+            case "sbstudypanel":
+                sbstudypanel.save(controller);
+                break;
+        }
+    }
+
+    public void setRightPanel(JPanel panel) {
+        rpanel = panel;
+        layoutMainFrame();
     }
 }

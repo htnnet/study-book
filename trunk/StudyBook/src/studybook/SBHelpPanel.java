@@ -6,6 +6,10 @@ import javax.swing.*;
 
 /**
  * Das Hilfspanel.
+ * 
+ * @author StudyBook-Crew
+ * @version 0.1
+ * @since 2012-10-14
  */
 public class SBHelpPanel extends JPanel {
     private JLabel hilfe;

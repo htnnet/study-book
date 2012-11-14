@@ -8,7 +8,12 @@ import javax.swing.table.TableColumn;
 
 /**
  * Hierin befindet sich das Panel für die Semesterverwaltung.
+ *
+ * @author StudyBook-Crew
+ * @version 0.1
+ * @since 2012-10-14
  */
+
 public class SBSemesterPanel extends JPanel {
     private Border margin;
     private Border timetabletborder;

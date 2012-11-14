@@ -8,32 +8,71 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 
 /**
+ * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und
+ * reagiert entsprechend.
  *
- * @author Admin
+ * @author StudyBook-Crew
+ * @version 0.1
+ * @since 2012-10-14
  */
 public class SBActionListener implements ActionListener {
-    private SBView mainframe;
+    private SBView view;
     private SBController controller;
-    public SBActionListener(SBView mainframe,SBController controller) {
-        this.mainframe = mainframe;
+    public SBActionListener(SBView view, SBController controller) {
+        this.view = view;
         this.controller = controller;
     }
+
+     /**
+     * Reagiert auf das Anklicken eines MenuItems in der MenuBar.
+     *
+     * @param event das Action-Event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
-        //Menuebuttons
         if (obj instanceof JMenuItem) {
             String cmd = e.getActionCommand();
             switch (cmd) {
                 //---Datei---
-                //      Beenden
-                case "beenden":
+                // Neues Profil
+                case "new":
+                    break;
+
+                // Profil öffnen
+                case "open":
                     controller.setStudyPanel();
                     break;
+
+                // Profil speichern
+                case "save":
+                    break;
+
+                // Profils speichern unter...
+                case "saveas":
+                    break;
+
+                // Beenden
+                case "exit":
+                    System.exit(0);
+                    break;
+
+                //---Bearbeiten---
+                // Knoten hinzufügen
+                case "add":
+                    break;
+
+                // Knoten entfernen
+                case "remove":
+                    break;
+
                 //---Hilfe---
-                //      Über
-                case "ueber":
+                // Hilfe
+                case "help":
                     controller.setHelpPanel();
+
+                // Über
+                case "about":
                     //JLabel mainlabel = new JLabel(new ImageIcon(getClass().getResource("/bilder/transp.gif")));
                     //mainlabel.setMinimumSize(new Dimension(20,20));
                     //mainframe.setMainFrame(mainlabel);
