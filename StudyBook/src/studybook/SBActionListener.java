@@ -1,11 +1,9 @@
 package studybook;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 /**
  * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und
@@ -31,12 +29,17 @@ public class SBActionListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
+        view.hideStatusBar();
         if (obj instanceof JMenuItem) {
             String cmd = e.getActionCommand();
             switch (cmd) {
                 //---Datei---
                 // Neues Profil
                 case "new":
+                    String str = JOptionPane.showInputDialog(null, "Profilname: ", "Neues Profil anlegen", 1);
+                    if(str != null) {
+                        controller.createProfile(str);
+                    }
                     break;
 
                 // Profil öffnen
@@ -54,7 +57,7 @@ public class SBActionListener implements ActionListener {
 
                 // Beenden
                 case "exit":
-                    System.exit(0);
+                    controller.exit();
                     break;
 
                 //---Bearbeiten---

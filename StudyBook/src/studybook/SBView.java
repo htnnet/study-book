@@ -63,8 +63,7 @@ public class SBView extends JFrame {
         } catch (IOException e) {
             System.err.println(e.toString());
         }
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(new SBWindowListener(controller));
         frame.setResizable(false);
 
         cpanel = new JPanel();
@@ -220,8 +219,8 @@ public class SBView extends JFrame {
         statusBar.setOpaque(true);  // für das Setzen der Hintergrundfarbe
         statusBar.setBackground(Color.red);
         statusBar.setForeground(Color.white);
-        statusBar.setVisible(false);
         statusBar.setHorizontalAlignment(SwingConstants.CENTER);
+        this.hideStatusBar();
     }
 
     private void createTree() { //Baum erstellen
@@ -258,6 +257,10 @@ public class SBView extends JFrame {
     public void showError(String message) {
         statusBar.setText(message);
         statusBar.setVisible(true);
+    }
+    
+    public void hideStatusBar() {
+        statusBar.setVisible(false);
     }
 
     public void save() {
