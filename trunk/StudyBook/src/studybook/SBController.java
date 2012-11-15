@@ -1,6 +1,12 @@
 package studybook;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -13,9 +19,10 @@ import java.sql.SQLException;
  * @since 2012-10-14
  */
 public class SBController {
+
     private SBModel model;
     private SBView view;
-    private String profilname;
+    private String profilname = null;
     private SBStudyPanel sbstudypanel = new SBStudyPanel();
     private SBHelpPanel sbhelppanel = new SBHelpPanel();
     private String activePanel = "sbstudypanel"; //Startpanel festlegen
@@ -23,13 +30,36 @@ public class SBController {
 
     public SBController(SBModel model) {
         this.model = model;
-        profilname = "test4";
-        this.createProfile(profilname); //Testaufruf createProfile
         this.initialize();
     }
 
+    private void loadSettings() {
+        try {
+            BufferedReader in = new BufferedReader(new FileReader("settings.sbc"));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                profilname = line;
+            }
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+        }
+    }
+
+    public void saveSettings() {
+        if (profilname != null) {
+            try {
+                BufferedWriter out = new BufferedWriter(new FileWriter("settings.sbc"));
+                out.write(profilname);
+                out.flush();
+                out.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+
     private void initialize() {
-        view = new SBView(this,sbstudypanel,sbhelppanel);
+        this.loadSettings();
+        view = new SBView(this, sbstudypanel, sbhelppanel);
         view.createMainFrame();
         view.layoutMainFrame();
         this.setStudyPanel();
@@ -41,13 +71,20 @@ public class SBController {
         view.setRightPanel(sbhelppanel);
         activePanel = "sbhelppanel";
     }
-
+    
+    public void exit() {
+        this.saveSettings();
+        System.exit(0);
+    }
+    
     public void setStudyPanel() {
         SBModel db = this.dbconnect();
-        if(db != null) {
-            if(!initialize) view.save();
+        if (db != null) {
+            if (!initialize) {
+                view.save();
+            }
             try {
-                ResultSet rs = db.get("SELECT * FROM allgemeindaten"); //Alles von der Tabelle Studiengaenge holen
+                ResultSet rs = db.get("SELECT * FROM allgemeindaten"); //Alles von der Tabelle allgemeindaten holen
                 while (rs.next()) {
                     sbstudypanel.setFields(rs.getString("studentname"),
                             rs.getString("studentbirth"),
@@ -59,11 +96,11 @@ public class SBController {
             } catch (SQLException e) {
                 System.err.println(e);
             }
-            view.setRightPanel(sbstudypanel);
-            activePanel = "sbstudypanel";
         } else {
             view.showError("Fehler bei dem Lesen des Profils! Profil erstellt?");
         }
+        activePanel = "sbstudypanel";
+        view.setRightPanel(sbstudypanel);
     }
 
     public String getActivePanel() {
@@ -71,26 +108,26 @@ public class SBController {
     }
 
     public SBModel dbconnect() {
-        if(!new File(profilname+".sb").exists()) {
+        if (!new File(profilname + ".sbprofile").exists()) {
             view.showError("Noch kein Profil erstellt!");
             return null;
         } else {
             SBModel sqltest = this.model;
-            sqltest.connect(profilname + ".sb");
+            sqltest.connect(profilname + ".sbprofile");
             return sqltest;
         }
     }
 
-    private void createProfile(String name) {
+    public void createProfile(String name) {
         SBModel db = this.model;
-        db.connect(name + ".profile");
+        db.connect(name + ".sbprofile");
         db.query("CREATE TABLE IF NOT EXISTS 'allgemeindaten' ("
- + "'studentname' varchar(100) NOT NULL,"
- + "'studentbirth' varchar(100) NOT NULL,"
- + "'studentmatnum' varchar(100) NOT NULL,"
- + "'studyname' varchar(100) NOT NULL,"
- + "'studyacad' varchar(100) NOT NULL,"
- + "'studystart' varchar(20) NOT NULL);");
+                + "'studentname' varchar(100) NOT NULL,"
+                + "'studentbirth' varchar(100) NOT NULL,"
+                + "'studentmatnum' varchar(100) NOT NULL,"
+                + "'studyname' varchar(100) NOT NULL,"
+                + "'studyacad' varchar(100) NOT NULL,"
+                + "'studystart' varchar(20) NOT NULL);");
         db.query("INSERT INTO allgemeindaten (studentname,studentbirth,studentmatnum,studyname,studyacad,studystart)"
                 + "VALUES ('','','','','','');");
         db.query("CREATE TABLE IF NOT EXISTS studiengaenge (name);"); //Erstelle Tabelle fuer Studiengaenge
@@ -103,5 +140,6 @@ public class SBController {
         } catch (SQLException e) {
             System.err.println(e);
         }
+        profilname = name;
     }
 }
