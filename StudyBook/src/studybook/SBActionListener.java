@@ -2,26 +2,31 @@ package studybook;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 /**
- * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und
- * reagiert entsprechend.
+ * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und reagiert
+ * entsprechend.
  *
  * @author StudyBook-Crew
  * @version 0.1
  * @since 2012-10-14
  */
 public class SBActionListener implements ActionListener {
+
     private SBView view;
     private SBController controller;
+
     public SBActionListener(SBView view, SBController controller) {
         this.view = view;
         this.controller = controller;
     }
 
-     /**
+    /**
      * Reagiert auf das Anklicken eines MenuItems in der MenuBar.
      *
      * @param event das Action-Event
@@ -37,14 +42,31 @@ public class SBActionListener implements ActionListener {
                 // Neues Profil
                 case "new":
                     String str = JOptionPane.showInputDialog(null, "Profilname: ", "Neues Profil anlegen", 1);
-                    if(str != null) {
+                    if (str != null) {
                         controller.createProfile(str);
                     }
                     break;
 
                 // Profil öffnen
                 case "open":
-                    controller.setStudyPanel();
+                    JFileChooser chooser = new JFileChooser();
+                    FileFilter ff = new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return f.getName().toLowerCase().endsWith(".sbprofile") || f.isDirectory();
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return "StudyBook Profile (*.sbprofile)";
+                        }
+                    };
+                    chooser.setFileFilter(ff);
+                    chooser.setAcceptAllFileFilterUsed(false);
+                    int rueckgabeWert = chooser.showOpenDialog(null);
+                    if (rueckgabeWert == JFileChooser.APPROVE_OPTION) {
+                        controller.changeProfile(chooser.getSelectedFile().getPath());
+                    }
                     break;
 
                 // Profil speichern

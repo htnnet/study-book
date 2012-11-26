@@ -55,6 +55,7 @@ public class SBController {
             } catch (IOException e) {
             }
         }
+        view.save();
     }
 
     private void initialize() {
@@ -99,6 +100,7 @@ public class SBController {
         } else {
             view.showError("Fehler bei dem Lesen des Profils! Profil erstellt?");
         }
+        System.out.println(profilname);
         activePanel = "sbstudypanel";
         view.setRightPanel(sbstudypanel);
     }
@@ -106,7 +108,14 @@ public class SBController {
     public String getActivePanel() {
         return activePanel;
     }
-
+    
+    public void changeProfile(String path) {
+        view.save();
+        profilname = path.substring(0,path.length()-10);
+        this.dbconnect();
+        this.setStudyPanel();
+    }
+    
     public SBModel dbconnect() {
         if (!new File(profilname + ".sbprofile").exists()) {
             view.showError("Noch kein Profil erstellt!");
@@ -114,6 +123,7 @@ public class SBController {
         } else {
             SBModel sqltest = this.model;
             sqltest.connect(profilname + ".sbprofile");
+            view.setFrameTitle(profilname+".sbprofile");
             return sqltest;
         }
     }
