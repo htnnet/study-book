@@ -78,6 +78,11 @@ public class SBView extends JFrame {
 
         frame.setContentPane(cpanel);
     }
+    
+    public void setFrameTitle(String path) {
+        frame.setTitle("StudyBook - "+path);
+        frame.revalidate();
+    }
 
     /**
      * Sorgt dafür, dass jede GUI-Komponente des Hauptfensters an ihren rechten
