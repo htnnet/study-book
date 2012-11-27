@@ -83,6 +83,11 @@ public class SBView extends JFrame {
         frame.setTitle("StudyBook - "+path);
         frame.revalidate();
     }
+    
+    public void setStandardTitle() {
+        frame.setTitle("StudyBook");
+        frame.revalidate();
+    }
 
     /**
      * Sorgt dafür, dass jede GUI-Komponente des Hauptfensters an ihren rechten

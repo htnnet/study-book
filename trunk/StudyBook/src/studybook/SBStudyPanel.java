@@ -84,6 +84,7 @@ public class SBStudyPanel extends JPanel{
     }
 
     public void save(SBController controller) {
+        System.err.println("save StudyPanel");
         SBModel db = controller.dbconnect();
         if(db != null) {
         db.query("UPDATE allgemeindaten SET studentname = '"+studentnamet.getText()+"',"
