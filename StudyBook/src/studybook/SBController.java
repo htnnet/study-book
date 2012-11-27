@@ -27,6 +27,7 @@ public class SBController {
     private SBHelpPanel sbhelppanel = new SBHelpPanel();
     private String activePanel = "sbstudypanel"; //Startpanel festlegen
     private boolean initialize = true;
+    private boolean profile_changed = false;
 
     public SBController(SBModel model) {
         this.model = model;
@@ -81,7 +82,7 @@ public class SBController {
     public void setStudyPanel() {
         SBModel db = this.dbconnect();
         if (db != null) {
-            if (!initialize) {
+            if (!initialize && !profile_changed) {
                 view.save();
             }
             try {
@@ -112,6 +113,7 @@ public class SBController {
     public void changeProfile(String path) {
         view.save();
         profilname = path.substring(0,path.length()-10);
+        profile_changed = true;
         this.dbconnect();
         this.setStudyPanel();
     }
@@ -150,6 +152,6 @@ public class SBController {
         } catch (SQLException e) {
             System.err.println(e);
         }
-        profilname = name;
+        this.changeProfile(name+".sbprofile");
     }
 }
