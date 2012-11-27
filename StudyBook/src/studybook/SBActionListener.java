@@ -20,10 +20,22 @@ public class SBActionListener implements ActionListener {
 
     private SBView view;
     private SBController controller;
+    FileFilter ff = null;
 
     public SBActionListener(SBView view, SBController controller) {
         this.view = view;
         this.controller = controller;
+        ff = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().toLowerCase().endsWith(".sbprofile") || f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "StudyBook Profile (*.sbprofile)";
+            }
+        };
     }
 
     /**
@@ -50,17 +62,7 @@ public class SBActionListener implements ActionListener {
                 // Profil öffnen
                 case "open":
                     JFileChooser chooser = new JFileChooser();
-                    FileFilter ff = new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            return f.getName().toLowerCase().endsWith(".sbprofile") || f.isDirectory();
-                        }
 
-                        @Override
-                        public String getDescription() {
-                            return "StudyBook Profile (*.sbprofile)";
-                        }
-                    };
                     chooser.setFileFilter(ff);
                     chooser.setAcceptAllFileFilterUsed(false);
                     int rueckgabeWert = chooser.showOpenDialog(null);
@@ -71,10 +73,18 @@ public class SBActionListener implements ActionListener {
 
                 // Profil speichern
                 case "save":
+
                     break;
 
                 // Profils speichern unter...
                 case "saveas":
+                    JFileChooser saver = new JFileChooser();
+                    saver.setFileFilter(ff);
+                    saver.setAcceptAllFileFilterUsed(false);
+                    rueckgabeWert = saver.showSaveDialog(null);
+                    if (rueckgabeWert == JFileChooser.APPROVE_OPTION) {
+                        controller.saveProfile(saver.getSelectedFile().getPath());
+                    }
                     break;
 
                 // Beenden
