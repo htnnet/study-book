@@ -108,9 +108,7 @@ public class SBActionListener implements ActionListener {
 
                 // Über
                 case "about":
-                    //JLabel mainlabel = new JLabel(new ImageIcon(getClass().getResource("/bilder/transp.gif")));
-                    //mainlabel.setMinimumSize(new Dimension(20,20));
-                    //mainframe.setMainFrame(mainlabel);
+                    controller.showModulePanel();
                     break;
             }
         }

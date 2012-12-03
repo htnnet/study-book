@@ -25,6 +25,7 @@ public class SBController {
     private String profilname = null;
     private SBStudyPanel sbstudypanel = new SBStudyPanel();
     private SBHelpPanel sbhelppanel = new SBHelpPanel();
+    private SBModulePanel sbmodulepanel = new SBModulePanel();
     private String activePanel = "sbstudypanel"; //Startpanel festlegen
     private boolean initialize = true;
     private boolean profile_changed = false;
@@ -69,17 +70,23 @@ public class SBController {
         initialize = false;
     }
 
+    public void showModulePanel() {
+        view.save();
+        view.setRightPanel(sbmodulepanel);
+        activePanel = "sbmodulepanel";
+    }
+
     public void setHelpPanel() {
         view.save();
         view.setRightPanel(sbhelppanel);
         activePanel = "sbhelppanel";
     }
-    
+
     public void exit() {
         this.saveSettings();
         System.exit(0);
     }
-    
+
     public void saveProfile(String path) {
         profileSaveAs = true;
         if(path.substring(path.length()-10,path.length()).equals(".sbprofile")) {
@@ -88,7 +95,7 @@ public class SBController {
         profilname = path+".sbprofile";
         this.createProfile(path);
     }
-    
+
     public void setStudyPanel() {
         SBModel db = this.dbconnect();
         if (db != null) {
@@ -121,7 +128,7 @@ public class SBController {
     public String getActivePanel() {
         return activePanel;
     }
-    
+
     public void changeProfile(String path) {
         System.out.println("changeprofile " +path);
         view.save();
@@ -130,7 +137,7 @@ public class SBController {
         this.dbconnect();
         this.setStudyPanel();
     }
-    
+
     public SBModel dbconnect() {
         if (!new File(profilname + ".sbprofile").exists()) {
             view.showError("Noch kein Profil erstellt!");

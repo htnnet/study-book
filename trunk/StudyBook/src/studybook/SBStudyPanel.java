@@ -4,135 +4,210 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableModel;
+
 /**
  * Enthält das Panel für die Studiengangverwaltung.
+ *
  * @author StudyBook-Crew
  * @version 0.1
  * @since 2012-10-14
  */
-public class SBStudyPanel extends JPanel{
-    private JPanel studentstudypanel;
-    private JPanel studentpanel;
-    private JPanel studypanel;
-    private JPanel progresspanel;
+public class SBStudyPanel extends JPanel {
+
+    private SBTable gradeTable;
+    private DefaultTableModel tableModel;
+    private JPanel northPanel;
+    private JPanel studentPanel;
+    private JPanel studentLabelPanel;
+    private JPanel studentFieldPanel;
+    private JPanel studyPanel;
+    private JPanel studyLabelPanel;
+    private JPanel studyFieldPanel;
+    private JPanel progressPanel;
+    private Border studentCompBorder;
+    private Border studentTitledBorder;
+    private Border studyCompBorder;
+    private Border studyTitledBorder;
+    private Border progressCompBorder;
+    private Border progressTitledBorder;
     private Border margin;
-    private Border studenttborder;
-    private Border studentcborder;
-    private Border studytborder;
-    private Border studycborder;
-    private Border progresstborder;
-    private Border progresscborder;
-    private JLabel studentnamel;
-    private JLabel studentbirthl;
-    private JLabel studentmatnuml;
-    private JLabel studynamel;
-    private JLabel studyacadl;
-    private JLabel studystartl;
-    private JTextField studentnamet;
-    private JTextField studentbirtht;
-    private JTextField studentmatnumt;
-    private JTextField studynamet;
-    private JTextField studyacadt;
-    private JTextField studystartt;
+    private JLabel studentNameLabel;
+    private JLabel studentBirthLabel;
+    private JLabel studentMatLabel;
+    private JLabel studyNameLabel;
+    private JLabel studyAcadLabel;
+    private JLabel studyStartLabel;
+    private JTextField studentNameField;
+    private JTextField studentBirthField;
+    private JTextField studentMatField;
+    private JTextField studyNameField;
+    private JTextField studyAcadField;
+    private JTextField studyStartField;
 
-
+    /**
+     * Konstruktor der Klasse SBStudyPanel.
+     */
     public SBStudyPanel() {
         this.createStudyPanel();
         this.layoutStudyPanel();
     }
 
-
     /**
-    * Erstellt das Panel zur Studiengangverwaltung, das dem Benutzer unter
-    * anderem einen Einblick in seinen Studienfortschritt gewährt.
-    */
+     * Erstellt das Panel zur Studiengangverwaltung, das dem Benutzer unter
+     * anderem einen Einblick in seinen Studienfortschritt gewährt.
+     */
     private void createStudyPanel() {
-        studentstudypanel = new JPanel();
+        northPanel = new JPanel();
 
         margin = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
-        studentpanel = new JPanel();
-        studenttborder = BorderFactory.createTitledBorder("Student");
-        studentcborder = BorderFactory.createCompoundBorder(studenttborder, margin);
-        studentpanel.setBorder(studentcborder);
+        studentPanel = new JPanel();
+        studentTitledBorder = BorderFactory.createTitledBorder("Student");
+        studentCompBorder = BorderFactory.createCompoundBorder(margin, studentTitledBorder);
+        studentPanel.setBorder(studentCompBorder);
 
-        studypanel = new JPanel();
-        studytborder = BorderFactory.createTitledBorder("Studiengang");
-        studycborder = BorderFactory.createCompoundBorder(studytborder, margin);
-        studypanel.setBorder(studycborder);
+        studyPanel = new JPanel();
+        studyTitledBorder = BorderFactory.createTitledBorder("Studiengang");
+        studyCompBorder = BorderFactory.createCompoundBorder(margin, studyTitledBorder);
+        studyPanel.setBorder(studyCompBorder);
 
-        progresspanel = new JPanel();
-        progresstborder = BorderFactory.createTitledBorder("Fortschritt");
-        progresscborder = BorderFactory.createCompoundBorder(progresstborder, margin);
-        progresspanel.setBorder(progresscborder);
+        progressPanel = new JPanel();
+        progressTitledBorder = BorderFactory.createTitledBorder("Fortschritt");
+        progressCompBorder = BorderFactory.createCompoundBorder(margin, progressTitledBorder);
+        progressPanel.setBorder(progressCompBorder);
 
-        studentnamel = new JLabel("Name:");
-        studentbirthl = new JLabel("Geburtsdatum:");
-        studentmatnuml = new JLabel("Matrikelnummer:");
+        studentLabelPanel = new JPanel();
+        studentLabelPanel.setBorder(margin);
 
-        studynamel = new JLabel("Name:");
-        studyacadl = new JLabel("Hochschule:");
-        studystartl = new JLabel("Studienbeginn:");
+        studentFieldPanel = new JPanel();
+        studentFieldPanel.setBorder(margin);
 
-        studentnamet = new JTextField();
-        studentbirtht = new JTextField();
-        studentmatnumt = new JTextField();
+        studyLabelPanel = new JPanel();
+        studyLabelPanel.setBorder(margin);
 
-        studynamet = new JTextField();
-        studyacadt = new JTextField();
-        studystartt = new JTextField();
-    }
+        studyFieldPanel = new JPanel();
+        studyFieldPanel.setBorder(margin);
 
-    public void save(SBController controller) {
-        System.err.println("save StudyPanel");
-        SBModel db = controller.dbconnect();
-        if(db != null) {
-        db.query("UPDATE allgemeindaten SET studentname = '"+studentnamet.getText()+"',"
-                + "studentbirth='"+studentbirtht.getText()+"',"
-                + "studentmatnum='"+studentmatnumt.getText()+"',"
-                + "studyname='"+studynamet.getText()+"',"
-                + "studyacad='"+studyacadt.getText()+"',"
-                + "studystart='"+studystartt.getText()+"';");
-        }
-    }
+        studentNameLabel = new JLabel("Name:");
+        studentBirthLabel = new JLabel("Geburtsdatum:");
+        studentMatLabel = new JLabel("Matrikelnummer:");
 
-    public void setFields(String studentname, String studentbirth, String studentmatnum, String studyname, String studyacad, String studystart) {
-        this.studentnamet.setText(studentname);
-        this.studentbirtht.setText(studentbirth);
-        this.studentmatnumt.setText(studentmatnum);
+        studyNameLabel = new JLabel("Name:");
+        studyAcadLabel = new JLabel("Hochschule:");
+        studyStartLabel = new JLabel("Studienbeginn:");
 
-        this.studynamet.setText(studyname);
-        this.studyacadt.setText(studyacad);
-        this.studystartt.setText(studystart);
+        studentNameField = new JTextField();
+        studentBirthField = new JTextField();
+        studentMatField = new JTextField();
+
+        studyNameField = new JTextField();
+        studyAcadField = new JTextField();
+        studyStartField = new JTextField();
     }
 
     /**
      * Damit die GUI-Komponenten an die richtige Stelle kommen.
      */
     private void layoutStudyPanel() {
-        // momentan noch GridLayout mit 5 Pixeln zum nächsten GUI-Element hin
-        studentpanel.setLayout(new GridLayout(3, 2, 5, 5));
-        studentpanel.add(studentnamel);
-        studentpanel.add(studentnamet);
-        studentpanel.add(studentbirthl);
-        studentpanel.add(studentbirtht);
-        studentpanel.add(studentmatnuml);
-        studentpanel.add(studentmatnumt);
+        studentLabelPanel.setLayout(new GridLayout(3, 1, 5, 5));
+        studentLabelPanel.add(studentNameLabel);
+        studentLabelPanel.add(studentBirthLabel);
+        studentLabelPanel.add(studentMatLabel);
 
-        studypanel.setLayout(new GridLayout(3, 2, 5, 5));
-        studypanel.add(studynamel);
-        studypanel.add(studynamet);
-        studypanel.add(studyacadl);
-        studypanel.add(studyacadt);
-        studypanel.add(studystartl);
-        studypanel.add(studystartt);
+        studentFieldPanel.setLayout(new GridLayout(3, 1, 5, 5));
+        studentFieldPanel.add(studentNameField);
+        studentFieldPanel.add(studentBirthField);
+        studentFieldPanel.add(studentMatField);
 
-        studentstudypanel.setLayout(new GridLayout(1,2));
-        studentstudypanel.add(studentpanel);
-        studentstudypanel.add(studypanel);
+        studyLabelPanel.setLayout(new GridLayout(3, 1, 5, 5));
+        studyLabelPanel.add(studyNameLabel);
+        studyLabelPanel.add(studyAcadLabel);
+        studyLabelPanel.add(studyStartLabel);
+
+        studyFieldPanel.setLayout(new GridLayout(3, 1, 5, 5));
+        studyFieldPanel.add(studyNameField);
+        studyFieldPanel.add(studyAcadField);
+        studyFieldPanel.add(studyStartField);
+
+        studentPanel.setLayout(new BorderLayout());
+        studentPanel.add(studentLabelPanel, BorderLayout.WEST);
+        studentPanel.add(studentFieldPanel, BorderLayout.CENTER);
+
+        studyPanel.setLayout(new BorderLayout());
+        studyPanel.add(studyLabelPanel, BorderLayout.WEST);
+        studyPanel.add(studyFieldPanel, BorderLayout.CENTER);
+
+        northPanel.setLayout(new GridLayout(1, 2));
+        northPanel.add(studentPanel);
+        northPanel.add(studyPanel);
 
         this.setLayout(new BorderLayout());
-        this.add(studentstudypanel, BorderLayout.NORTH);
-        this.add(progresspanel, BorderLayout.CENTER);
+        this.add(northPanel, BorderLayout.NORTH);
+        this.add(progressPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Getter-Methode für die Tabelle, die den Notenüberblick beinhaltet.
+     *
+     * @return die Notentabelle
+     */
+    public SBTable getTable() {
+        return this.gradeTable;
+    }
+
+    /**
+     * Getter-Methode für das Holen der Textfeldwerte.
+     *
+     * @return die eingetragenen Textfeldwerte
+     */
+    public String[] getFields() {
+        String[] fields = {
+            this.studentNameField.getText(),
+            this.studentBirthField.getText(),
+            this.studentMatField.getText(),
+            this.studyNameField.getText(),
+            this.studyAcadField.getText(),
+            this.studyStartField.getText()
+        };
+        return fields;
+    }
+
+    /**
+     * Setter-Methode für das Setzen der Textfelwerte.
+     *
+     * @param fields die einzutragenen Textfeldwerte
+     */
+    public void setFields(String[] fields) {
+        this.studentNameField.setText(fields[0]);
+        this.studentBirthField.setText(fields[1]);
+        this.studentMatField.setText(fields[2]);
+
+        this.studyNameField.setText(fields[3]);
+        this.studyAcadField.setText(fields[4]);
+        this.studyStartField.setText(fields[5]);
+    }
+
+    public void save(SBController controller) {
+        System.err.println("save studyPanel");
+        SBModel db = controller.dbconnect();
+        if (db != null) {
+            db.query("UPDATE allgemeindaten SET studentname = '" + studentNameField.getText() + "',"
+                    + "studentbirth='" + studentBirthField.getText() + "',"
+                    + "studentmatnum='" + studentMatField.getText() + "',"
+                    + "studyname='" + studyNameField.getText() + "',"
+                    + "studyacad='" + studyAcadField.getText() + "',"
+                    + "studystart='" + studyStartField.getText() + "';");
+        }
+    }
+
+    public void setFields(String studentname, String studentbirth, String studentmatnum, String studyname, String studyacad, String studystart) {
+        this.studentNameField.setText(studentname);
+        this.studentBirthField.setText(studentbirth);
+        this.studentMatField.setText(studentmatnum);
+
+        this.studyNameField.setText(studyname);
+        this.studyAcadField.setText(studyacad);
+        this.studyStartField.setText(studystart);
     }
 }
