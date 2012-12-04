@@ -58,12 +58,12 @@ public class SBController {
             } catch (IOException e) {
             }
         }
-        view.save();
+        this.save();
     }
 
     private void initialize() {
         this.loadSettings();
-        view = new SBView(this, sbstudypanel, sbhelppanel);
+        view = new SBView(this);
         view.createMainFrame();
         view.layoutMainFrame();
         this.setStudyPanel();
@@ -71,15 +71,35 @@ public class SBController {
     }
 
     public void showModulePanel() {
-        view.save();
+        this.save();
         view.setRightPanel(sbmodulepanel);
         activePanel = "sbmodulepanel";
     }
 
     public void setHelpPanel() {
-        view.save();
+        this.save();
         view.setRightPanel(sbhelppanel);
         activePanel = "sbhelppanel";
+    }
+
+    private void save() {
+        switch (activePanel) {
+            case "sbstudypanel":
+                System.err.println("save studyPanel");
+                SBModel db = this.dbconnect();
+                if (db != null) {
+                    String fields[] = sbstudypanel.getFields();
+                    db.query("UPDATE allgemeindaten SET studentname = '" + fields[0] + "',"
+                            + "studentbirth='" + fields[1] + "',"
+                            + "studentmatnum='" + fields[2] + "',"
+                            + "studyname='" + fields[3] + "',"
+                            + "studyacad='" + fields[4] + "',"
+                            + "studystart='" + fields[5] + "';");
+                }
+                break;
+            case "sbmodulepanel":
+                break;
+        }
     }
 
     public void exit() {
@@ -89,10 +109,10 @@ public class SBController {
 
     public void saveProfile(String path) {
         profileSaveAs = true;
-        if(path.substring(path.length()-10,path.length()).equals(".sbprofile")) {
-            path = path.substring(0,path.length()-10);
+        if (path.substring(path.length() - 10, path.length()).equals(".sbprofile")) {
+            path = path.substring(0, path.length() - 10);
         }
-        profilname = path+".sbprofile";
+        profilname = path + ".sbprofile";
         this.createProfile(path);
     }
 
@@ -100,17 +120,13 @@ public class SBController {
         SBModel db = this.dbconnect();
         if (db != null) {
             if (!initialize && !profile_changed) {
-                view.save();
+                this.save();
             }
             try {
                 ResultSet rs = db.get("SELECT * FROM allgemeindaten"); //Alles von der Tabelle allgemeindaten holen
                 while (rs.next()) {
-                    sbstudypanel.setFields(rs.getString("studentname"),
-                            rs.getString("studentbirth"),
-                            rs.getString("studentmatnum"),
-                            rs.getString("studyname"),
-                            rs.getString("studyacad"),
-                            rs.getString("studystart"));
+                    String fields[] = {rs.getString("studentname"),rs.getString("studentbirth"),rs.getString("studentmatnum"),rs.getString("studyname"),rs.getString("studyacad"),rs.getString("studystart")};
+                    sbstudypanel.setFields(fields);
                 }
             } catch (SQLException e) {
                 System.err.println(e);
@@ -130,9 +146,9 @@ public class SBController {
     }
 
     public void changeProfile(String path) {
-        System.out.println("changeprofile " +path);
-        view.save();
-        profilname = path.substring(0,path.length()-10);
+        System.out.println("changeprofile " + path);
+        this.save();
+        profilname = path.substring(0, path.length() - 10);
         profile_changed = true;
         this.dbconnect();
         this.setStudyPanel();
@@ -146,8 +162,8 @@ public class SBController {
             profileSaveAs = false;
             SBModel sqltest = this.model;
             sqltest.connect(profilname + ".sbprofile");
-            view.setFrameTitle(profilname+".sbprofile");
-            System.out.println("dbconnect "+profilname);
+            view.setFrameTitle(profilname + ".sbprofile");
+            System.out.println("dbconnect " + profilname);
             return sqltest;
         }
     }
@@ -174,6 +190,6 @@ public class SBController {
         } catch (SQLException e) {
             System.err.println(e);
         }
-        this.changeProfile(name+".sbprofile");
+        this.changeProfile(name + ".sbprofile");
     }
 }
