@@ -314,5 +314,4 @@ public class SBModulePanel extends JPanel {
         this.examTwoGradeField.setText(fields[15]);
         this.noteArea.setText(fields[16]);
     }
-
 }

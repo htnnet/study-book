@@ -36,19 +36,17 @@ public class SBView extends JFrame {
     private JTree tree; //Baum, linke Seite
     private TreeNode root; //Wurzel des JTree's !!!Muss datenbankbasiert werden, da mehrere Studiengaenge moeglich
     private ActionListener alistener; //ActionListener fuer Fenster
-    private SBStudyPanel sbstudypanel;
-    private SBHelpPanel sbhelppanel;
+
 
     /**
      * Konstruktor der Klasse "SBView"
      *
      * @param controller das Controller-Objekt
      */
-    public SBView(SBController controller, SBStudyPanel sbstudypanel, SBHelpPanel sbhelppanel) {
+    public SBView(SBController controller) {
         alistener = new SBActionListener(this, controller); //ActionListener initialisieren
         this.controller = controller;
-        this.sbstudypanel = sbstudypanel;
-        this.sbhelppanel = sbhelppanel;
+
     }
 
     /**
@@ -271,15 +269,6 @@ public class SBView extends JFrame {
     
     public void hideStatusBar() {
         statusBar.setVisible(false);
-    }
-
-    public void save() {
-        //Speichern der veränderten Daten
-        switch (controller.getActivePanel()) {
-            case "sbstudypanel":
-                sbstudypanel.save(controller);
-                break;
-        }
     }
 
     public void setRightPanel(JPanel panel) {

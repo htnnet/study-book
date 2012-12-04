@@ -187,27 +187,4 @@ public class SBStudyPanel extends JPanel {
         this.studyAcadField.setText(fields[4]);
         this.studyStartField.setText(fields[5]);
     }
-
-    public void save(SBController controller) {
-        System.err.println("save studyPanel");
-        SBModel db = controller.dbconnect();
-        if (db != null) {
-            db.query("UPDATE allgemeindaten SET studentname = '" + studentNameField.getText() + "',"
-                    + "studentbirth='" + studentBirthField.getText() + "',"
-                    + "studentmatnum='" + studentMatField.getText() + "',"
-                    + "studyname='" + studyNameField.getText() + "',"
-                    + "studyacad='" + studyAcadField.getText() + "',"
-                    + "studystart='" + studyStartField.getText() + "';");
-        }
-    }
-
-    public void setFields(String studentname, String studentbirth, String studentmatnum, String studyname, String studyacad, String studystart) {
-        this.studentNameField.setText(studentname);
-        this.studentBirthField.setText(studentbirth);
-        this.studentMatField.setText(studentmatnum);
-
-        this.studyNameField.setText(studyname);
-        this.studyAcadField.setText(studyacad);
-        this.studyStartField.setText(studystart);
-    }
 }
