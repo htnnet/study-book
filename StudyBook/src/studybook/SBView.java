@@ -76,12 +76,12 @@ public class SBView extends JFrame {
 
         frame.setContentPane(cpanel);
     }
-    
+
     public void setFrameTitle(String path) {
         frame.setTitle("StudyBook - "+path);
         frame.revalidate();
     }
-    
+
     public void setStandardTitle() {
         frame.setTitle("StudyBook");
         frame.revalidate();
@@ -103,8 +103,8 @@ public class SBView extends JFrame {
         frame.add(statusBar, BorderLayout.SOUTH);
         frame.add(splitpane, BorderLayout.CENTER);
 
-        frame.pack();
         frame.setSize(800, 600);
+        frame.setMinimumSize(new Dimension(800, 600));
         frame.setResizable(true);
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);  // Zentrieren
@@ -266,7 +266,7 @@ public class SBView extends JFrame {
         statusBar.setText(message);
         statusBar.setVisible(true);
     }
-    
+
     public void hideStatusBar() {
         statusBar.setVisible(false);
     }

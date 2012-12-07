@@ -97,13 +97,16 @@ public class SBStudyPanel extends JPanel {
         studyAcadLabel = new JLabel("Hochschule:");
         studyStartLabel = new JLabel("Studienbeginn:");
 
-        studentNameField = new JTextField();
+        SBFieldDocument fieldDocument = new SBFieldDocument(20);
+
+        studentNameField = new JTextField(fieldDocument, "", 0);
         studentBirthField = new JTextField();
         studentMatField = new JTextField();
 
         studyNameField = new JTextField();
         studyAcadField = new JTextField();
         studyStartField = new JTextField();
+
     }
 
     /**
