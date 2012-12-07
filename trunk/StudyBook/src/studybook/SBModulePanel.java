@@ -5,6 +5,12 @@ import java.awt.GridLayout;
 import javax.swing.border.Border;
 import javax.swing.*;
 import java.awt.Font;
+import java.text.DecimalFormat;
+import javax.print.attribute.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.NumberFormatter;
+import javax.swing.text.PlainDocument;
 
 /**
  * Das Panel für die Modulverwaltung.
@@ -31,6 +37,7 @@ public class SBModulePanel extends JPanel {
     private JPanel examTwoLabelPanel;
     private JPanel examTwoFieldPanel;
     private JPanel notePanel;
+    private JScrollPane noteScrollPane;
     private Border academicCompBorder;
     private Border academicTitledBorder;
     private Border examOneCompBorder;
@@ -64,16 +71,23 @@ public class SBModulePanel extends JPanel {
     private JTextField examOneRoomField;
     private JTextField examOneDateField;
     private JTextField examOneTimeField;
-    private JTextField examOneCreditsField;
-    private JTextField examOneGradeField;
     private JTextField examTwoTypeField;
     private JTextField examTwoRoomField;
     private JTextField examTwoDateField;
     private JTextField examTwoTimeField;
-    private JTextField examTwoCreditsField;
-    private JTextField examTwoGradeField;
+    private JSpinner examOneCreditsSpinner;
+    private JSpinner examOneGradeSpinner;
+    private JSpinner examTwoCreditsSpinner;
+    private JSpinner examTwoGradeSpinner;
+    private SpinnerNumberModel examOneCreditsSpinnerModel;
+    private SpinnerNumberModel examOneGradeSpinnerModel;
+    private SpinnerNumberModel examTwoCreditsSpinnerModel;
+    private SpinnerNumberModel examTwoGradeSpinnerModel;
+    private JFormattedTextField formattedField;
+    private NumberFormatter numberFormatter;
+    private DecimalFormat decimalFormat;
+
     private JTextArea noteArea;
-    private Font font;
 
     /**
      * Konstruktor der Klasse SBModulePanel.
@@ -114,12 +128,14 @@ public class SBModulePanel extends JPanel {
         notePanel.setBorder(noteCompBorder);
 
         academicLeftPanel = new JPanel();
+
         academicLeftLabelPanel = new JPanel();
         academicLeftLabelPanel.setBorder(margin);
         academicLeftFieldPanel = new JPanel();
         academicLeftFieldPanel.setBorder(margin);
 
         academicRightPanel = new JPanel();
+
         academicRightLabelPanel = new JPanel();
         academicRightLabelPanel.setBorder(margin);
         academicRightFieldPanel = new JPanel();
@@ -135,7 +151,7 @@ public class SBModulePanel extends JPanel {
         examTwoFieldPanel = new JPanel();
         examTwoFieldPanel.setBorder(margin);
 
-        academicNameLabel = new JLabel("Name:");
+        academicNameLabel = new JLabel("Name:  ");
         academicRoomLabel = new JLabel("Raum:");
         academicTelLabel = new JLabel("Telefon:");
         academicMailLabel = new JLabel("E-Mail:");
@@ -160,21 +176,56 @@ public class SBModulePanel extends JPanel {
         examOneRoomField = new JTextField();
         examOneDateField = new JTextField();
         examOneTimeField = new JTextField();
-        examOneCreditsField = new JTextField();
-        examOneGradeField = new JTextField();
         examTwoTypeField = new JTextField();
         examTwoRoomField = new JTextField();
         examTwoDateField = new JTextField();
         examTwoTimeField = new JTextField();
-        examTwoCreditsField = new JTextField();
-        examTwoGradeField = new JTextField();
+
+
+        // Eingabebeschränkungen für "Credits" und "Note" festlegen
+        examOneCreditsSpinnerModel = new SpinnerNumberModel(0, 0, 20, 1);
+        examOneGradeSpinnerModel = new SpinnerNumberModel(1.0, 1, 5.0, 0.1);
+        examTwoCreditsSpinnerModel = new SpinnerNumberModel(0, 0, 20, 1);
+        examTwoGradeSpinnerModel = new SpinnerNumberModel(1.0, 1, 5.0, 0.1);
+
+        examOneCreditsSpinner = new JSpinner(examOneCreditsSpinnerModel);
+        examOneGradeSpinner = new JSpinner(examOneGradeSpinnerModel);
+        examTwoCreditsSpinner = new JSpinner(examTwoCreditsSpinnerModel);
+        examTwoGradeSpinner = new JSpinner(examTwoGradeSpinnerModel);
+
+
+        // Neben der Eingabe über den Spinner, auch Eingabe mittels
+        // Tastatur ermöglichen
+        decimalFormat = new DecimalFormat("0.0");
+
+        formattedField = ((JSpinner.NumberEditor) examOneCreditsSpinner.getEditor()).getTextField();
+        numberFormatter = (NumberFormatter) formattedField.getFormatter();
+        numberFormatter.setAllowsInvalid(false);
+
+        formattedField = ((JSpinner.NumberEditor) examOneGradeSpinner.getEditor()).getTextField();
+        numberFormatter = (NumberFormatter) formattedField.getFormatter();
+        numberFormatter.setFormat(decimalFormat);
+        numberFormatter.setAllowsInvalid(false);
+
+        formattedField = ((JSpinner.NumberEditor) examTwoCreditsSpinner.getEditor()).getTextField();
+        numberFormatter = (NumberFormatter) formattedField.getFormatter();
+        numberFormatter.setAllowsInvalid(false);
+
+        formattedField = ((JSpinner.NumberEditor) examTwoGradeSpinner.getEditor()).getTextField();
+        numberFormatter = (NumberFormatter) formattedField.getFormatter();
+        numberFormatter.setFormat(decimalFormat);
+        numberFormatter.setAllowsInvalid(false);
+
+        // JTextArea in die die Notizen hineinkommen
         noteArea = new JTextArea();
-        noteArea.setLineWrap(true);
+        noteArea.setLineWrap(true);                 // Zeilenumbruch
+        noteArea.setWrapStyleWord(true);            // Zeilenumbruch für Wörter
+        noteScrollPane = new JScrollPane(noteArea);
     }
 
     /**
-     * Die GUI-Komponenten der Modulverwaltung kriegen hier einen Platz
-     * zugeteilt.
+     * Die GUI-Komponenten der Modulverwaltung kriegen hier ihren Platz
+     * zugewiesen.
      */
     public void layoutModulePanel() {
         academicLeftLabelPanel.setLayout(new GridLayout(2, 1, 5, 5));
@@ -201,7 +252,7 @@ public class SBModulePanel extends JPanel {
         academicRightPanel.add(academicRightLabelPanel, BorderLayout.WEST);
         academicRightPanel.add(academicRightFieldPanel, BorderLayout.CENTER);
 
-        academicPanel.setLayout(new GridLayout(1, 2, 5, 5));
+        academicPanel.setLayout(new GridLayout(1, 2, 20, 20));
         academicPanel.add(academicLeftPanel);
         academicPanel.add(academicRightPanel);
 
@@ -218,8 +269,8 @@ public class SBModulePanel extends JPanel {
         examOneFieldPanel.add(examOneRoomField);
         examOneFieldPanel.add(examOneDateField);
         examOneFieldPanel.add(examOneTimeField);
-        examOneFieldPanel.add(examOneCreditsField);
-        examOneFieldPanel.add(examOneGradeField);
+        examOneFieldPanel.add(examOneCreditsSpinner);
+        examOneFieldPanel.add(examOneGradeSpinner);
 
         examTwoLabelPanel.setLayout(new GridLayout(6, 1, 5, 5));
         examTwoLabelPanel.add(examTwoTypeLabel);
@@ -234,8 +285,8 @@ public class SBModulePanel extends JPanel {
         examTwoFieldPanel.add(examTwoRoomField);
         examTwoFieldPanel.add(examTwoDateField);
         examTwoFieldPanel.add(examTwoTimeField);
-        examTwoFieldPanel.add(examTwoCreditsField);
-        examTwoFieldPanel.add(examTwoGradeField);
+        examTwoFieldPanel.add(examTwoCreditsSpinner);
+        examTwoFieldPanel.add(examTwoGradeSpinner);
 
         examOnePanel.setLayout(new BorderLayout());
         examOnePanel.add(examOneLabelPanel, BorderLayout.WEST);
@@ -250,7 +301,7 @@ public class SBModulePanel extends JPanel {
         centerPanel.add(examTwoPanel);
 
         notePanel.setLayout(new BorderLayout());
-        notePanel.add(noteArea);
+        notePanel.add(noteScrollPane);
 
         southPanel.setLayout(new BorderLayout());
         southPanel.add(centerPanel, BorderLayout.NORTH);
@@ -277,14 +328,14 @@ public class SBModulePanel extends JPanel {
             this.examOneRoomField.getText(),
             this.examOneDateField.getText(),
             this.examOneTimeField.getText(),
-            this.examOneCreditsField.getText(),
-            this.examOneGradeField.getText(),
+            this.examOneCreditsSpinner.getValue().toString(),
+            this.examOneGradeSpinner.getValue().toString(),
             this.examTwoTypeField.getText(),
             this.examTwoRoomField.getText(),
             this.examTwoDateField.getText(),
             this.examTwoTimeField.getText(),
-            this.examTwoCreditsField.getText(),
-            this.examTwoGradeField.getText(),
+            this.examTwoCreditsSpinner.getValue().toString(),
+            this.examTwoGradeSpinner.getValue().toString(),
             this.noteArea.getText()
         };
         return fields;
@@ -304,14 +355,14 @@ public class SBModulePanel extends JPanel {
         this.examOneRoomField.setText(fields[5]);
         this.examOneDateField.setText(fields[6]);
         this.examOneTimeField.setText(fields[7]);
-        this.examOneCreditsField.setText(fields[8]);
-        this.examOneGradeField.setText(fields[9]);
+        this.examOneCreditsSpinner.setValue(fields[8]);
+        this.examOneGradeSpinner.setValue(fields[9]);
         this.examTwoTypeField.setText(fields[10]);
         this.examTwoRoomField.setText(fields[11]);
         this.examTwoDateField.setText(fields[12]);
         this.examTwoTimeField.setText(fields[13]);
-        this.examTwoCreditsField.setText(fields[14]);
-        this.examTwoGradeField.setText(fields[15]);
+        this.examTwoCreditsSpinner.setValue(fields[14]);
+        this.examTwoGradeSpinner.setValue(fields[15]);
         this.noteArea.setText(fields[16]);
     }
 }
