@@ -73,7 +73,7 @@ public class SBActionListener implements ActionListener {
 
                 // Profil speichern
                 case "save":
-
+                    controller.save();
                     break;
 
                 // Profils speichern unter...

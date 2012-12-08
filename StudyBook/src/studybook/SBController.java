@@ -82,7 +82,7 @@ public class SBController {
         activePanel = "sbhelppanel";
     }
 
-    private void save() {
+    public void save() {
         switch (activePanel) {
             case "sbstudypanel":
                 System.err.println("save studyPanel");
@@ -90,8 +90,8 @@ public class SBController {
                 if (db != null) {
                     String fields[] = sbstudypanel.getFields();
                     db.query("UPDATE allgemeindaten SET studentname = '" + fields[0] + "',"
-                            + "studentbirth='" + fields[1] + "',"
-                            + "studentmatnum='" + fields[2] + "',"
+                            + "studentmatnum='" + fields[1] + "',"
+                            + "studentbirth='" + fields[2] + "',"
                             + "studyname='" + fields[3] + "',"
                             + "studyacad='" + fields[4] + "',"
                             + "studystart='" + fields[5] + "';");
@@ -125,7 +125,7 @@ public class SBController {
             try {
                 ResultSet rs = db.get("SELECT * FROM allgemeindaten"); //Alles von der Tabelle allgemeindaten holen
                 while (rs.next()) {
-                    String fields[] = {rs.getString("studentname"),rs.getString("studentbirth"),rs.getString("studentmatnum"),rs.getString("studyname"),rs.getString("studyacad"),rs.getString("studystart")};
+                    String fields[] = {rs.getString("studentname"),rs.getString("studentmatnum"),rs.getString("studentbirth"),rs.getString("studyname"),rs.getString("studyacad"),rs.getString("studystart")};
                     sbstudypanel.setFields(fields);
                 }
             } catch (SQLException e) {

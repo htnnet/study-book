@@ -17,33 +17,56 @@ import javax.swing.text.PlainDocument;
  * @since 2012-10-14
  */
 public class SBFieldDocument extends PlainDocument {
-    private int max;
+    private int maxLength;
+    private String acceptedChars;
 
     /**
-     * Konstruktor der Klasse SBFieldDocument.
+     * 1. Konstruktor der Klasse SBFieldDocument.
      *
      * @param maxLength Die maximale Anzahl an einzugebenden Zeichen
      */
     public SBFieldDocument(int maxLength) {
-        max = maxLength;
+        this.maxLength = maxLength;
+    }
+
+    /**
+     * 2. Konstruktor der Klasse SBFieldDocument.
+     *
+     * @param maxLength Die maximale Anzahl an einzugebenden Zeichen
+     *
+     */
+    public SBFieldDocument(int maxLength, String acceptedChars) {
+        this.maxLength =  maxLength;
+        this.acceptedChars = acceptedChars;
     }
 
 
     /**
      * Überschriebene Methode von PlainDocument, mit der man das Eingabe-
      * verhalten steuern kann.
-     * @param offset
-     * @param str
-     * @param a
+     * @param offset Der startende Offset
+     * @param str Der vom Benutzer eingegebene Text
+     * @param a Attribute des eingegebene Textes
      * @throws BadLocationException
      */
     @Override
-    public void insertString(int offset, String str, AttributeSet a)
-            throws BadLocationException {
-        if (getLength() + str.length() > max) {
+    public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
+        // Falls es "verbotene" Zeichen gibt, werden sie hier herausgefiltert
+        if (acceptedChars != null) {
+            for (int i = 0; i < str.length(); i++) {
+                if (acceptedChars.indexOf(str.valueOf(str.charAt(i))) == -1) {
+                    return;
+                }
+            }
+        }
+
+        // Längenüberschreitung prüfen
+        if (this.getLength() + str.length() > maxLength) {
         } else {
             super.insertString(offset, str, a);
         }
+
+
     }
 }
 
