@@ -2,9 +2,21 @@ package studybook;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.NumberFormatter;
+import com.michaelbaranov.microba.calendar.DatePicker;
+import java.beans.PropertyVetoException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Enthält das Panel für die Studiengangverwaltung.
@@ -39,11 +51,16 @@ public class SBStudyPanel extends JPanel {
     private JLabel studyAcadLabel;
     private JLabel studyStartLabel;
     private JTextField studentNameField;
-    private JTextField studentBirthField;
     private JTextField studentMatField;
     private JTextField studyNameField;
     private JTextField studyAcadField;
-    private JTextField studyStartField;
+    private SBFieldDocument studentNameDocument;
+    private SBFieldDocument studentMatDocument;
+    private SBFieldDocument studyNameDocument;
+    private SBFieldDocument studyAcadDocument;
+    private DatePicker studentBirthPicker;
+    private DatePicker studyStartPicker;
+    private SimpleDateFormat dateFormat;
 
     /**
      * Konstruktor der Klasse SBStudyPanel.
@@ -90,22 +107,35 @@ public class SBStudyPanel extends JPanel {
         studyFieldPanel.setBorder(margin);
 
         studentNameLabel = new JLabel("Name:");
-        studentBirthLabel = new JLabel("Geburtsdatum:");
         studentMatLabel = new JLabel("Matrikelnummer:");
+        studentBirthLabel = new JLabel("Geburtsdatum:");
 
         studyNameLabel = new JLabel("Name:");
         studyAcadLabel = new JLabel("Hochschule:");
         studyStartLabel = new JLabel("Studienbeginn:");
 
-        SBFieldDocument fieldDocument = new SBFieldDocument(20);
+        ///////////////////
 
-        studentNameField = new JTextField(fieldDocument, "", 0);
-        studentBirthField = new JTextField();
-        studentMatField = new JTextField();
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
 
-        studyNameField = new JTextField();
-        studyAcadField = new JTextField();
-        studyStartField = new JTextField();
+        studentBirthPicker = new DatePicker(null, dateFormat, Locale.GERMAN);
+        studyStartPicker = new DatePicker(null, dateFormat, Locale.GERMAN);
+
+        //////////////
+
+
+        // Einschränkungen für Textfelder festlegen
+        studentNameDocument = new SBFieldDocument(50);
+        studentMatDocument = new SBFieldDocument(50, "1234567890");
+        studyNameDocument = new SBFieldDocument(50);
+        studyAcadDocument = new SBFieldDocument(50);
+
+
+        studentNameField = new JTextField(studentNameDocument, "", 0);
+        studentMatField = new JTextField(studentMatDocument, "", 0);
+
+        studyNameField = new JTextField(studyNameDocument, "", 0);
+        studyAcadField = new JTextField(studyAcadDocument, "", 0);
 
     }
 
@@ -115,13 +145,15 @@ public class SBStudyPanel extends JPanel {
     private void layoutStudyPanel() {
         studentLabelPanel.setLayout(new GridLayout(3, 1, 5, 5));
         studentLabelPanel.add(studentNameLabel);
-        studentLabelPanel.add(studentBirthLabel);
         studentLabelPanel.add(studentMatLabel);
+        studentLabelPanel.add(studentBirthLabel);
+
 
         studentFieldPanel.setLayout(new GridLayout(3, 1, 5, 5));
         studentFieldPanel.add(studentNameField);
-        studentFieldPanel.add(studentBirthField);
         studentFieldPanel.add(studentMatField);
+        studentFieldPanel.add(studentBirthPicker);
+
 
         studyLabelPanel.setLayout(new GridLayout(3, 1, 5, 5));
         studyLabelPanel.add(studyNameLabel);
@@ -131,7 +163,7 @@ public class SBStudyPanel extends JPanel {
         studyFieldPanel.setLayout(new GridLayout(3, 1, 5, 5));
         studyFieldPanel.add(studyNameField);
         studyFieldPanel.add(studyAcadField);
-        studyFieldPanel.add(studyStartField);
+        studyFieldPanel.add(studyStartPicker);
 
         studentPanel.setLayout(new BorderLayout());
         studentPanel.add(studentLabelPanel, BorderLayout.WEST);
@@ -165,13 +197,30 @@ public class SBStudyPanel extends JPanel {
      * @return die eingetragenen Textfeldwerte
      */
     public String[] getFields() {
+        String studentBirth;
+        String studyStart;
+
+        // Sicherstellen, dass bei leeren Datumsangaben auch ein leerer String
+        // in das Array eingetragen wird
+        try {
+            studentBirth = this.dateFormat.format(studentBirthPicker.getDate());
+        } catch (NullPointerException exception) {
+            studentBirth = "";
+        }
+
+        try {
+            studyStart = this.dateFormat.format(studyStartPicker.getDate());
+        } catch (NullPointerException exception) {
+            studyStart = "";
+        }
+
         String[] fields = {
             this.studentNameField.getText(),
-            this.studentBirthField.getText(),
             this.studentMatField.getText(),
+            studentBirth,
             this.studyNameField.getText(),
             this.studyAcadField.getText(),
-            this.studyStartField.getText()
+            studyStart
         };
         return fields;
     }
@@ -182,12 +231,33 @@ public class SBStudyPanel extends JPanel {
      * @param fields die einzutragenen Textfeldwerte
      */
     public void setFields(String[] fields) {
-        this.studentNameField.setText(fields[0]);
-        this.studentBirthField.setText(fields[1]);
-        this.studentMatField.setText(fields[2]);
+        Date studentBirth;
+        Date studyStart;
 
+        // Falls das Umwandeln des String in ein Datum nicht funktioniert
+        try {
+            studentBirth = dateFormat.parse(fields[2]);
+        } catch (ParseException ex) {
+            studentBirth = null;
+        }
+
+        try {
+            studyStart = dateFormat.parse(fields[5]);
+        } catch (ParseException ex) {
+            studyStart = null;
+        }
+
+
+        this.studentNameField.setText(fields[0]);
+        this.studentMatField.setText(fields[1]);
         this.studyNameField.setText(fields[3]);
         this.studyAcadField.setText(fields[4]);
-        this.studyStartField.setText(fields[5]);
+
+        // Falls das Setzen des Datums nicht funktionieren sollte
+        try {
+            this.studentBirthPicker.setDate(studentBirth);
+            this.studyStartPicker.setDate(studyStart);
+        } catch (PropertyVetoException ex) {
+        }
     }
 }
