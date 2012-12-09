@@ -2,21 +2,15 @@ package studybook;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.text.DecimalFormat;
-import java.util.Calendar;
 import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.NumberFormatter;
 import com.michaelbaranov.microba.calendar.DatePicker;
 import java.beans.PropertyVetoException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Enthält das Panel für die Studiengangverwaltung.
