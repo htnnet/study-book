@@ -67,26 +67,6 @@ public class SBModulePanel extends JPanel {
     private JLabel examTwoTimeLabel;
     private JLabel examTwoCreditsLabel;
     private JLabel examTwoGradeLabel;
-    private JTextField academicNameField;
-    private JTextField academicRoomField;
-    private JTextField academicTelField;
-    private JTextField academicMailField;
-    private JTextField examOneTypeField;
-    private JTextField examOneRoomField;
-    private JTextField examTwoTypeField;
-    private JTextField examTwoRoomField;
-    private JSpinner examOneTimeSpinner;
-    private JSpinner examOneCreditsSpinner;
-    private JSpinner examOneGradeSpinner;
-    private JSpinner examTwoTimeSpinner;
-    private JSpinner examTwoCreditsSpinner;
-    private JSpinner examTwoGradeSpinner;
-    private SpinnerDateModel examOneTimeSpinnerModel;
-    private SpinnerNumberModel examOneCreditsSpinnerModel;
-    private SpinnerNumberModel examOneGradeSpinnerModel;
-    private SpinnerDateModel examTwoTimeSpinnerModel;
-    private SpinnerNumberModel examTwoCreditsSpinnerModel;
-    private SpinnerNumberModel examTwoGradeSpinnerModel;
     private SBFieldDocument academicNameDocument;
     private SBFieldDocument academicRoomDocument;
     private SBFieldDocument academicTelDocument;
@@ -96,22 +76,36 @@ public class SBModulePanel extends JPanel {
     private SBFieldDocument examTwoTypeDocument;
     private SBFieldDocument examTwoRoomDocument;
     private SBFieldDocument noteDocument;
-
-
+    private JTextField academicNameField;
+    private JTextField academicRoomField;
+    private JTextField academicTelField;
+    private JTextField academicMailField;
+    private JTextField examOneTypeField;
+    private JTextField examOneRoomField;
+    private JTextField examTwoTypeField;
+    private JTextField examTwoRoomField;
+    private JTextArea noteArea;
+    private SpinnerDateModel examOneTimeSpinnerModel;
+    private SpinnerNumberModel examOneCreditsSpinnerModel;
+    private SpinnerNumberModel examOneGradeSpinnerModel;
+    private SpinnerDateModel examTwoTimeSpinnerModel;
+    private SpinnerNumberModel examTwoCreditsSpinnerModel;
+    private SpinnerNumberModel examTwoGradeSpinnerModel;
     private DatePicker examOneDatePicker;
     private DatePicker examTwoDatePicker;
-
+    private JSpinner examOneTimeSpinner;
+    private JSpinner examOneCreditsSpinner;
+    private JSpinner examOneGradeSpinner;
+    private JSpinner examTwoTimeSpinner;
+    private JSpinner examTwoCreditsSpinner;
+    private JSpinner examTwoGradeSpinner;
     private JFormattedTextField formattedField;
-    private DateFormatter dateFormatter;
-    private NumberFormatter numberFormatter;
-
     private Date initTime;
     private SimpleDateFormat dateFormat;
     private SimpleDateFormat timeFormat;
+    private DateFormatter dateFormatter;
+    private NumberFormatter numberFormatter;
     private DecimalFormat decimalFormat;
-
-    private JTextArea noteArea;
-
 
     /**
      * Konstruktor der Klasse SBModulePanel.
@@ -120,10 +114,11 @@ public class SBModulePanel extends JPanel {
         this.createModulePanel();
         this.layoutModulePanel();
 
-        /**
+
         String[] inputString = {"Risse", "231a", "7575673", "trris@bla.de",
-        "Klausur", "34d", "18.02.2012", "00:00", "5", "4.0", "Labor", "57b", "",
-        "", "5", "1.0", "Hallo\nWelt!"};
+         "Klausur", "34d", "18.02.2012", "23:00", "5", "4.0", "Labor", "57b",
+         "", "", "20", "1.0", "Hallo\nWelt!"};
+
         this.setFields(inputString);
 
         String[] outputString = this.getFields();
@@ -131,7 +126,6 @@ public class SBModulePanel extends JPanel {
             System.out.println(outputString[i]);
         }
 
-*/
 
     }
 
@@ -140,30 +134,25 @@ public class SBModulePanel extends JPanel {
      * modulrelevanten Daten ermöglicht.
      */
     public void createModulePanel() {
-        centerPanel = new JPanel();
-        southPanel = new JPanel();
+        this.createChildPanel();
+        this.createLabel();
+        this.createTextFields();
+        this.createDatePicker();
+        this.createSpinner();
+        this.createTextArea();
+    }
 
-        margin = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+    /**
+     * Erstellt alle zur Modulverwaltung dazugehörigen "Child"-Panels.
+     */
+    private void createChildPanel() {
+        margin = BorderFactory.createEmptyBorder(5, 5, 5, 5); // Abstandshalter
 
+        // Dozenten-Panel
         academicPanel = new JPanel();
         academicTitledBorder = BorderFactory.createTitledBorder("Dozent");
         academicCompBorder = BorderFactory.createCompoundBorder(margin, academicTitledBorder);
         academicPanel.setBorder(academicCompBorder);
-
-        examOnePanel = new JPanel();
-        examOneTitledBorder = BorderFactory.createTitledBorder("1. Leistungsnachweis");
-        examOneCompBorder = BorderFactory.createCompoundBorder(margin, examOneTitledBorder);
-        examOnePanel.setBorder(examOneCompBorder);
-
-        examTwoPanel = new JPanel();
-        examTwoTitledBorder = BorderFactory.createTitledBorder("2. Leistungsnachweis");
-        examTwoCompBorder = BorderFactory.createCompoundBorder(margin, examTwoTitledBorder);
-        examTwoPanel.setBorder(examTwoCompBorder);
-
-        notePanel = new JPanel();
-        noteTitledBorder = BorderFactory.createTitledBorder("Notizen");
-        noteCompBorder = BorderFactory.createCompoundBorder(margin, noteTitledBorder);
-        notePanel.setBorder(noteCompBorder);
 
         academicLeftPanel = new JPanel();
 
@@ -179,20 +168,50 @@ public class SBModulePanel extends JPanel {
         academicRightFieldPanel = new JPanel();
         academicRightFieldPanel.setBorder(margin);
 
+        // Panels für die Leistungsnachweise
+        centerPanel = new JPanel();
+
+        examOnePanel = new JPanel();
+        examOneTitledBorder = BorderFactory.createTitledBorder("1. Leistungsnachweis");
+        examOneCompBorder = BorderFactory.createCompoundBorder(margin, examOneTitledBorder);
+        examOnePanel.setBorder(examOneCompBorder);
+
         examOneLabelPanel = new JPanel();
         examOneLabelPanel.setBorder(margin);
         examOneFieldPanel = new JPanel();
         examOneFieldPanel.setBorder(margin);
+
+
+        examTwoPanel = new JPanel();
+        examTwoTitledBorder = BorderFactory.createTitledBorder("2. Leistungsnachweis");
+        examTwoCompBorder = BorderFactory.createCompoundBorder(margin, examTwoTitledBorder);
+        examTwoPanel.setBorder(examTwoCompBorder);
 
         examTwoLabelPanel = new JPanel();
         examTwoLabelPanel.setBorder(margin);
         examTwoFieldPanel = new JPanel();
         examTwoFieldPanel.setBorder(margin);
 
+        // Panel für die Notizen
+        notePanel = new JPanel();
+        noteTitledBorder = BorderFactory.createTitledBorder("Notizen");
+        noteCompBorder = BorderFactory.createCompoundBorder(margin, noteTitledBorder);
+        notePanel.setBorder(noteCompBorder);
+
+        southPanel = new JPanel();
+
+    }
+
+    /**
+     * Erstellt alle darzustellenden Label.
+     */
+    private void createLabel() {
+        // Dozent
         academicNameLabel = new JLabel("Name:  ");
         academicRoomLabel = new JLabel("Raum:");
         academicTelLabel = new JLabel("Telefon:");
         academicMailLabel = new JLabel("E-Mail:");
+        // Leistunsnachweise
         examOneTypeLabel = new JLabel("Art:");
         examOneRoomLabel = new JLabel("Raum:");
         examOneDateLabel = new JLabel("Datum:");
@@ -205,7 +224,13 @@ public class SBModulePanel extends JPanel {
         examTwoTimeLabel = new JLabel("Zeit:");
         examTwoCreditsLabel = new JLabel("Credits:");
         examTwoGradeLabel = new JLabel("Note:");
+    }
 
+    /**
+     * Erzeugt alle Eingabefelder und versieht sie mit Eingabebeschränkungen.
+     */
+    private void createTextFields() {
+        // Eingabebeschränkungen
         academicNameDocument = new SBFieldDocument(50);
         academicRoomDocument = new SBFieldDocument(50);
         academicTelDocument = new SBFieldDocument(50, "+-()/1234567890");
@@ -215,7 +240,7 @@ public class SBModulePanel extends JPanel {
         examTwoTypeDocument = new SBFieldDocument(50);
         examTwoRoomDocument = new SBFieldDocument(50);
 
-
+        // Eingabefelder
         academicNameField = new JTextField(academicNameDocument, "", 0);
         academicRoomField = new JTextField(academicRoomDocument, "", 0);
         academicTelField = new JTextField(academicTelDocument, "", 0);
@@ -224,17 +249,26 @@ public class SBModulePanel extends JPanel {
         examOneRoomField = new JTextField(examOneRoomDocument, "", 0);
         examTwoTypeField = new JTextField(examTwoTypeDocument, "", 0);
         examTwoRoomField = new JTextField(examTwoRoomDocument, "", 0);
+    }
 
-
-        ////////////////
-
+    /**
+     * Erzeugt GUI-Komponenten, mit denen man ein Datum für die
+     * Leistungsnachweise festlegen kann.
+     */
+    private void createDatePicker() {
         dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
 
         examOneDatePicker = new DatePicker(null, dateFormat, Locale.GERMAN);
         examTwoDatePicker = new DatePicker(null, dateFormat, Locale.GERMAN);
-        //////////////
+    }
 
-        // Eingabebeschränkungen für "Zeit", "Credits" und "Note" festlegen
+    /**
+     * Hier werden sogenannte "JSpinner" erzeugt über die der Benutzer die
+     * Uhrzeit, die Credit-Points und die Note entweder mittles der Maus oder
+     * der Tastatur einstellen kann.
+     */
+    private void createSpinner() {
+        // Eingaberestriktionen für "Zeit", "Credits" und "Note" festlegen
         examOneTimeSpinnerModel = new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY);
         examOneCreditsSpinnerModel = new SpinnerNumberModel(0, 0, 20, 1);
         examOneGradeSpinnerModel = new SpinnerNumberModel(5.0, 1.0, 5.0, 0.1);
@@ -242,6 +276,7 @@ public class SBModulePanel extends JPanel {
         examTwoCreditsSpinnerModel = new SpinnerNumberModel(0, 0, 20, 1);
         examTwoGradeSpinnerModel = new SpinnerNumberModel(5.0, 1.0, 5.0, 0.1);
 
+        // Spinner erzeugen
         examOneTimeSpinner = new JSpinner(examOneTimeSpinnerModel);
         examOneCreditsSpinner = new JSpinner(examOneCreditsSpinnerModel);
         examOneGradeSpinner = new JSpinner(examOneGradeSpinnerModel);
@@ -249,10 +284,8 @@ public class SBModulePanel extends JPanel {
         examTwoCreditsSpinner = new JSpinner(examTwoCreditsSpinnerModel);
         examTwoGradeSpinner = new JSpinner(examTwoGradeSpinnerModel);
 
-
-        // Neben der Eingabe über den Spinner, auch Eingabe mittels
-        // Tastatur ermöglichen
-
+        // Den Spinner-Elementen Formate vorgeben und neben der Eingabe mittels
+        // der Maus, auch Eingaben mittels Tastatur ermöglichen
         decimalFormat = new DecimalFormat("0.0");
         timeFormat = new SimpleDateFormat("HH:mm");
 
@@ -288,19 +321,26 @@ public class SBModulePanel extends JPanel {
         numberFormatter.setFormat(decimalFormat);
         numberFormatter.setAllowsInvalid(false);
 
+
+        // Den Spinner-Elementen für die Zeit und die Note Startwerte mitgeben
+        initTime = new Date();
         try {
             initTime = timeFormat.parse("00:00");
         } catch (ParseException exception) {
         }
-
 
         examOneTimeSpinner.setValue(initTime);
         examTwoTimeSpinner.setValue(initTime);
 
         examOneGradeSpinner.setValue(1.0);
         examTwoGradeSpinner.setValue(1.0);
+    }
 
-        // JTextArea in die die Notizen hineinkommen
+    /**
+     * Erzeugt das große Eingabefeld, in das modulrelevante Notizen eingetragen
+     * werden können.
+     */
+    private void createTextArea() {
         noteDocument = new SBFieldDocument(1000);
         noteArea = new JTextArea(noteDocument, "", 0, 0);
         noteArea.setLineWrap(true);                 // Zeilenumbruch
@@ -313,6 +353,7 @@ public class SBModulePanel extends JPanel {
      * zugewiesen.
      */
     public void layoutModulePanel() {
+        // Dozent
         academicLeftLabelPanel.setLayout(new GridLayout(2, 1, 5, 5));
         academicLeftLabelPanel.add(academicNameLabel);
         academicLeftLabelPanel.add(academicRoomLabel);
@@ -341,6 +382,7 @@ public class SBModulePanel extends JPanel {
         academicPanel.add(academicLeftPanel);
         academicPanel.add(academicRightPanel);
 
+        // Leistungsnachweise
         examOneLabelPanel.setLayout(new GridLayout(6, 1, 5, 5));
         examOneLabelPanel.add(examOneTypeLabel);
         examOneLabelPanel.add(examOneRoomLabel);
@@ -385,6 +427,7 @@ public class SBModulePanel extends JPanel {
         centerPanel.add(examOnePanel);
         centerPanel.add(examTwoPanel);
 
+        // Notizen
         notePanel.setLayout(new BorderLayout());
         notePanel.add(noteScrollPane);
 
@@ -392,49 +435,20 @@ public class SBModulePanel extends JPanel {
         southPanel.add(centerPanel, BorderLayout.NORTH);
         southPanel.add(notePanel, BorderLayout.CENTER);
 
+        // alle Hauptpanels
         this.setLayout(new BorderLayout());
         this.add(academicPanel, BorderLayout.NORTH);
         this.add(southPanel, BorderLayout.CENTER);
 
     }
 
-     /**
-     * Getter-Methode für das Holen der Textfeldwerte.
+    /**
+     * Getter-Methode für das Holen der Textfeldwerte, Datumsangaben,
+     * Spinner-Eingaben.
      *
-     * @return die eingetragenen Textfeldwerte
+     * @return die eingetragenen Werte
      */
     public String[] getFields() {
-        String examOneDate;
-        String examOneTime;
-        String examTwoDate;
-        String examTwoTime;
-
-        // Sicherstellen, dass bei leeren Datumsangaben und auch ein leerer String
-        // in das Array eingetragen wird
-        try {
-            examOneDate = this.dateFormat.format(examOneDatePicker.getDate());
-        } catch (NullPointerException exception) {
-            examOneDate = "";
-        }
-
-        try {
-            examOneTime = this.timeFormat.format(examOneTimeSpinner.getValue());
-        } catch (NullPointerException exception) {
-            examOneTime = "";
-        }
-
-        try {
-            examTwoDate = this.dateFormat.format(examTwoDatePicker.getDate());
-        } catch (NullPointerException exception) {
-            examTwoDate = "";
-        }
-
-        try {
-            examTwoTime = this.timeFormat.format(examTwoTimeSpinner.getValue());
-        } catch (NullPointerException exception) {
-            examTwoTime = "";
-        }
-
         String[] fields = {
             this.academicNameField.getText(),
             this.academicRoomField.getText(),
@@ -442,14 +456,14 @@ public class SBModulePanel extends JPanel {
             this.academicMailField.getText(),
             this.examOneTypeField.getText(),
             this.examOneRoomField.getText(),
-            examOneDate,
-            examOneTime,
+            this.getStringDate(examOneDatePicker.getDate()),
+            this.getStringTime((Date) examOneTimeSpinner.getValue()),
             this.examOneCreditsSpinner.getValue().toString(),
             this.examOneGradeSpinner.getValue().toString(),
             this.examTwoTypeField.getText(),
             this.examTwoRoomField.getText(),
-            examTwoDate,
-            examTwoTime,
+            this.getStringDate(examTwoDatePicker.getDate()),
+            this.getStringTime((Date) examTwoTimeSpinner.getValue()),
             this.examTwoCreditsSpinner.getValue().toString(),
             this.examTwoGradeSpinner.getValue().toString(),
             this.noteArea.getText()
@@ -458,63 +472,108 @@ public class SBModulePanel extends JPanel {
     }
 
     /**
-     * Setter-Methode für das Setzen der Textfelwerte.
+     * Methode, die die Datumsangaben als "Date"-Objekt einliest und zur
+     * Weiterreichung an die Datenbank als String zurückliefert.
      *
-     * @param fields die einzutragenen Textfeldwerte
+     * @return Das Datum als String
+     * @param examDate Das Datum als Date-Objekt
+     */
+    private String getStringDate(Date examDate) {
+        String examStringDate = "";
+
+        // Sicherstellen, dass bei leeren Datumsangaben und auch ein leerer
+        // String zurückgegeben wird
+        try {
+            examStringDate = this.dateFormat.format(examDate);
+        } catch (NullPointerException exception) {
+        }
+        return examStringDate;
+    }
+
+    /**
+     * Methode, die die Zeitangaben als "Date"-Objekt einliest und zur
+     * Weiterreichung an die Datenbank als String zurückliefert.
+     *
+     * @return Die Zeit als String
+     * @param examTime Die Zeit als Date-Objekt
+     */
+    private String getStringTime(Date examTime) {
+        String examStringTime = "";
+
+        // Sicherstellen, dass bei leeren Datumsangaben und auch ein leerer
+        // String zurückgegeben wird
+        try {
+            examStringTime = this.timeFormat.format(examTime);
+        } catch (NullPointerException exception) {
+        }
+        return examStringTime;
+    }
+
+    /**
+     * Setter-Methode für das Setzen der Textfeldwerte, DatePicker und JSpinner.
+     *
+     * @param fields die einzutragenden Werte
      */
     public void setFields(String[] fields) {
-        Date examOneDate;
-        Date examOneTime;
-        Date examTwoDate;
-        Date examTwoTime;
-
-        // Falls das Umwandeln des Strings in ein Datum nicht funktioniert
-        try {
-            examOneDate = dateFormat.parse(fields[6]);
-        } catch (ParseException exception) {
-            examOneDate = null;
-        }
-
-        try {
-            examOneTime = timeFormat.parse(fields[7]);
-        } catch (ParseException exception) {
-            examOneTime = initTime;
-        }
-
-        try {
-            examTwoDate = dateFormat.parse(fields[12]);
-        } catch (ParseException exception) {
-            examTwoDate = null;
-        }
-
-        try {
-            examTwoTime = timeFormat.parse(fields[13]);
-        } catch (ParseException exception) {
-            examTwoTime = initTime;
-        }
-
         this.academicNameField.setText(fields[0]);
         this.academicRoomField.setText(fields[1]);
         this.academicTelField.setText(fields[2]);
         this.academicMailField.setText(fields[3]);
         this.examOneTypeField.setText(fields[4]);
         this.examOneRoomField.setText(fields[5]);
-        this.examOneTimeSpinner.setValue(examOneTime);
+        this.examOneTimeSpinner.setValue(this.getTime(fields[7]));
         this.examOneCreditsSpinner.setValue(Integer.parseInt(fields[8]));
         this.examOneGradeSpinner.setValue(Float.parseFloat(fields[9]));
         this.examTwoTypeField.setText(fields[10]);
         this.examTwoRoomField.setText(fields[11]);
-        this.examTwoTimeSpinner.setValue(examTwoTime);
+        this.examTwoTimeSpinner.setValue(this.getTime(fields[13]));
         this.examTwoCreditsSpinner.setValue(Integer.parseInt(fields[14]));
         this.examTwoGradeSpinner.setValue(Float.parseFloat(fields[15]));
         this.noteArea.setText(fields[16]);
 
-
-        // Falls das Setzen des Datums Zeit nicht funktionieren sollte
+        // Falls das Setzen des Datums nicht funktionieren sollte
         try {
-            this.examOneDatePicker.setDate(examOneDate);
-            this.examTwoDatePicker.setDate(examTwoDate);
+            this.examOneDatePicker.setDate(this.getDate(fields[6]));
+            this.examTwoDatePicker.setDate(this.getDate(fields[12]));
         } catch (PropertyVetoException ex) {
         }
+    }
+
+     /**
+     * Methode, die die Datumsangaben als String einliest und sie für
+     * die DatePicker als Date-Objekt zurückliefert.
+     *
+     * @return Das Datum als Date-Objekt
+     * @param examStringDate Das Datum als String
+     */
+    private Date getDate(String examStringDate) {
+        Date examDate = null;
+
+        // Falls das Umwandeln des Strings in ein Date-Objekt nicht
+        // funktionieren sollte
+        try {
+            examDate = dateFormat.parse(examStringDate);
+        } catch (ParseException exception) {
+        }
+        return examDate;
+    }
+
+     /**
+     * Methode, die die Zeitangaben als String einliest und sie für
+     * die JSpinner als Date-Objekt zurückliefert.
+     *
+     * @return Die Zeit als Date-Objekt
+     * @param examStringTime Die Zeit String
+     */
+    private Date getTime(String examStringTime) {
+        Date examTime = initTime;
+
+        // Falls das Umwandeln des Strings in ein Date-Objekt nicht
+        // funktionieren sollte
+        try {
+            examTime = timeFormat.parse(examStringTime);
+        } catch (ParseException exception) {
+        }
+        return examTime;
     }
 }
