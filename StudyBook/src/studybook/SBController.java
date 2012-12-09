@@ -19,7 +19,6 @@ import java.sql.SQLException;
  * @since 2012-10-14
  */
 public class SBController {
-
     private SBModel model;
     private SBView view;
     private String profilname = null;
@@ -89,12 +88,12 @@ public class SBController {
                 SBModel db = this.dbconnect();
                 if (db != null) {
                     String fields[] = sbstudypanel.getFields();
-                    db.query("UPDATE allgemeindaten SET studentname = '" + fields[0] + "',"
-                            + "studentmatnum='" + fields[1] + "',"
-                            + "studentbirth='" + fields[2] + "',"
-                            + "studyname='" + fields[3] + "',"
-                            + "studyacad='" + fields[4] + "',"
-                            + "studystart='" + fields[5] + "';");
+                    db.query("UPDATE allgemeindaten SET studentName = '" + fields[0] + "',"
+                            + "studentMatnum='" + fields[1] + "',"
+                            + "studentBirth='" + fields[2] + "',"
+                            + "studyName='" + fields[3] + "',"
+                            + "studyAcad='" + fields[4] + "',"
+                            + "studyStart='" + fields[5] + "';");
                 }
                 break;
             case "sbmodulepanel":
@@ -140,6 +139,10 @@ public class SBController {
         activePanel = "sbstudypanel";
         view.setRightPanel(sbstudypanel);
     }
+    
+    public void setModulePanel() {
+        
+    }
 
     public String getActivePanel() {
         return activePanel;
@@ -172,12 +175,31 @@ public class SBController {
         SBModel db = this.model;
         db.connect(name + ".sbprofile");
         db.query("CREATE TABLE IF NOT EXISTS 'allgemeindaten' ("
-                + "'studentname' varchar(100) NOT NULL,"
-                + "'studentbirth' varchar(100) NOT NULL,"
-                + "'studentmatnum' varchar(100) NOT NULL,"
-                + "'studyname' varchar(100) NOT NULL,"
-                + "'studyacad' varchar(100) NOT NULL,"
-                + "'studystart' varchar(20) NOT NULL);");
+                + "'studentName' varchar(100) NOT NULL,"
+                + "'studentBirth' varchar(100) NOT NULL,"
+                + "'studentMatnum' varchar(100) NOT NULL,"
+                + "'studyName' varchar(100) NOT NULL,"
+                + "'studyAcad' varchar(100) NOT NULL,"
+                + "'studyStart' varchar(20) NOT NULL);");
+        db.query("CREATE TABLE IF NOT EXISTS 'module' ("
+                + "'semesterID' int(1000) NOT NULL,"
+                + "'academicName' varchar(100) NOT NULL,"
+                + "'academicRoom' varchar(100) NOT NULL,"
+                + "'academicTel' varchar(100) NOT NULL,"
+                + "'academicMail' varchar(100) NOT NULL,"
+                + "'examOneType' varchar(100) NOT NULL,"
+                + "'examOneRoom' varchar(20) NOT NULL" 
+                + "'examOneDate' varchar(100) NOT NULL,"
+                + "'examOneTime' varchar(100) NOT NULL,"
+                + "'examOneCredits' varchar(100) NOT NULL,"
+                + "'examOneGrade' varchar(100) NOT NULL,"
+                + "'examTwoType' varchar(100) NOT NULL,"
+                + "'examTwoRoom' varchar(20) NOT NULL" 
+                + "'examTwoDate' varchar(100) NOT NULL,"
+                + "'examTwoTime' varchar(100) NOT NULL,"
+                + "'examTwoCredits' varchar(100) NOT NULL,"
+                + "'examTwoGrade' varchar(100) NOT NULL,"
+                + "'note' varchar(10000) NOT NULL);");
         db.query("INSERT INTO allgemeindaten (studentname,studentbirth,studentmatnum,studyname,studyacad,studystart)"
                 + "VALUES ('','','','','','');");
         db.query("CREATE TABLE IF NOT EXISTS studiengaenge (name);"); //Erstelle Tabelle fuer Studiengaenge
@@ -190,6 +212,18 @@ public class SBController {
         } catch (SQLException e) {
             System.err.println(e);
         }
+        //!!!!!!!!!ACHTUNG MUSS HIER ENTFERNT WERDEN BEI ERSTELLUNG VON MODULEN UEBER BAUM
+        this.addModule(1);
         this.changeProfile(name + ".sbprofile");
+    }
+    
+    public void addModule(int semesterID) {
+        ////////////Nicht dynamisch, da Semester noch nicht implementiert!
+        if(semesterID == 1) {
+            //Erstelle neues Modul
+            SBModel db = this.dbconnect();
+            db.query("INSERT INTO module (semesterID)"
+                + "VALUES ("+semesterID+");");
+        }
     }
 }
