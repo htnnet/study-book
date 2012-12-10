@@ -20,15 +20,28 @@ public class SBActionListener implements ActionListener {
 
     private SBView view;
     private SBController controller;
-    FileFilter ff = null;
+    private JFileChooser fileChooser;
+    private int check;
 
     public SBActionListener(SBView view, SBController controller) {
         this.view = view;
         this.controller = controller;
-        ff = new FileFilter() {
+        this.setupFileChooser();
+
+    }
+
+    /**
+     * Erstellt einen JFileChosser mit dessen Hilfe Dateien zum Öffnen und
+     * Zielorte zum Abspeichern ausgewählt werden können.
+     */
+    private void setupFileChooser() {
+        // FileFilter erstellen, umungewollte Dateien in der
+        // Verzeichnisauflistung herauszufiltern
+        FileFilter fileFilter = new FileFilter() {
+
             @Override
-            public boolean accept(File f) {
-                return f.getName().toLowerCase().endsWith(".sbprofile") || f.isDirectory();
+            public boolean accept(File file) {
+                return file.getName().toLowerCase().endsWith(".sbprofile") || file.isDirectory();
             }
 
             @Override
@@ -36,6 +49,9 @@ public class SBActionListener implements ActionListener {
                 return "StudyBook Profile (*.sbprofile)";
             }
         };
+        fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(fileFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
     }
 
     /**
@@ -46,28 +62,24 @@ public class SBActionListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
-        view.hideStatusBar();
+        view.hideStatusError();
         if (obj instanceof JMenuItem) {
             String cmd = e.getActionCommand();
             switch (cmd) {
                 //---Datei---
                 // Neues Profil
                 case "new":
-                    String str = JOptionPane.showInputDialog(null, "Profilname: ", "Neues Profil anlegen", 1);
-                    if (str != null) {
-                        controller.createProfile(str);
+                    String name = JOptionPane.showInputDialog(null, "Profilname: ", "Neues Profil anlegen", 1);
+                    if (name != null) {
+                        controller.createProfile(name);
                     }
                     break;
 
                 // Profil öffnen
                 case "open":
-                    JFileChooser chooser = new JFileChooser();
-
-                    chooser.setFileFilter(ff);
-                    chooser.setAcceptAllFileFilterUsed(false);
-                    int rueckgabeWert = chooser.showOpenDialog(null);
-                    if (rueckgabeWert == JFileChooser.APPROVE_OPTION) {
-                        controller.changeProfile(chooser.getSelectedFile().getPath());
+                    check = fileChooser.showOpenDialog(null);
+                    if (check == JFileChooser.APPROVE_OPTION) {
+                        controller.changeProfile(fileChooser.getSelectedFile().getPath());
                     }
                     break;
 
@@ -76,14 +88,11 @@ public class SBActionListener implements ActionListener {
                     controller.save();
                     break;
 
-                // Profils speichern unter...
+                // Profil speichern unter...
                 case "saveas":
-                    JFileChooser saver = new JFileChooser();
-                    saver.setFileFilter(ff);
-                    saver.setAcceptAllFileFilterUsed(false);
-                    rueckgabeWert = saver.showSaveDialog(null);
-                    if (rueckgabeWert == JFileChooser.APPROVE_OPTION) {
-                        controller.saveProfile(saver.getSelectedFile().getPath());
+                    check = fileChooser.showSaveDialog(null);
+                    if (check == JFileChooser.APPROVE_OPTION) {
+                        controller.saveProfile(fileChooser.getSelectedFile().getPath());
                     }
                     break;
 
@@ -93,22 +102,40 @@ public class SBActionListener implements ActionListener {
                     break;
 
                 //---Bearbeiten---
-                // Knoten hinzufügen
-                case "add":
+                // -Hinzufügen-
+                // Studiengang
+                case "study":
+                    System.out.println("neuer Studiengang");
                     break;
 
-                // Knoten entfernen
-                case "remove":
+                // Semester
+                case "semester":
+                    System.out.println("neues Semester");
                     break;
 
+                // Modul
+                case "module":
+                    System.out.println("neues Modul");
+                    break;
+
+                // Löschen
+                case "delete":
+                    System.out.println("Löschen");
+                    break;
+
+                // Umbenennen
+                case "rename":
+                    System.out.println("Umbenennen");
+                    break;
                 //---Hilfe---
                 // Hilfe
                 case "help":
-                    controller.setHelpPanel();
+                    controller.showHelpPanel();
+                    break;
 
                 // Über
                 case "about":
-                    controller.showModulePanel();
+                    controller.showAboutPanel();
                     break;
             }
         }

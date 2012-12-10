@@ -73,6 +73,7 @@ public class SBStudyPanel extends JPanel {
         this.createLabel();
         this.createTextFields();
         this.createDatePicker();
+        this.createTable();
     }
 
     /**
@@ -157,6 +158,15 @@ public class SBStudyPanel extends JPanel {
     }
 
     /**
+     * Erzeugt die Notentabelle.
+     */
+    private void createTable() {
+        String[] columns = {"Leistung", "Credits", "Note"};
+        tableModel = new DefaultTableModel(columns, 30);
+        gradeTable = new SBTable(tableModel);
+        gradeTable.setEnabled(false);
+    }
+    /**
      * Damit die GUI-Komponenten an die richtige Stelle kommen.
      */
     private void layoutStudyPanel() {
@@ -194,6 +204,10 @@ public class SBStudyPanel extends JPanel {
         northPanel.setLayout(new GridLayout(1, 2));
         northPanel.add(studentPanel);
         northPanel.add(studyPanel);
+
+        // Notentabelle
+        progressPanel.setLayout(new BorderLayout());
+        progressPanel.add(gradeTable, BorderLayout.CENTER);
 
         // alle Hauptpanels
         this.setLayout(new BorderLayout());

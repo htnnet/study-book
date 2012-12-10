@@ -121,10 +121,13 @@ public class SBModulePanel extends JPanel {
 
         this.setFields(inputString);
 
+        /*
         String[] outputString = this.getFields();
         for (int i = 0; i < outputString.length; i++) {
             System.out.println(outputString[i]);
         }
+        * 
+        */
 
 
     }

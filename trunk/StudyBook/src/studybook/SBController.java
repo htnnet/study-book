@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.tree.TreePath;
 
 /**
  * Ist für die reibungslose Interkommunikation zwischen der grafischen
@@ -25,6 +26,7 @@ public class SBController {
     private SBStudyPanel sbstudypanel = new SBStudyPanel();
     private SBHelpPanel sbhelppanel = new SBHelpPanel();
     private SBModulePanel sbmodulepanel = new SBModulePanel();
+    private SBSemesterPanel sbsemesterpanel = new SBSemesterPanel();
     private String activePanel = "sbstudypanel"; //Startpanel festlegen
     private boolean initialize = true;
     private boolean profile_changed = false;
@@ -34,6 +36,55 @@ public class SBController {
         this.model = model;
         this.initialize();
     }
+
+    public void showStudyPanel() {
+        SBModel db = this.dbconnect();
+        if (db != null) {
+            if (!initialize && !profile_changed) {
+                this.save();
+            }
+            try {
+                ResultSet rs = db.get("SELECT * FROM allgemeindaten"); //Alles von der Tabelle allgemeindaten holen
+                while (rs.next()) {
+                    String fields[] = {rs.getString("studentname"),rs.getString("studentmatnum"),rs.getString("studentbirth"),
+                        rs.getString("studyname"),rs.getString("studyacad"),rs.getString("studystart")};
+                    sbstudypanel.setFields(fields);
+                }
+            } catch (SQLException e) {
+                System.err.println(e);
+            }
+        } else {
+            view.showStatusError("Fehler bei dem Lesen des Profils! Profil erstellt?");
+            view.setFrameTitle("StudyBook");
+        }
+        profile_changed = false;
+        System.out.println(profilname);
+        activePanel = "sbstudypanel";
+        view.setRightPanel(sbstudypanel);
+    }
+
+    public void showSemesterPanel() {
+        this.save();
+        view.setRightPanel(sbsemesterpanel);
+        activePanel = "sbsemesterpanel";
+    }
+
+    public void showModulePanel() {
+        this.save();
+        view.setRightPanel(sbmodulepanel);
+        activePanel = "sbmodulepanel";
+    }
+
+    public void showHelpPanel() {
+        this.save();
+        view.setRightPanel(sbhelppanel);
+        activePanel = "sbhelppanel";
+    }
+
+    public void showAboutPanel() {
+        System.out.println("About");
+    }
+
 
     private void loadSettings() {
         try {
@@ -63,23 +114,13 @@ public class SBController {
     private void initialize() {
         this.loadSettings();
         view = new SBView(this);
-        view.createMainFrame();
-        view.layoutMainFrame();
-        this.setStudyPanel();
+        view.createView();
+        view.layoutView();
+        this.showStudyPanel();
         initialize = false;
     }
 
-    public void showModulePanel() {
-        this.save();
-        view.setRightPanel(sbmodulepanel);
-        activePanel = "sbmodulepanel";
-    }
 
-    public void setHelpPanel() {
-        this.save();
-        view.setRightPanel(sbhelppanel);
-        activePanel = "sbhelppanel";
-    }
 
     public void save() {
         switch (activePanel) {
@@ -115,34 +156,9 @@ public class SBController {
         this.createProfile(path);
     }
 
-    public void setStudyPanel() {
-        SBModel db = this.dbconnect();
-        if (db != null) {
-            if (!initialize && !profile_changed) {
-                this.save();
-            }
-            try {
-                ResultSet rs = db.get("SELECT * FROM allgemeindaten"); //Alles von der Tabelle allgemeindaten holen
-                while (rs.next()) {
-                    String fields[] = {rs.getString("studentname"),rs.getString("studentmatnum"),rs.getString("studentbirth"),rs.getString("studyname"),rs.getString("studyacad"),rs.getString("studystart")};
-                    sbstudypanel.setFields(fields);
-                }
-            } catch (SQLException e) {
-                System.err.println(e);
-            }
-        } else {
-            view.showError("Fehler bei dem Lesen des Profils! Profil erstellt?");
-            view.setStandardTitle();
-        }
-        profile_changed = false;
-        System.out.println(profilname);
-        activePanel = "sbstudypanel";
-        view.setRightPanel(sbstudypanel);
-    }
-    
-    public void setModulePanel() {
-        
-    }
+
+
+
 
     public String getActivePanel() {
         return activePanel;
@@ -154,18 +170,18 @@ public class SBController {
         profilname = path.substring(0, path.length() - 10);
         profile_changed = true;
         this.dbconnect();
-        this.setStudyPanel();
+        this.showStudyPanel();
     }
 
     public SBModel dbconnect() {
         if (!new File(profilname + ".sbprofile").exists()) {
-            view.showError("Noch kein Profil erstellt!");
+            view.showStatusError("Noch kein Profil erstellt!");
             return null;
         } else {
             profileSaveAs = false;
             SBModel sqltest = this.model;
             sqltest.connect(profilname + ".sbprofile");
-            view.setFrameTitle(profilname + ".sbprofile");
+            view.setFrameTitle("StudyBook - " + profilname + ".sbprofile");
             System.out.println("dbconnect " + profilname);
             return sqltest;
         }
@@ -188,13 +204,13 @@ public class SBController {
                 + "'academicTel' varchar(100) NOT NULL,"
                 + "'academicMail' varchar(100) NOT NULL,"
                 + "'examOneType' varchar(100) NOT NULL,"
-                + "'examOneRoom' varchar(20) NOT NULL" 
+                + "'examOneRoom' varchar(20) NOT NULL"
                 + "'examOneDate' varchar(100) NOT NULL,"
                 + "'examOneTime' varchar(100) NOT NULL,"
                 + "'examOneCredits' varchar(100) NOT NULL,"
                 + "'examOneGrade' varchar(100) NOT NULL,"
                 + "'examTwoType' varchar(100) NOT NULL,"
-                + "'examTwoRoom' varchar(20) NOT NULL" 
+                + "'examTwoRoom' varchar(20) NOT NULL"
                 + "'examTwoDate' varchar(100) NOT NULL,"
                 + "'examTwoTime' varchar(100) NOT NULL,"
                 + "'examTwoCredits' varchar(100) NOT NULL,"
@@ -216,7 +232,7 @@ public class SBController {
         this.addModule(1);
         this.changeProfile(name + ".sbprofile");
     }
-    
+
     public void addModule(int semesterID) {
         ////////////Nicht dynamisch, da Semester noch nicht implementiert!
         if(semesterID == 1) {
