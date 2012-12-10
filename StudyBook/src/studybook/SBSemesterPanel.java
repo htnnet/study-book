@@ -16,10 +16,10 @@ import javax.swing.table.TableColumn;
 
 public class SBSemesterPanel extends JPanel {
     private Border margin;
-    private Border timetabletborder;
-    private Border timetablecborder;
+    private Border timeTitledBorder;
+    private Border timeCompBorder;
     private DefaultTableModel timetablemodel;
-    private JTable timetable;
+    private JTable timeTable;
 
 
     public SBSemesterPanel() {
@@ -33,22 +33,22 @@ public class SBSemesterPanel extends JPanel {
      * stundenplan einsehen und verwalten kann.
      */
     private void createSemesterPanel() {
-        timetablemodel = new DefaultTableModel(5, 6);
-        timetable = new JTable(timetablemodel);
+        timetablemodel = new DefaultTableModel(10, 7);
+        timeTable = new JTable(timetablemodel);
 
 
         // alle Zellen des Stundenplans quadratisch darstellen
-        timetable.setRowHeight(100);
-        for (int i = 0; i < timetable.getColumnCount(); i++) {
-            TableColumn column = timetable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(100);
+        timeTable.setRowHeight(50);
+        for (int i = 0; i < timeTable.getColumnCount(); i++) {
+            TableColumn column = timeTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(50);
         }
 
         margin = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-        timetabletborder = BorderFactory.createTitledBorder("Stundenplan");
-        timetablecborder = BorderFactory.createCompoundBorder(timetabletborder, margin);
+        timeTitledBorder = BorderFactory.createTitledBorder("Stundenplan");
+        timeCompBorder = BorderFactory.createCompoundBorder(timeTitledBorder, margin);
 
-        this.setBorder(timetablecborder);
+        this.setBorder(timeCompBorder);
 
     }
 
@@ -58,6 +58,6 @@ public class SBSemesterPanel extends JPanel {
      */
     private void layoutSemesterPanel() {
         this.setLayout(new BorderLayout());
-        this.add(timetable);
+        this.add(timeTable);
     }
 }
