@@ -41,16 +41,16 @@ public class SBStudyPanel extends JPanel {
     private JLabel studentNameLabel;
     private JLabel studentBirthLabel;
     private JLabel studentMatLabel;
-    private JLabel studyNameLabel;
+    private JLabel studyDegreeLabel;
     private JLabel studyAcadLabel;
     private JLabel studyStartLabel;
     private JTextField studentNameField;
     private JTextField studentMatField;
-    private JTextField studyNameField;
+    private JTextField studyDegreeField;
     private JTextField studyAcadField;
     private SBFieldDocument studentNameDocument;
     private SBFieldDocument studentMatDocument;
-    private SBFieldDocument studyNameDocument;
+    private SBFieldDocument studyDegreeDocument;
     private SBFieldDocument studyAcadDocument;
     private SimpleDateFormat dateFormat;
     private DatePicker studentBirthPicker;
@@ -124,7 +124,7 @@ public class SBStudyPanel extends JPanel {
         studentBirthLabel = new JLabel("Geburtsdatum:");
 
         // Studiengang
-        studyNameLabel = new JLabel("Name:");
+        studyDegreeLabel = new JLabel("Abschluss:");
         studyAcadLabel = new JLabel("Hochschule:");
         studyStartLabel = new JLabel("Studienbeginn:");
     }
@@ -136,13 +136,13 @@ public class SBStudyPanel extends JPanel {
         // Einschränkungen für Textfelder festlegen
         studentNameDocument = new SBFieldDocument(50);
         studentMatDocument = new SBFieldDocument(50, "1234567890");
-        studyNameDocument = new SBFieldDocument(50);
+        studyDegreeDocument = new SBFieldDocument(50);
         studyAcadDocument = new SBFieldDocument(50);
 
         // Eingabefelder
         studentNameField = new JTextField(studentNameDocument, "", 0);
         studentMatField = new JTextField(studentMatDocument, "", 0);
-        studyNameField = new JTextField(studyNameDocument, "", 0);
+        studyDegreeField = new JTextField(studyDegreeDocument, "", 0);
         studyAcadField = new JTextField(studyAcadDocument, "", 0);
     }
 
@@ -187,12 +187,12 @@ public class SBStudyPanel extends JPanel {
 
         // Studiengang
         studyLabelPanel.setLayout(new GridLayout(3, 1, 5, 5));
-        studyLabelPanel.add(studyNameLabel);
+        studyLabelPanel.add(studyDegreeLabel);
         studyLabelPanel.add(studyAcadLabel);
         studyLabelPanel.add(studyStartLabel);
 
         studyFieldPanel.setLayout(new GridLayout(3, 1, 5, 5));
-        studyFieldPanel.add(studyNameField);
+        studyFieldPanel.add(studyDegreeField);
         studyFieldPanel.add(studyAcadField);
         studyFieldPanel.add(studyStartPicker);
 
@@ -234,7 +234,7 @@ public class SBStudyPanel extends JPanel {
             this.studentNameField.getText(),
             this.studentMatField.getText(),
             this.getStringDate(studentBirthPicker.getDate()),
-            this.studyNameField.getText(),
+            this.studyDegreeField.getText(),
             this.studyAcadField.getText(),
             this.getStringDate(studyStartPicker.getDate())
         };
@@ -268,7 +268,7 @@ public class SBStudyPanel extends JPanel {
     public void setFields(String[] fields) {
         this.studentNameField.setText(fields[0]);
         this.studentMatField.setText(fields[1]);
-        this.studyNameField.setText(fields[3]);
+        this.studyDegreeField.setText(fields[3]);
         this.studyAcadField.setText(fields[4]);
 
         // Falls das Setzen des Datums nicht funktionieren sollte

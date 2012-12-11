@@ -1,7 +1,6 @@
 package studybook;
 
 
-import java.awt.Menu;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
@@ -22,7 +21,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionListener {
 
     private SBController controller;
-    private ActionListener actionListener;
     private JTree tree;
     private JPopupMenu popupMenu;
 
@@ -57,9 +55,15 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     @Override
     public void valueChanged(TreeSelectionEvent event) {
         int pathLength = event.getPath().getPathCount();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+
+        System.out.println(event.getPath());
+        SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
+        System.out.println(nodeInfo.getId());
 
         switch (pathLength) {
                 case 2:
+
                     controller.showStudyPanel();
                     break;
 

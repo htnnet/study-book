@@ -5,10 +5,11 @@ import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Vector;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
@@ -27,6 +28,7 @@ public class SBView {
     private SBSemesterPanel semesterPanel;
     private SBModulePanel modulePanel;
     private ActionListener actionListener;
+    private JScrollPane treePane;
     private SBMouseTreeListener mouseTreeListener;
     private JTree tree;
     private DefaultMutableTreeNode treeRoot;
@@ -38,7 +40,10 @@ public class SBView {
     private JMenuBar menuBar;
     private JPopupMenu popupMenu;
     private JMenu menu;
+    private JMenu editMenu;
     private JMenu submenu;
+    private JMenuItem moduleBarMenuItem;
+    private JMenuItem modulePopupMenuItem;
     private ImageIcon itemIcon;
     private JMenuItem menuItem;
     private JLabel statusBar;
@@ -67,6 +72,7 @@ public class SBView {
         }
 
         mainFrame.addWindowListener(new WindowAdapter() {
+
             public void windowClosing(WindowEvent e) {
                 controller.exit();
             }
@@ -80,8 +86,8 @@ public class SBView {
 
         leftPanel = new JPanel();
         this.createMenuBar();
-        this.createPopupMenu();
         this.createTree();
+        this.createPopupMenu();
         this.createStatusBar();
 
         mainFrame.setContentPane(mainPanel);
@@ -91,6 +97,7 @@ public class SBView {
     /**
      * Setzt den Titel des Frames, um den Benutzer zu zeigen, welche Profildatei
      * er gerade geöffnet hat und wo diese liegt.
+     *
      * @param title der neue Titel des Frames
      */
     public void setFrameTitle(String title) {
@@ -106,7 +113,7 @@ public class SBView {
         mainFrame.setLayout(new BorderLayout());
 
         leftPanel.setLayout(new BorderLayout());
-        leftPanel.add(tree);
+        leftPanel.add(treePane);
 
         splitPane.setLeftComponent(leftPanel);
         splitPane.setRightComponent(rightPanel);
@@ -122,64 +129,78 @@ public class SBView {
     }
 
     /**
+     * Befüllt das JTree mit neuen Daten.
+     * @param nodes
+     */
+    public void reloadTree(Vector<SBNodeStruct> nodes) {
+        treeRoot = this.addTreeNodes(nodes, nodes.get(0), 1);
+        DefaultTreeModel treeModel = new DefaultTreeModel(treeRoot);
+        tree.setModel(treeModel);
+    }
+
+    /**
      * Methode zum Erstellen eines Baumes, der zur Navigation zwischen der
      * Studiengang-,Semester- und Modulverwatlung dient.
      */
-
     private void createTree() { //Baum erstellen
-        treeRoot = new DefaultMutableTreeNode("root");
-        DefaultMutableTreeNode studiengang1 = new DefaultMutableTreeNode("Technische Informatik B.Sc.");
-        DefaultMutableTreeNode studiengang2 = new DefaultMutableTreeNode("Informatik M.Sc.");
-
-        for (int i = 1; i < 8; i++) {
-            DefaultMutableTreeNode semester = new DefaultMutableTreeNode(i + ". Semester");
-            DefaultMutableTreeNode modul1 = new DefaultMutableTreeNode("MATHE1");
-            DefaultMutableTreeNode modul2 = new DefaultMutableTreeNode("GELEK1");
-            DefaultMutableTreeNode modul3 = new DefaultMutableTreeNode("INFORM");
-            DefaultMutableTreeNode modul4 = new DefaultMutableTreeNode("PROG1");
-            DefaultMutableTreeNode modul5 = new DefaultMutableTreeNode("ENGL1");
-            semester.add(modul1);
-            semester.add(modul2);
-            semester.add(modul3);
-            semester.add(modul4);
-            semester.add(modul5);
-            studiengang1.add(semester);
-        }
-
-        for (int i = 1; i < 8; i++) {
-            DefaultMutableTreeNode semester = new DefaultMutableTreeNode(i + ". Semester");
-            DefaultMutableTreeNode modul1 = new DefaultMutableTreeNode("MATHE1");
-            DefaultMutableTreeNode modul2 = new DefaultMutableTreeNode("GELEK1");
-            DefaultMutableTreeNode modul3 = new DefaultMutableTreeNode("INFORM");
-            DefaultMutableTreeNode modul4 = new DefaultMutableTreeNode("PROG1");
-            DefaultMutableTreeNode modul5 = new DefaultMutableTreeNode("ENGL1");
-            semester.add(modul1);
-            semester.add(modul2);
-            semester.add(modul3);
-            semester.add(modul4);
-            semester.add(modul5);
-            studiengang2.add(semester);
-        }
-
-        treeRoot.add(studiengang1);
-        treeRoot.add(studiengang2);
-        tree = new JTree(treeRoot);
-
+        //treeRoot = new DefaultMutableTreeNode("root");
+        tree = new JTree();
+        treePane = new JScrollPane(tree);
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
         // Damit nur ein Element gleichzeitig ausgewählt werden kann.
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
+
         DefaultTreeCellRenderer tree_renderer = new DefaultTreeCellRenderer() {
+
             {
                 setLeafIcon(new ImageIcon(getClass().getResource("/pics/module16x16.png"))); //Icon von Blaettern
                 setOpenIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn aufgeklappt
                 setClosedIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn zugeklappt
             }
         };
-        tree.setRootVisible(false);
+        
+
+
         tree.setCellRenderer(tree_renderer); //Renderer dem Baum hinzufuegen
         mouseTreeListener = new SBMouseTreeListener(controller, tree, popupMenu);
         tree.addMouseListener(mouseTreeListener); // SBMouseTreeListener dem Baum hinzufuegen
         tree.addTreeSelectionListener(mouseTreeListener);
+
+    }
+
+    /**
+     * Fügt dem JTree Elemente in Form von SBNodeStruct-Objekten aus einem
+     * Vector hinzu.
+     * @param nodes Vector mit den SBNodeStruct-Objekten
+     * @param parent parent-element
+     * @param start gibt die Stelle an, an der der Vector nodes abgearbeitet wird
+     * @return
+     */
+    private DefaultMutableTreeNode addTreeNodes(Vector<SBNodeStruct> nodes, SBNodeStruct parent, int start) {
+
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(parent);
+
+        // durch den Vektor iterieren
+        for (int i = start; i < nodes.size(); i++) {
+
+            // nur Einträge einfügen, deren Verschachtelungstiefe eine höher ist als die des parents
+            if (nodes.get(i).getLevel() == parent.getLevel() + 1) {
+
+                // Unterbaum des childs rekursiv anhängen
+                node.add(addTreeNodes(nodes, nodes.get(i), i + 1));
+            } else {
+
+                // Schleife abbrechen, wenn auf ein Element gestoßen wird, dessen
+                // Verschachtelungstiefe
+                if (nodes.get(i).getLevel() <= parent.getLevel()) {
+                    break;
+                }
+            }
+        }
+        return node;
+
     }
 
     /**
@@ -243,8 +264,8 @@ public class SBView {
         menuBar.add(menu);
 
         // Bearbeiten
-        menu = new JMenu("Bearbeiten");
-        menu.setMnemonic('B');
+        editMenu = new JMenu("Bearbeiten");
+        editMenu.setMnemonic('B');
 
         submenu = new JMenu("Hinzufügen");
         submenu.setMnemonic('H');
@@ -265,13 +286,13 @@ public class SBView {
         menuItem.addActionListener(actionListener);
         submenu.add(menuItem);
 
-        menuItem = new JMenuItem("Modul", 'M');
+        moduleBarMenuItem = new JMenuItem("Modul", 'M');
         itemIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
-        menuItem.setIcon(itemIcon);
-        menuItem.setActionCommand("module");
-        menuItem.addActionListener(actionListener);
-        submenu.add(menuItem);
-        menu.add(submenu);
+        moduleBarMenuItem.setIcon(itemIcon);
+        moduleBarMenuItem.setActionCommand("module");
+        moduleBarMenuItem.addActionListener(actionListener);
+        submenu.add(moduleBarMenuItem);
+        editMenu.add(submenu);
 
         menuItem = new JMenuItem("Löschen", 'L');
         itemIcon = new ImageIcon(getClass().getResource("/pics/delete16x16.png"));
@@ -280,7 +301,7 @@ public class SBView {
         menuItem.setAccelerator(deleteKeyStroke);
         menuItem.setActionCommand("delete");
         menuItem.addActionListener(actionListener);
-        menu.add(menuItem);
+        editMenu.add(menuItem);
 
         menuItem = new JMenuItem("Umbenennen", 'U');
         itemIcon = new ImageIcon(getClass().getResource("/pics/rename16x16.png"));
@@ -289,9 +310,10 @@ public class SBView {
         menuItem.setAccelerator(f2KeyStroke);
         menuItem.setActionCommand("rename");
         menuItem.addActionListener(actionListener);
-        menu.add(menuItem);
+        editMenu.add(menuItem);
 
-        menuBar.add(menu);
+        editMenu.setEnabled(false);
+        menuBar.add(editMenu);
 
         // Hilfe
         menu = new JMenu("Hilfe");
@@ -339,12 +361,12 @@ public class SBView {
         menuItem.addActionListener(actionListener);
         submenu.add(menuItem);
 
-        menuItem = new JMenuItem("Modul", 'M');
+        modulePopupMenuItem = new JMenuItem("Modul", 'M');
         itemIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
-        menuItem.setIcon(itemIcon);
-        menuItem.setActionCommand("module");
-        menuItem.addActionListener(actionListener);
-        submenu.add(menuItem);
+        modulePopupMenuItem.setIcon(itemIcon);
+        modulePopupMenuItem.setActionCommand("module");
+        modulePopupMenuItem.addActionListener(actionListener);
+        submenu.add(modulePopupMenuItem);
         popupMenu.add(submenu);
 
         menuItem = new JMenuItem("Löschen", 'L');
@@ -364,7 +386,10 @@ public class SBView {
         menuItem.setActionCommand("rename");
         menuItem.addActionListener(actionListener);
         popupMenu.add(menuItem);
+
+        popupMenu.setEnabled(false);
     }
+
     /**
      * Die StatusBar fungiert in erster Linie dazu dem Benutzer über
      * aufgetretene Fehler zu unterrichten. Hierbei wird sie rot, um die Blicke
@@ -382,14 +407,15 @@ public class SBView {
     /**
      * Lässt eine rot aufleuchtende Statusbar erscheinen, die dem Benutzer über
      * eventuell auftretende Fehler unterrichtet.
-     * @param errorMessage
+     *
+     * @param errorMessage die auszugebende Fehlermeldung
      */
     public void showStatusError(String errorMessage) {
         statusBar.setText(errorMessage);
         statusBar.setVisible(true);
     }
 
-     /**
+    /**
      * Ist der Fehler behoben, so wird mittels dieser Methode die StatusBar
      * ausgeblendet.
      */
@@ -398,12 +424,35 @@ public class SBView {
     }
 
     /**
-     * Mithilfe dieser Methode kann das Panel auf der rechten Seite des
-     * Frames mit einem beliebigen Panel versehen werden.
+     * Wenn kein Baumelement markiert ist, kann mittels dieser Methode das
+     * Popup-Menü und das Bearbeiten-Menü aktiviert und deaktiviert werden.
+     *
+     * @param enabled Menü aktivieren oder deaktivieren
+     */
+    public void setEditMenuEnabled(boolean enabled) {
+        editMenu.setEnabled(enabled);
+        popupMenu.setEnabled(enabled);
+    }
+
+    /**
+     * Wenn ein Studiengang im Baum markiert ist, kann mittels dieser Methode
+     * das MenuItem zum Hinzufügen von Modulen deaktiviert werden.
+     *
+     * @param enabled Menü aktivieren oder deaktivieren
+     */
+    public void setModuleMenuItemEnabled(boolean enabled) {
+        moduleBarMenuItem.setEnabled(enabled);
+        modulePopupMenuItem.setEnabled(enabled);
+
+    }
+
+    /**
+     * Mithilfe dieser Methode kann das Panel auf der rechten Seite des Frames
+     * mit einem beliebigen Panel versehen werden.
+     *
      * @param panel
      */
-    public void setRightPanel(JPanel panel) {
-        rightPanel = panel;
-        this.layoutView();
+    public void setRightPanel(JPanel rightPanel) {
+        splitPane.setRightComponent(rightPanel);
     }
 }
