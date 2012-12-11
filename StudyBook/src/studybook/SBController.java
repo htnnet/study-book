@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 import javax.swing.tree.TreePath;
 
 /**
@@ -38,6 +39,10 @@ public class SBController {
     }
 
     public void showStudyPanel() {
+        view.setEditMenuEnabled(true);
+        view.setModuleMenuItemEnabled(false);
+
+
         SBModel db = this.dbconnect();
         if (db != null) {
             if (!initialize && !profile_changed) {
@@ -64,12 +69,16 @@ public class SBController {
     }
 
     public void showSemesterPanel() {
+        view.setEditMenuEnabled(true);
+        view.setModuleMenuItemEnabled(true);
         this.save();
         view.setRightPanel(sbsemesterpanel);
         activePanel = "sbsemesterpanel";
     }
 
     public void showModulePanel() {
+        view.setEditMenuEnabled(true);
+        view.setModuleMenuItemEnabled(true);
         this.save();
         view.setRightPanel(sbmodulepanel);
         activePanel = "sbmodulepanel";
@@ -112,11 +121,31 @@ public class SBController {
     }
 
     private void initialize() {
+        Vector<SBNodeStruct> v = new Vector<SBNodeStruct>();
+        v.add(new SBNodeStruct("root", 0, 0));
+        v.add(new SBNodeStruct("Technische Informatik B.Sc.", 0, 1));
+        v.add(new SBNodeStruct("1. Semester", 0, 2));
+        v.add(new SBNodeStruct("MATHE2", 0, 3));
+        v.add(new SBNodeStruct("ENGL", 1, 3));
+        v.add(new SBNodeStruct("GELEK1", 2, 3));
+        v.add(new SBNodeStruct("PROG1", 3, 3));
+        v.add(new SBNodeStruct("INFORM", 4, 3));
+        v.add(new SBNodeStruct("2. Semester", 1, 2));
+        v.add(new SBNodeStruct("3. Semester", 2, 2));
+        v.add(new SBNodeStruct("Informatik M.Sc.", 1, 1));
+        v.add(new SBNodeStruct("1. Semester", 0, 2));
+
         this.loadSettings();
         view = new SBView(this);
         view.createView();
+        view.reloadTree(v);
+        v.add(new SBNodeStruct("1. Semester", 0, 2));
+        v.add(new SBNodeStruct("1. Semester", 0, 2));
+        v.add(new SBNodeStruct("1. Semester", 0, 2));
+        view.reloadTree(v);
         view.layoutView();
         this.showStudyPanel();
+
         initialize = false;
     }
 
