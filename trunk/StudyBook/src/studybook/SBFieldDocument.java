@@ -37,6 +37,10 @@ public class SBFieldDocument extends PlainDocument {
     }
 
 
+    public int checkInput(String proposeValue) throws NumberFormatException {
+        return 1;
+    }
+
     /**
      * Überschriebene Methode von PlainDocument, mit der man das Eingabe-
      * verhalten steuern kann.
@@ -47,6 +51,8 @@ public class SBFieldDocument extends PlainDocument {
      */
     @Override
     public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
+
+
         // Falls es "verbotene" Zeichen gibt, werden sie hier herausgefiltert
         if (acceptedChars != null) {
             for (int i = 0; i < str.length(); i++) {
@@ -57,9 +63,10 @@ public class SBFieldDocument extends PlainDocument {
         }
 
         // Längenüberschreitung prüfen
-        if (this.getLength() + str.length() > maxLength) {
+        if ((this.getLength() + str.length() > maxLength)) {
+
         } else {
-            super.insertString(offset, str, a);
+           super.insertString(offset, str, a);
         }
 
 

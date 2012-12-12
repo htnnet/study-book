@@ -7,10 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 
 /**
  * Die grafischen Oberfläche bildet das Herzstück des Programms. Hierüber kann
@@ -47,6 +44,8 @@ public class SBView {
     private ImageIcon itemIcon;
     private JMenuItem menuItem;
     private JLabel statusBar;
+    private SBFieldDocument nodeDocument;
+    private JTextField nodeField;
 
     /**
      * Konstruktor der Klasse "SBView"
@@ -82,15 +81,19 @@ public class SBView {
         mainPanel = new JPanel();
         splitPane = new JSplitPane();
         splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(200);
 
         leftPanel = new JPanel();
+        leftPanel.setMinimumSize(new Dimension(200, 200));
+        rightPanel = new JPanel();
+        rightPanel.setMinimumSize(new Dimension(500, 500));
+
         this.createMenuBar();
-        this.createTree();
         this.createPopupMenu();
+        this.createTree();
         this.createStatusBar();
 
         mainFrame.setContentPane(mainPanel);
+
 
     }
 
@@ -133,9 +136,28 @@ public class SBView {
      * @param nodes
      */
     public void reloadTree(Vector<SBNodeStruct> nodes) {
+        //TreePath lastSelected
         treeRoot = this.addTreeNodes(nodes, nodes.get(0), 1);
-        DefaultTreeModel treeModel = new DefaultTreeModel(treeRoot);
+        DefaultTreeModel treeModel = new DefaultTreeModel(treeRoot) {
+            @Override
+            public void valueForPathChanged(final TreePath path, final Object newValue) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+                SBNodeStruct oldValue = (SBNodeStruct) node.getUserObject();
+                oldValue.setName(newValue.toString());
+
+                super.valueForPathChanged(path, oldValue);
+        }
+        };
+
+
+
         tree.setModel(treeModel);
+
+        // alles aufklappen
+        for (int i = 0; i < tree.getRowCount() ; i++) {
+            tree.expandRow( i );
+        }
+        treeModel.addTreeModelListener(mouseTreeListener);
     }
 
     /**
@@ -145,29 +167,66 @@ public class SBView {
     private void createTree() { //Baum erstellen
         //treeRoot = new DefaultMutableTreeNode("root");
         tree = new JTree();
+        tree.setEditable(true);
         treePane = new JScrollPane(tree);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         // Damit nur ein Element gleichzeitig ausgewählt werden kann.
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
+        // Render erstellen für die Icons
+        DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer() {
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree,
+                    Object value, boolean sel, boolean expanded, boolean leaf,
+                    int row, boolean hasFocus) {
+                DefaultMutableTreeNode currentTreeNode = (DefaultMutableTreeNode) value;
+                int pathLength = currentTreeNode.getPath().length;
 
-        DefaultTreeCellRenderer tree_renderer = new DefaultTreeCellRenderer() {
+                SBNodeStruct userObject = (SBNodeStruct) currentTreeNode.getUserObject();
+                ImageIcon studyIcon = new ImageIcon(getClass().getResource("/pics/sb_icon.gif"));
+                ImageIcon semesterIcon = new ImageIcon(getClass().getResource("/pics/semester16x16.png"));
+                ImageIcon moduleIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
 
-            {
-                setLeafIcon(new ImageIcon(getClass().getResource("/pics/module16x16.png"))); //Icon von Blaettern
-                setOpenIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn aufgeklappt
-                setClosedIcon(new ImageIcon(getClass().getResource("/pics/sb_icon.gif"))); //Icon, wenn zugeklappt
+                int level = userObject.getLevel();
+                //System.out.println(userObject.toString() + ": \nPfadlänge: " + pathLength + " | Level. " + level );
+
+                switch (pathLength) {
+                    case 2:
+                        setLeafIcon(studyIcon);
+                        setOpenIcon(studyIcon);
+                        setClosedIcon(studyIcon);
+                        break;
+                    case 3:
+                        setLeafIcon(semesterIcon);
+                        setOpenIcon(semesterIcon);
+                        setClosedIcon(semesterIcon);
+                        break;
+                    case 4:
+                        setLeafIcon(moduleIcon);
+                        break;
+
+
+                }
+                return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             }
         };
-        
 
+        nodeDocument = new SBFieldDocument(50);
 
-        tree.setCellRenderer(tree_renderer); //Renderer dem Baum hinzufuegen
+        nodeField = new JTextField(nodeDocument, "", 0);
+
+        tree.setCellRenderer(treeRenderer); //Renderer dem Baum hinzufuegen
+
+        TreeCellEditor fieldEditor = new DefaultCellEditor(nodeField);
+        TreeCellEditor editor = new DefaultTreeCellEditor(tree, treeRenderer, fieldEditor);
+
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.setInvokesStopCellEditing(true);      // Fokus-Verlust bedeutet das Ändern des Namens
+        tree.setCellEditor(editor);
         mouseTreeListener = new SBMouseTreeListener(controller, tree, popupMenu);
         tree.addMouseListener(mouseTreeListener); // SBMouseTreeListener dem Baum hinzufuegen
         tree.addTreeSelectionListener(mouseTreeListener);
-
     }
 
     /**
@@ -453,6 +512,48 @@ public class SBView {
      * @param panel
      */
     public void setRightPanel(JPanel rightPanel) {
+        // damit beim Panel-Wechsel die alte Position des Dividers gewahrt wird
+        int dividerLocation = splitPane.getDividerLocation();
+        rightPanel.setMinimumSize(new Dimension(500, 500));
         splitPane.setRightComponent(rightPanel);
+        splitPane.setDividerLocation(dividerLocation);
+    }
+
+    /**
+     * Gibt das HelpPanel zurück.
+     * @return das HelpPanel
+     */
+    public SBHelpPanel getHelpPanel() {
+        return this.helpPanel;
+    }
+
+    /**
+     * Gibt das StudyPanel zurück.
+     * @return das HelpPanel
+     */
+    public SBStudyPanel getStudyPanel() {
+        return this.studyPanel;
+    }
+     /**
+     * Gibt das SemesterPanel zurück.
+     * @return das SemesterPanel
+     */
+    public SBSemesterPanel getSemesterPanel() {
+        return this.semesterPanel;
+    }
+        /**
+     * Gibt das ModulePanel zurück.
+     * @return das ModulePanel
+     */
+    public SBModulePanel getModulePanel() {
+        return this.modulePanel;
+    }
+
+    /**
+     * Gibt den Tree zurück.
+     * @return der Tree
+     */
+    public JTree getTree() {
+        return this.tree;
     }
 }

@@ -31,6 +31,7 @@ public class SBStudyPanel extends JPanel {
     private JPanel studyLabelPanel;
     private JPanel studyFieldPanel;
     private JPanel progressPanel;
+    private JScrollPane gradeScrollPane;
     private Border studentCompBorder;
     private Border studentTitledBorder;
     private Border studyCompBorder;
@@ -157,6 +158,7 @@ public class SBStudyPanel extends JPanel {
         studyStartPicker = new DatePicker(null, dateFormat, Locale.GERMAN);
     }
 
+
     /**
      * Erzeugt die Notentabelle.
      */
@@ -165,6 +167,8 @@ public class SBStudyPanel extends JPanel {
         tableModel = new DefaultTableModel(columns, 30);
         gradeTable = new SBTable(tableModel);
         gradeTable.setEnabled(false);
+        gradeTable.getTableHeader().setReorderingAllowed(false) ;
+        gradeScrollPane = new JScrollPane(gradeTable);
     }
     /**
      * Damit die GUI-Komponenten an die richtige Stelle kommen.
@@ -207,7 +211,7 @@ public class SBStudyPanel extends JPanel {
 
         // Notentabelle
         progressPanel.setLayout(new BorderLayout());
-        progressPanel.add(gradeTable, BorderLayout.CENTER);
+        progressPanel.add(gradeScrollPane, BorderLayout.CENTER);
 
         // alle Hauptpanels
         this.setLayout(new BorderLayout());
@@ -220,7 +224,7 @@ public class SBStudyPanel extends JPanel {
      *
      * @return die Notentabelle
      */
-    public SBTable getTable() {
+    public SBTable getGradeTable() {
         return this.gradeTable;
     }
 

@@ -6,6 +6,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JTree;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -20,12 +21,14 @@ public class SBActionListener implements ActionListener {
 
     private SBView view;
     private SBController controller;
+    private JTree tree;
     private JFileChooser fileChooser;
     private int check;
 
     public SBActionListener(SBView view, SBController controller) {
         this.view = view;
         this.controller = controller;
+        this.fileChooser = fileChooser;
         this.setupFileChooser();
 
     }
@@ -106,26 +109,31 @@ public class SBActionListener implements ActionListener {
                 // Studiengang
                 case "study":
                     System.out.println("neuer Studiengang");
+                    //controller.addStudyNode(tree.getSelectionPath());
                     break;
 
                 // Semester
                 case "semester":
                     System.out.println("neues Semester");
+                    //controller.addSemesterNode(tree.getSelectionPath());
                     break;
 
                 // Modul
                 case "module":
                     System.out.println("neues Modul");
+                    //controller.addModuleNode(tree.getSelectionPath());
                     break;
 
                 // Löschen
                 case "delete":
                     System.out.println("Löschen");
+                    //controller.deleteNode(tree.getSelectionPath());
                     break;
 
                 // Umbenennen
                 case "rename":
-                    System.out.println("Umbenennen");
+                    tree = view.getTree();
+                    tree.startEditingAtPath(tree.getSelectionPath());
                     break;
                 //---Hilfe---
                 // Hilfe

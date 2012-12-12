@@ -126,7 +126,7 @@ public class SBModulePanel extends JPanel {
         for (int i = 0; i < outputString.length; i++) {
             System.out.println(outputString[i]);
         }
-        * 
+        *
         */
 
 
@@ -344,7 +344,7 @@ public class SBModulePanel extends JPanel {
      * werden können.
      */
     private void createTextArea() {
-        noteDocument = new SBFieldDocument(1000);
+        noteDocument = new SBFieldDocument(10000);
         noteArea = new JTextArea(noteDocument, "", 0, 0);
         noteArea.setLineWrap(true);                 // Zeilenumbruch
         noteArea.setWrapStyleWord(true);            // Zeilenumbruch für Wörter

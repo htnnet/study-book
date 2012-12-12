@@ -17,10 +17,18 @@ public class SBNodeStruct {
     /**
      * Standardkonstruktor zum Erzeugen eines Stringobjekts.
      */
-    public SBNodeStruct(String name, int id, int level) {      //
+    public SBNodeStruct(String name, int id, int level) {
         this.name = new String(name);
         this.id = id;
         this.level = level;
+    }
+
+    /**
+     * Zum Setzen des Namens nach Änderung im Tree.
+     * @param name der neue Name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
