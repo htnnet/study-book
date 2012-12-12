@@ -18,7 +18,8 @@ public class SBSemesterPanel extends JPanel {
     private Border margin;
     private Border timeTitledBorder;
     private Border timeCompBorder;
-    private DefaultTableModel timetablemodel;
+    private JScrollPane timeScrollPane;
+    private DefaultTableModel timeTableModel;
     private JTable timeTable;
 
 
@@ -33,9 +34,9 @@ public class SBSemesterPanel extends JPanel {
      * stundenplan einsehen und verwalten kann.
      */
     private void createSemesterPanel() {
-        timetablemodel = new DefaultTableModel(10, 7);
-        timeTable = new JTable(timetablemodel);
-
+        String[] columns = {"Uhrzeit", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"};
+        timeTableModel = new DefaultTableModel(columns, 20);
+        timeTable = new SBTable(timeTableModel);
 
         // alle Zellen des Stundenplans quadratisch darstellen
         timeTable.setRowHeight(50);
@@ -44,6 +45,8 @@ public class SBSemesterPanel extends JPanel {
             column.setPreferredWidth(50);
         }
 
+        timeTable.getTableHeader().setReorderingAllowed(false);
+        timeScrollPane = new JScrollPane(timeTable);
         margin = BorderFactory.createEmptyBorder(5, 5, 5, 5);
         timeTitledBorder = BorderFactory.createTitledBorder("Stundenplan");
         timeCompBorder = BorderFactory.createCompoundBorder(timeTitledBorder, margin);
@@ -58,6 +61,14 @@ public class SBSemesterPanel extends JPanel {
      */
     private void layoutSemesterPanel() {
         this.setLayout(new BorderLayout());
-        this.add(timeTable);
+        this.add(timeScrollPane);
+    }
+
+    /**
+     * Gibt den Stundenplan in Form einer JTable zurück.
+     * @return der Stundenplan
+     */
+    public JTable getTimeTable() {
+        return timeTable;
     }
 }

@@ -5,9 +5,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import javax.swing.*;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -18,7 +21,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @version 0.1
  * @since 2012-10-14
  */
-public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionListener {
+public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionListener, TreeModelListener {
 
     private SBController controller;
     private JTree tree;
@@ -61,20 +64,55 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
         System.out.println(nodeInfo.getId());
 
+        // In Abhängigkeit von der Länge von Pathlength Panel aufrufen.
         switch (pathLength) {
                 case 2:
 
                     controller.showStudyPanel();
+                    //controller.showStudyPanel(nodeInfo.getId());
                     break;
 
                 case 3:
                     controller.showSemesterPanel();
+                    //controller.showSemesterPanel(nodeInfo.getId());
                     break;
 
                 case 4:
                     controller.showModulePanel();
+                    //controller.showModulePanel(nodeInfo.getId());
                     break;
         }
 
+    }
+
+    @Override
+    public void treeNodesChanged(TreeModelEvent e) {
+        DefaultMutableTreeNode node;
+        node = (DefaultMutableTreeNode)(e.getTreePath().getLastPathComponent());
+
+        try {
+            int index = e.getChildIndices()[0];
+            node = (DefaultMutableTreeNode)
+                   (node.getChildAt(index));
+        } catch (NullPointerException exc) {}
+
+        SBNodeStruct struct = (SBNodeStruct) node.getUserObject();
+        //controller.renameNode(struct.getId());
+        System.out.println("Neuer Name: " + struct);
+    }
+
+    @Override
+    public void treeNodesInserted(TreeModelEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void treeNodesRemoved(TreeModelEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void treeStructureChanged(TreeModelEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

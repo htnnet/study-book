@@ -42,13 +42,13 @@ public class SBController {
     public void showStudyPanel() {
         view.setEditMenuEnabled(true);
         view.setModuleMenuItemEnabled(false);
-        
+
         if (!initialize && !profile_changed) {
             this.save();
         }
-        
+
         sbstudypanel.setFields(model.getStudyPanelValues(view));
-        
+
         profile_changed = false;
         activePanel = "sbstudypanel";
         view.setRightPanel(sbstudypanel);
@@ -59,6 +59,7 @@ public class SBController {
         view.setModuleMenuItemEnabled(true);
         this.save();
         view.setRightPanel(sbsemesterpanel);
+        //sbsemesterpanel.getTable().populateTimeTable(cellvalues);
         activePanel = "sbsemesterpanel";
     }
 
@@ -67,6 +68,7 @@ public class SBController {
         view.setModuleMenuItemEnabled(true);
         this.save();
         view.setRightPanel(sbmodulepanel);
+        //sbmodulepanel.getTable().populateGradeTable(cellvalues);
         activePanel = "sbmodulepanel";
     }
 
@@ -105,7 +107,7 @@ public class SBController {
         this.save();
     }
 
-    private void initialize() {
+    public void reloadTree() {
         Vector<SBNodeStruct> v = new Vector<SBNodeStruct>();
         v.add(new SBNodeStruct("root", 0, 0));
         v.add(new SBNodeStruct("Technische Informatik B.Sc.", 0, 1));
@@ -119,14 +121,29 @@ public class SBController {
         v.add(new SBNodeStruct("3. Semester", 2, 2));
         v.add(new SBNodeStruct("Informatik M.Sc.", 1, 1));
         v.add(new SBNodeStruct("1. Semester", 0, 2));
+        v.add(new SBNodeStruct("Informatik M.Sc.", 1, 1));
+
+        view.reloadTree(v);
+    }
+
+    private void initialize() {
+        Vector<SBNodeStruct> v = new Vector<SBNodeStruct>();
+        v.add(new SBNodeStruct("root", 0, 0));
+        v.add(new SBNodeStruct("Technische Informatik B.Sc.", 0, 1));
+        v.add(new SBNodeStruct("1. Semester", 0, 2));
+        v.add(new SBNodeStruct("MATHE2", 0, 3));
+        v.add(new SBNodeStruct("ENGL", 1, 3));
+        v.add(new SBNodeStruct("GELEK1", 2, 3));
+        v.add(new SBNodeStruct("PROG1", 3, 3));
+        v.add(new SBNodeStruct("INFORM", 4, 3));
+        v.add(new SBNodeStruct("2. Semester", 1, 2));
+        v.add(new SBNodeStruct("3. Semester", 2, 2));
 
         this.loadSettings();
         view = new SBView(this);
         view.createView();
         view.reloadTree(v);
-        v.add(new SBNodeStruct("1. Semester", 0, 2));
-        v.add(new SBNodeStruct("1. Semester", 0, 2));
-        v.add(new SBNodeStruct("1. Semester", 0, 2));
+
         view.reloadTree(v);
         view.layoutView();
         this.showStudyPanel();

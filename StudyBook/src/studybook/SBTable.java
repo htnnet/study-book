@@ -22,7 +22,7 @@ public class SBTable extends JTable {
 
     }
 
-    public String[][] getRowValues() {
+    public String[][] getTimeTableValues() {
         return null;
     }
 
