@@ -4,9 +4,11 @@
  */
 package studybook;
 
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import java.awt.Component;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 /**
  * Dient zur Darstellung der Spielsteine in den Tabellenzellen.
@@ -15,23 +17,34 @@ import javax.swing.table.DefaultTableCellRenderer;
  * @version 1.0
  * @since 2012-06-20
  */
-public class SBTableRenderer extends DefaultTableCellRenderer {
+class SBTableRenderer extends JTextArea implements TableCellRenderer {
 
-    /**
-     * Ermöglicht das Visualisieren der in der Tabelle eingetragenen
-     * Spielsteine.
-     *
-     * @param value der darzustellende Spielstein als JLabel
-     */
-    @Override
-    public void setValue(Object value) {
-        if (value instanceof JLabel) {
-            JLabel stone = (JLabel) value;
-            this.setIcon(stone.getIcon());
-            this.setHorizontalAlignment(SwingConstants.CENTER);
+    public SBTableRenderer() {
+        setLineWrap(true);
+        setWrapStyleWord(true);
+        setOpaque(true);
+    }
+
+    public Component getTableCellRendererComponent(JTable table, Object value,
+            boolean isSelected, boolean hasFocus, int row, int column) {
+        if (isSelected) {
+            setForeground(table.getSelectionForeground());
+            setBackground(table.getSelectionBackground());
         } else {
-            this.setIcon(null);
-            super.setValue(value);
+            setForeground(table.getForeground());
+            setBackground(table.getBackground());
         }
+        setFont(table.getFont());
+        if (hasFocus) {
+            setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
+            if (table.isCellEditable(row, column)) {
+                setForeground(UIManager.getColor("Table.focusCellForeground"));
+                setBackground(UIManager.getColor("Table.focusCellBackground"));
+            }
+        } else {
+            setBorder(new EmptyBorder(1, 2, 1, 2));
+        }
+        setText((value == null) ? "" : value.toString());
+        return this;
     }
 }
