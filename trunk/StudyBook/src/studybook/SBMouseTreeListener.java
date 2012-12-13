@@ -60,9 +60,7 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         int pathLength = event.getPath().getPathCount();
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
-        System.out.println(event.getPath());
         SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
-        System.out.println(nodeInfo.getId());
 
         // In Abhängigkeit von der Länge von Pathlength Panel aufrufen.
         switch (pathLength) {
@@ -97,7 +95,7 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         } catch (NullPointerException exc) {}
 
         SBNodeStruct struct = (SBNodeStruct) node.getUserObject();
-        //controller.renameNode(struct.getId());
+        controller.renameNode(struct.getId());
         System.out.println("Neuer Name: " + struct);
     }
 
@@ -108,7 +106,21 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
 
     @Override
     public void treeNodesRemoved(TreeModelEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        /*
+        DefaultMutableTreeNode node;
+        node = (DefaultMutableTreeNode)(e.getTreePath().getLastPathComponent());
+
+        try {
+            int index = e.getChildIndices()[0];
+            node = (DefaultMutableTreeNode)
+                   (node.getChildAt(index));
+        } catch (NullPointerException exc) {}
+
+        SBNodeStruct struct = (SBNodeStruct) node.getUserObject();
+        controller.removeNode(struct.getId());
+        System.out.println("Gelöscht: " + struct);
+        *
+        */
     }
 
     @Override

@@ -30,7 +30,7 @@ public class SBController {
     private SBModulePanel sbmodulepanel = new SBModulePanel();
     private SBSemesterPanel sbsemesterpanel = new SBSemesterPanel();
     private String activePanel = "sbstudypanel"; //Startpanel festlegen
-    private boolean initialize = true;
+    private boolean initialized = true;
     private boolean profile_changed = false;
     private boolean profileSaveAs = false;
 
@@ -39,16 +39,40 @@ public class SBController {
         this.initialize();
     }
 
+    private void initialize() {
+        Vector<SBNodeStruct> v = new Vector<SBNodeStruct>();
+        v.add(new SBNodeStruct("root", 0, 0));
+        v.add(new SBNodeStruct("Technische Informatik B.Sc.", 0, 1));
+        v.add(new SBNodeStruct("1. Semester", 0, 2));
+        v.add(new SBNodeStruct("MATHE2", 0, 3));
+        v.add(new SBNodeStruct("ENGL", 1, 3));
+        v.add(new SBNodeStruct("GELEK1", 2, 3));
+        v.add(new SBNodeStruct("PROG1", 3, 3));
+        v.add(new SBNodeStruct("INFORM", 4, 3));
+        v.add(new SBNodeStruct("2. Semester", 1, 2));
+        v.add(new SBNodeStruct("3. Semester", 2, 2));
+
+        this.loadSettings();
+        view = new SBView(this);
+        view.createView();
+        view.reloadTree(v);
+
+        view.reloadTree(v);
+        view.layoutView();
+        this.showStudyPanel();
+
+        initialized = false;
+    }
+
     public void showStudyPanel() {
         view.setEditMenuEnabled(true);
         view.setModuleMenuItemEnabled(false);
 
-        if (!initialize && !profile_changed) {
+        if (!initialized && !profile_changed) {
             this.save();
         }
 
         sbstudypanel.setFields(model.getStudyPanelValues(view));
-
         profile_changed = false;
         activePanel = "sbstudypanel";
         view.setRightPanel(sbstudypanel);
@@ -126,36 +150,12 @@ public class SBController {
         view.reloadTree(v);
     }
 
-    private void initialize() {
-        Vector<SBNodeStruct> v = new Vector<SBNodeStruct>();
-        v.add(new SBNodeStruct("root", 0, 0));
-        v.add(new SBNodeStruct("Technische Informatik B.Sc.", 0, 1));
-        v.add(new SBNodeStruct("1. Semester", 0, 2));
-        v.add(new SBNodeStruct("MATHE2", 0, 3));
-        v.add(new SBNodeStruct("ENGL", 1, 3));
-        v.add(new SBNodeStruct("GELEK1", 2, 3));
-        v.add(new SBNodeStruct("PROG1", 3, 3));
-        v.add(new SBNodeStruct("INFORM", 4, 3));
-        v.add(new SBNodeStruct("2. Semester", 1, 2));
-        v.add(new SBNodeStruct("3. Semester", 2, 2));
-
-        this.loadSettings();
-        view = new SBView(this);
-        view.createView();
-        view.reloadTree(v);
-
-        view.reloadTree(v);
-        view.layoutView();
-        this.showStudyPanel();
-
-        initialize = false;
-    }
-
     public void save() {
         switch (activePanel) {
             case "sbstudypanel":
                 System.err.println("save studyPanel");
                 model.saveStudyPanel(sbstudypanel.getFields(), view);
+                view.showStatusError("Profil konnte nicht geladen werden!");
                 break;
             case "sbmodulepanel":
                 break;
@@ -173,7 +173,7 @@ public class SBController {
             path = path.substring(0, path.length() - 10);
         }
         model.setProfile(path + ".sbprofile");
-        this.createProfile(path);
+        this.newProfile(path);
     }
 
     public String getActivePanel() {
@@ -188,11 +188,7 @@ public class SBController {
         this.showStudyPanel();
     }
 
-    public void showStatusError(String error) {
-        view.showStatusError(error);
-    }
-
-    public void createProfile(String name) {
+    public void newProfile(String name) {
         model.createProfile(name);
         //!!!!!!!!!ACHTUNG MUSS HIER ENTFERNT WERDEN BEI ERSTELLUNG VON MODULEN UEBER BAUM
         this.addModule(1);
@@ -205,5 +201,26 @@ public class SBController {
             //Erstelle neues Modul
             model.addModule(semesterID);
         }
+    }
+
+
+
+    /**
+     * Lässt das Baumelement sowohl im Tree selbst als auch in der Datenbank
+     * verschwinden.
+     *
+     * @param nodeId die ID des Baumelements
+     */
+    public void removeNode(int nodeId) {
+        //model.removeNode(nodeId);
+    }
+
+    /**
+     * Veranlasst das Umbennen eines Baumelements in in der Datenbank.
+     *
+     * @param nodeId die ID des Baumelements
+     */
+    public void renameNode(int nodeId) {
+        //model.renameNode(nodeId);
     }
 }

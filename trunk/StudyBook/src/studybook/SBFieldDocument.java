@@ -13,6 +13,7 @@ import javax.swing.text.PlainDocument;
  * @since 2012-10-14
  */
 public class SBFieldDocument extends PlainDocument {
+
     private int maxLength;
     private String acceptedChars;
 
@@ -32,27 +33,38 @@ public class SBFieldDocument extends PlainDocument {
      *
      */
     public SBFieldDocument(int maxLength, String acceptedChars) {
-        this.maxLength =  maxLength;
+        this.maxLength = maxLength;
         this.acceptedChars = acceptedChars;
     }
 
+    public void remove(int offset, int length) throws BadLocationException {
+        int currentLength = getLength();
+        String currentContent = getText(0, currentLength);
+        System.out.println(currentContent);
 
-    public int checkInput(String proposeValue) throws NumberFormatException {
-        return 1;
+        super.remove(offset, length);
+
     }
 
     /**
      * Überschriebene Methode von PlainDocument, mit der man das Eingabe-
      * verhalten steuern kann.
+     *
      * @param offset Der startende Offset
      * @param str Der vom Benutzer eingegebene Text
-     * @param a Attribute des eingegebene Textes
+     * @param a Attribute des eingegebenen Textes
      * @throws BadLocationException
      */
     @Override
     public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
 
 
+        /*
+         * if ((this.getLength() < minLength) && (str.trim().length() == 0 ||
+         * str.equals(""))){ System.out.println("verboten");
+         *
+         * }
+         */
         // Falls es "verbotene" Zeichen gibt, werden sie hier herausgefiltert
         if (acceptedChars != null) {
             for (int i = 0; i < str.length(); i++) {
@@ -63,13 +75,12 @@ public class SBFieldDocument extends PlainDocument {
         }
 
         // Längenüberschreitung prüfen
-        if ((this.getLength() + str.length() > maxLength)) {
 
+        if ((this.getLength() + str.length() > maxLength) || this.getLength() + str.length() < 1) {
         } else {
-           super.insertString(offset, str, a);
+            super.insertString(offset, str, a);
         }
 
 
     }
 }
-

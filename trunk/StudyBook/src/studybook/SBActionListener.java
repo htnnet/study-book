@@ -8,6 +8,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und reagiert
@@ -74,7 +75,7 @@ public class SBActionListener implements ActionListener {
                 case "new":
                     String name = JOptionPane.showInputDialog(null, "Profilname: ", "Neues Profil anlegen", 1);
                     if (name != null) {
-                        controller.createProfile(name);
+                        controller.newProfile(name);
                     }
                     break;
 
@@ -126,8 +127,9 @@ public class SBActionListener implements ActionListener {
 
                 // Löschen
                 case "delete":
-                    System.out.println("Löschen");
-                    //controller.deleteNode(tree.getSelectionPath());
+                    //DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+                    //SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
+                    view.removeNode();
                     break;
 
                 // Umbenennen

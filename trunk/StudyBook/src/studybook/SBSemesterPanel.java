@@ -13,8 +13,8 @@ import javax.swing.table.TableColumn;
  * @version 0.1
  * @since 2012-10-14
  */
-
 public class SBSemesterPanel extends JPanel {
+
     private Border margin;
     private Border timeTitledBorder;
     private Border timeCompBorder;
@@ -22,12 +22,10 @@ public class SBSemesterPanel extends JPanel {
     private DefaultTableModel timeTableModel;
     private JTable timeTable;
 
-
     public SBSemesterPanel() {
         this.createSemesterPanel();
         this.layoutSemesterPanel();
     }
-
 
     /**
      * Hier wird das Panel erstellt, über das der Benutzer seinen Semester-
@@ -35,9 +33,16 @@ public class SBSemesterPanel extends JPanel {
      */
     private void createSemesterPanel() {
         String[] columns = {"Uhrzeit", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"};
-        timeTableModel = new DefaultTableModel(columns, 20);
-        timeTable = new SBTable(timeTableModel);
+        //timeTableModel = new DefaultTableModel(columns, 20);
 
+
+        timeTableModel = new DefaultTableModel(columns, 20) {
+            public Class getColumnClass(int columnIndex) {
+                return String.class;
+            }
+        };
+
+        timeTable = new SBTable(timeTableModel);
         // alle Zellen des Stundenplans quadratisch darstellen
         timeTable.setRowHeight(50);
         for (int i = 0; i < timeTable.getColumnCount(); i++) {
@@ -45,6 +50,7 @@ public class SBSemesterPanel extends JPanel {
             column.setPreferredWidth(50);
         }
 
+        timeTable.setDefaultRenderer(String.class, new SBTableRenderer());
         timeTable.getTableHeader().setReorderingAllowed(false);
         timeScrollPane = new JScrollPane(timeTable);
         margin = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -66,6 +72,7 @@ public class SBSemesterPanel extends JPanel {
 
     /**
      * Gibt den Stundenplan in Form einer JTable zurück.
+     *
      * @return der Stundenplan
      */
     public JTable getTimeTable() {

@@ -28,6 +28,7 @@ public class SBView {
     private JScrollPane treePane;
     private SBMouseTreeListener mouseTreeListener;
     private JTree tree;
+    private DefaultTreeModel treeModel;
     private DefaultMutableTreeNode treeRoot;
     private JFrame mainFrame;
     private JSplitPane splitPane;
@@ -131,6 +132,23 @@ public class SBView {
         mainFrame.setLocationRelativeTo(null);  // Zentrieren
     }
 
+
+    /**
+     * Baumelement und Unterblätter entfernen.
+     */
+    public void removeNode() {
+        TreePath currentSelection = tree.getSelectionPath();
+        if (currentSelection != null) {
+            DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)
+                         (currentSelection.getLastPathComponent());
+            MutableTreeNode parent = (MutableTreeNode)(currentNode.getParent());
+            if (parent != null) {
+                this.treeModel.removeNodeFromParent(currentNode);
+                return;
+            }
+        }
+    }
+
     /**
      * Befüllt das JTree mit neuen Daten.
      * @param nodes
@@ -138,7 +156,7 @@ public class SBView {
     public void reloadTree(Vector<SBNodeStruct> nodes) {
         //TreePath lastSelected
         treeRoot = this.addTreeNodes(nodes, nodes.get(0), 1);
-        DefaultTreeModel treeModel = new DefaultTreeModel(treeRoot) {
+        treeModel = new DefaultTreeModel(treeRoot) {
             @Override
             public void valueForPathChanged(final TreePath path, final Object newValue) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
