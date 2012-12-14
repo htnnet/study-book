@@ -1,6 +1,5 @@
 package studybook;
 
-
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
@@ -11,7 +10,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-
 
 /**
  * Empfängt die vom Nutzer getätigten Mauseingaben in dem JTree und reagiert
@@ -24,17 +22,19 @@ import javax.swing.tree.TreePath;
 public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionListener, TreeModelListener {
 
     private SBController controller;
+    private SBView view;
     private JTree tree;
     private JPopupMenu popupMenu;
 
-     /**
+    /**
      * Konstruktor der Klasse "SBMouseTreeListener".
      *
      * @param controller das Controller-Objekt
      * @param tree das Baum-Objekt, auf dem Ereignisse stattfinden
      */
-    public SBMouseTreeListener(SBController controller, JTree tree, JPopupMenu popupMenu) {
+    public SBMouseTreeListener(SBController controller, SBView view, JTree tree, JPopupMenu popupMenu) {
         this.controller = controller;
+        this.view = view;
         this.tree = tree;
         this.popupMenu = popupMenu;
     }
@@ -42,8 +42,16 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     @Override
     public void mouseClicked(MouseEvent event) {
         if (SwingUtilities.isRightMouseButton(event)) {
-            //int row = tree.getClosestRowForLocation(event.getX(), event.getY());
-            //tree.setSelectionRow(row);
+            int row = tree.getRowForLocation(event.getX(), event.getY());
+            //TreePath path = tree.getPathForLocation(event.getX(), event.getY());
+            if (row == -1) {  // Wenn ins "leere" Feld unter dem Baum geklickt wird
+                tree.clearSelection();
+                view.setEditMenuEnabled(true, true, false, false, false, false);
+
+            } else {
+                tree.setSelectionRow(row);
+
+            }
             popupMenu.show(tree, event.getX(), event.getY());
         }
     }
@@ -52,33 +60,32 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
      * Bei jedem Klick auf ein neues Baumelement wird ein Event ausgelöst
      * mittels dieses sich der TreePath und somit die aufzurufendende Verwaltung
      * bestimmen lässt.
+     *
      * @param event das TreeSelection-Event
      */
-
     @Override
     public void valueChanged(TreeSelectionEvent event) {
         int pathLength = event.getPath().getPathCount();
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
-        SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
+        System.out.println(pathLength);
 
         // In Abhängigkeit von der Länge von Pathlength Panel aufrufen.
         switch (pathLength) {
-                case 2:
+            case 2:
 
-                    controller.showStudyPanel();
-                    //controller.showStudyPanel(nodeInfo.getId());
-                    break;
+                controller.showStudyPanel();
+                //controller.showStudyPanel(nodeInfo.getId());
+                break;
 
-                case 3:
-                    controller.showSemesterPanel();
-                    //controller.showSemesterPanel(nodeInfo.getId());
-                    break;
+            case 3:
+                controller.showSemesterPanel();
+                //controller.showSemesterPanel(nodeInfo.getId());
+                break;
 
-                case 4:
-                    controller.showModulePanel();
-                    //controller.showModulePanel(nodeInfo.getId());
-                    break;
+            case 4:
+                controller.showModulePanel();
+                //controller.showModulePanel(nodeInfo.getId());
+                break;
         }
 
     }
@@ -86,13 +93,13 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     @Override
     public void treeNodesChanged(TreeModelEvent e) {
         DefaultMutableTreeNode node;
-        node = (DefaultMutableTreeNode)(e.getTreePath().getLastPathComponent());
+        node = (DefaultMutableTreeNode) (e.getTreePath().getLastPathComponent());
 
         try {
             int index = e.getChildIndices()[0];
-            node = (DefaultMutableTreeNode)
-                   (node.getChildAt(index));
-        } catch (NullPointerException exc) {}
+            node = (DefaultMutableTreeNode) (node.getChildAt(index));
+        } catch (NullPointerException exc) {
+        }
 
         SBNodeStruct struct = (SBNodeStruct) node.getUserObject();
         controller.renameNode(struct.getId());
@@ -106,21 +113,23 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
 
     @Override
     public void treeNodesRemoved(TreeModelEvent e) {
-        /*
+
         DefaultMutableTreeNode node;
-        node = (DefaultMutableTreeNode)(e.getTreePath().getLastPathComponent());
+        node = (DefaultMutableTreeNode) (e.getTreePath().getLastPathComponent());
 
         try {
             int index = e.getChildIndices()[0];
-            node = (DefaultMutableTreeNode)
-                   (node.getChildAt(index));
-        } catch (NullPointerException exc) {}
+            node = (DefaultMutableTreeNode) (node.getChildAt(index));
+        } catch (NullPointerException exception) {
+        } catch (ArrayIndexOutOfBoundsException exception) {
+
+        }
 
         SBNodeStruct struct = (SBNodeStruct) node.getUserObject();
         controller.removeNode(struct.getId());
-        System.out.println("Gelöscht: " + struct);
-        *
-        */
+        System.out.println("Gelöscht:" + struct);
+
+
     }
 
     @Override

@@ -46,18 +46,17 @@ public class SBModel {
             view.setFrameTitle("StudyBook - " + this.profilname + ".sbprofile");
             connected = true;
         }
-        System.out.println(connected+" mit"+profilname);
     }
 
     public void saveStudyPanel(String fields[], SBView view) {
-        if(!connected) this.dbconnect(view); 
+        if(!connected) this.dbconnect(view);
         db.query("UPDATE allgemeindaten SET studentName = '" + fields[0] + "',"
                 + "studentMatnum='" + fields[1] + "',"
                 + "studentBirth='" + fields[2] + "',"
                 + "studyName='" + fields[3] + "',"
                 + "studyAcad='" + fields[4] + "',"
                 + "studyStart='" + fields[5] + "';");
-        
+
     }
 
     public void createProfile(String name) {
@@ -105,9 +104,8 @@ public class SBModel {
                 while (rs.next()) {
                     String fields[] = {rs.getString("studentname"), rs.getString("studentmatnum"), rs.getString("studentbirth"),
                         rs.getString("studyname"), rs.getString("studyacad"), rs.getString("studystart")};
-                    System.out.println(fields[0]);
                     return fields;
-                    
+
                 }
                 return null;
             } catch (SQLException e) {

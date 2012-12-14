@@ -36,7 +36,7 @@ public class SBSemesterPanel extends JPanel {
         //timeTableModel = new DefaultTableModel(columns, 20);
 
 
-        timeTableModel = new DefaultTableModel(columns, 20) {
+        timeTableModel = new DefaultTableModel(columns, 10) {
             public Class getColumnClass(int columnIndex) {
                 return String.class;
             }
