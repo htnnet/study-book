@@ -117,8 +117,7 @@ public class SBActionListener implements ActionListener {
                 case "semester":
                     System.out.println("neues Semester");
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();      
-                    DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
-                    SBNodeStruct nodeInfo = (SBNodeStruct) parentNode.getUserObject();
+                    SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
                     controller.addSemester(nodeInfo.getId());
                     break;
 
