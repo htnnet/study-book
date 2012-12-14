@@ -42,8 +42,8 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     @Override
     public void mouseClicked(MouseEvent event) {
         if (SwingUtilities.isRightMouseButton(event)) {
-            int row = tree.getClosestRowForLocation(event.getX(), event.getY());
-            tree.setSelectionRow(row);
+            //int row = tree.getClosestRowForLocation(event.getX(), event.getY());
+            //tree.setSelectionRow(row);
             popupMenu.show(tree, event.getX(), event.getY());
         }
     }
