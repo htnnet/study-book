@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und reagiert
@@ -28,6 +29,7 @@ public class SBActionListener implements ActionListener {
 
     public SBActionListener(SBView view, SBController controller) {
         this.view = view;
+
         this.controller = controller;
         this.fileChooser = fileChooser;
         this.setupFileChooser();
@@ -65,7 +67,11 @@ public class SBActionListener implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
+        this.tree = view.getTree();
         Object obj = e.getSource();
+        DefaultMutableTreeNode parentNode;
+        DefaultMutableTreeNode node;
+        SBNodeStruct nodeInfo;
         view.hideStatusError();
         if (obj instanceof JMenuItem) {
             String cmd = e.getActionCommand();
@@ -110,33 +116,30 @@ public class SBActionListener implements ActionListener {
                 // Studiengang
                 case "study":
                     System.out.println("neuer Studiengang");
-                    //controller.addStudyNode();
+                    //controller.addStudy();
                     break;
 
                 // Semester
                 case "semester":
-                    System.out.println("neues Semester");
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();      
-                    SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
+                    node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+                    nodeInfo = (SBNodeStruct) node.getUserObject();
                     controller.addSemester(nodeInfo.getId());
                     break;
 
                 // Modul
                 case "module":
-                    System.out.println("neues Modul");
-                    //controller.addModuleNode(tree.getSelectionPath());
+                    node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+                    nodeInfo = (SBNodeStruct) node.getUserObject();
+                    controller.addSemester(nodeInfo.getId());
                     break;
 
                 // Löschen
                 case "delete":
-                    //DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-                    //SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
                     view.removeNode();
                     break;
 
                 // Umbenennen
                 case "rename":
-                    tree = view.getTree();
                     tree.startEditingAtPath(tree.getSelectionPath());
                     break;
                 //---Hilfe---

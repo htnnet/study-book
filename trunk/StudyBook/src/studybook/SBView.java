@@ -38,10 +38,18 @@ public class SBView {
     private JMenuBar menuBar;
     private JPopupMenu popupMenu;
     private JMenu menu;
-    private JMenu editMenu;
-    private JMenu submenu;
+    private JMenu addBarMenu;
+    private JMenu addPopupMenu;
+    private JMenuItem studyBarMenuItem;
+    private JMenuItem semesterBarMenuItem;
     private JMenuItem moduleBarMenuItem;
+    private JMenuItem deleteBarMenuItem;
+    private JMenuItem renameBarMenuItem;
+    private JMenuItem studyPopupMenuItem;
+    private JMenuItem semesterPopupMenuItem;
     private JMenuItem modulePopupMenuItem;
+    private JMenuItem deletePopupMenuItem;
+    private JMenuItem renamePopupMenuItem;
     private ImageIcon itemIcon;
     private JMenuItem menuItem;
     private JLabel statusBar;
@@ -65,7 +73,7 @@ public class SBView {
         mainFrame = new JFrame("StudyBook");
         // Fenster-Icon setzen
         try {
-            Image img = ImageIO.read(getClass().getResource("/pics/sb_icon.gif"));
+            Image img = ImageIO.read(getClass().getResource("/pics/study32x32.png"));
             mainFrame.setIconImage(img);
         } catch (IOException e) {
             System.err.println(e.toString());
@@ -93,7 +101,9 @@ public class SBView {
         this.createTree();
         this.createStatusBar();
 
+
         mainFrame.setContentPane(mainPanel);
+
 
 
     }
@@ -202,7 +212,7 @@ public class SBView {
                 int pathLength = currentTreeNode.getPath().length;
 
                 //SBNodeStruct userObject = (SBNodeStruct) currentTreeNode.getUserObject();
-                ImageIcon studyIcon = new ImageIcon(getClass().getResource("/pics/sb_icon.gif"));
+                ImageIcon studyIcon = new ImageIcon(getClass().getResource("/pics/study16x16.png"));
                 ImageIcon semesterIcon = new ImageIcon(getClass().getResource("/pics/semester16x16.png"));
                 ImageIcon moduleIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
 
@@ -211,6 +221,7 @@ public class SBView {
 
                 switch (pathLength) {
                     case 2:
+
                         setLeafIcon(studyIcon);
                         setOpenIcon(studyIcon);
                         setClosedIcon(studyIcon);
@@ -222,6 +233,8 @@ public class SBView {
                         break;
                     case 4:
                         setLeafIcon(moduleIcon);
+                        setOpenIcon(moduleIcon);
+                        setClosedIcon(moduleIcon);
                         break;
 
 
@@ -237,12 +250,30 @@ public class SBView {
         tree.setCellRenderer(treeRenderer); //Renderer dem Baum hinzufuegen
 
         TreeCellEditor fieldEditor = new DefaultCellEditor(nodeField);
-        TreeCellEditor editor = new DefaultTreeCellEditor(tree, treeRenderer, fieldEditor);
+        TreeCellEditor editor = new DefaultTreeCellEditor(tree, treeRenderer, fieldEditor) {
+            @Override
+            protected void determineOffset(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
+
+	    if (renderer != null) {
+	        JLabel l = (JLabel)renderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf,
+                        row,tree.hasFocus() && tree.getLeadSelectionRow() == row);
+	        editingIcon = l.getIcon();
+
+	        if (editingIcon != null) {
+	            offset = renderer.getIconTextGap() + editingIcon.getIconWidth();
+	        } else
+	            offset = renderer.getIconTextGap();
+	   } else {
+	       editingIcon = null;
+	       offset = 0;
+	   }
+	}
+        };
 
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setInvokesStopCellEditing(true);      // Fokus-Verlust bedeutet das Ändern des Namens
         tree.setCellEditor(editor);
-        mouseTreeListener = new SBMouseTreeListener(controller, tree, popupMenu);
+        mouseTreeListener = new SBMouseTreeListener(controller, this, tree, popupMenu);
         tree.addMouseListener(mouseTreeListener); // SBMouseTreeListener dem Baum hinzufuegen
         tree.addTreeSelectionListener(mouseTreeListener);
     }
@@ -341,56 +372,55 @@ public class SBView {
         menuBar.add(menu);
 
         // Bearbeiten
-        editMenu = new JMenu("Bearbeiten");
-        editMenu.setMnemonic('B');
+        menu = new JMenu("Bearbeiten");
+        menu.setMnemonic('B');
 
-        submenu = new JMenu("Hinzufügen");
-        submenu.setMnemonic('H');
+        addBarMenu = new JMenu("Hinzufügen");
+        addBarMenu.setMnemonic('H');
         itemIcon = new ImageIcon(getClass().getResource("/pics/add16x16.png"));
-        submenu.setIcon(itemIcon);
+        addBarMenu.setIcon(itemIcon);
 
-        menuItem = new JMenuItem("Studiengang", 'S');
-        itemIcon = new ImageIcon(getClass().getResource("/pics/sb_icon.gif"));
-        menuItem.setIcon(itemIcon);
-        menuItem.setActionCommand("study");
-        menuItem.addActionListener(actionListener);
-        submenu.add(menuItem);
+        studyBarMenuItem = new JMenuItem("Studiengang", 'S');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/study16x16.png"));
+        studyBarMenuItem.setIcon(itemIcon);
+        studyBarMenuItem.setActionCommand("study");
+        studyBarMenuItem.addActionListener(actionListener);
+        addBarMenu.add(studyBarMenuItem);
 
-        menuItem = new JMenuItem("Semester", 'e');
+        semesterBarMenuItem = new JMenuItem("Semester", 'e');
         itemIcon = new ImageIcon(getClass().getResource("/pics/semester16x16.png"));
-        menuItem.setIcon(itemIcon);
-        menuItem.setActionCommand("semester");
-        menuItem.addActionListener(actionListener);
-        submenu.add(menuItem);
+        semesterBarMenuItem.setIcon(itemIcon);
+        semesterBarMenuItem.setActionCommand("semester");
+        semesterBarMenuItem.addActionListener(actionListener);
+        addBarMenu.add(semesterBarMenuItem);
 
         moduleBarMenuItem = new JMenuItem("Modul", 'M');
         itemIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
         moduleBarMenuItem.setIcon(itemIcon);
         moduleBarMenuItem.setActionCommand("module");
         moduleBarMenuItem.addActionListener(actionListener);
-        submenu.add(moduleBarMenuItem);
-        editMenu.add(submenu);
+        addBarMenu.add(moduleBarMenuItem);
+        menu.add(addBarMenu);
 
-        menuItem = new JMenuItem("Löschen", 'L');
+        deleteBarMenuItem = new JMenuItem("Löschen", 'L');
         itemIcon = new ImageIcon(getClass().getResource("/pics/delete16x16.png"));
         KeyStroke deleteKeyStroke = KeyStroke.getKeyStroke("DELETE");
-        menuItem.setIcon(itemIcon);
-        menuItem.setAccelerator(deleteKeyStroke);
-        menuItem.setActionCommand("delete");
-        menuItem.addActionListener(actionListener);
-        editMenu.add(menuItem);
+        deleteBarMenuItem.setIcon(itemIcon);
+        deleteBarMenuItem.setAccelerator(deleteKeyStroke);
+        deleteBarMenuItem.setActionCommand("delete");
+        deleteBarMenuItem.addActionListener(actionListener);
+        menu.add(deleteBarMenuItem);
 
-        menuItem = new JMenuItem("Umbenennen", 'U');
+        renameBarMenuItem = new JMenuItem("Umbenennen", 'U');
         itemIcon = new ImageIcon(getClass().getResource("/pics/rename16x16.png"));
         KeyStroke f2KeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
-        menuItem.setIcon(itemIcon);
-        menuItem.setAccelerator(f2KeyStroke);
-        menuItem.setActionCommand("rename");
-        menuItem.addActionListener(actionListener);
-        editMenu.add(menuItem);
+        renameBarMenuItem.setIcon(itemIcon);
+        renameBarMenuItem.setAccelerator(f2KeyStroke);
+        renameBarMenuItem.setActionCommand("rename");
+        renameBarMenuItem.addActionListener(actionListener);
+        menu.add(renameBarMenuItem);
 
-        editMenu.setEnabled(false);
-        menuBar.add(editMenu);
+        menuBar.add(menu);
 
         // Hilfe
         menu = new JMenu("Hilfe");
@@ -419,52 +449,50 @@ public class SBView {
      */
     private void createPopupMenu() {
         popupMenu = new JPopupMenu();
-        submenu = new JMenu("Hinzufügen");
-        submenu.setMnemonic('H');
+        addPopupMenu = new JMenu("Hinzufügen");
+        addPopupMenu.setMnemonic('H');
         itemIcon = new ImageIcon(getClass().getResource("/pics/add16x16.png"));
-        submenu.setIcon(itemIcon);
+        addPopupMenu.setIcon(itemIcon);
 
-        menuItem = new JMenuItem("Studiengang", 'S');
-        itemIcon = new ImageIcon(getClass().getResource("/pics/sb_icon.gif"));
-        menuItem.setIcon(itemIcon);
-        menuItem.setActionCommand("study");
-        menuItem.addActionListener(actionListener);
-        submenu.add(menuItem);
+        studyPopupMenuItem = new JMenuItem("Studiengang", 'S');
+        itemIcon = new ImageIcon(getClass().getResource("/pics/study16x16.png"));
+        studyPopupMenuItem.setIcon(itemIcon);
+        studyPopupMenuItem.setActionCommand("study");
+        studyPopupMenuItem.addActionListener(actionListener);
+        addPopupMenu.add(studyPopupMenuItem);
 
-        menuItem = new JMenuItem("Semester", 'e');
+        semesterPopupMenuItem = new JMenuItem("Semester", 'e');
         itemIcon = new ImageIcon(getClass().getResource("/pics/semester16x16.png"));
-        menuItem.setIcon(itemIcon);
-        menuItem.setActionCommand("semester");
-        menuItem.addActionListener(actionListener);
-        submenu.add(menuItem);
+        semesterPopupMenuItem.setIcon(itemIcon);
+        semesterPopupMenuItem.setActionCommand("semester");
+        semesterPopupMenuItem.addActionListener(actionListener);
+        addPopupMenu.add(semesterPopupMenuItem);
 
         modulePopupMenuItem = new JMenuItem("Modul", 'M');
         itemIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
         modulePopupMenuItem.setIcon(itemIcon);
         modulePopupMenuItem.setActionCommand("module");
         modulePopupMenuItem.addActionListener(actionListener);
-        submenu.add(modulePopupMenuItem);
-        popupMenu.add(submenu);
+        addPopupMenu.add(modulePopupMenuItem);
+        popupMenu.add(addPopupMenu);
 
-        menuItem = new JMenuItem("Löschen", 'L');
+        deletePopupMenuItem = new JMenuItem("Löschen", 'L');
         itemIcon = new ImageIcon(getClass().getResource("/pics/delete16x16.png"));
         KeyStroke deleteKeyStroke = KeyStroke.getKeyStroke("DELETE");
-        menuItem.setIcon(itemIcon);
-        menuItem.setAccelerator(deleteKeyStroke);
-        menuItem.setActionCommand("delete");
-        menuItem.addActionListener(actionListener);
-        popupMenu.add(menuItem);
+        deletePopupMenuItem.setIcon(itemIcon);
+        deletePopupMenuItem.setAccelerator(deleteKeyStroke);
+        deletePopupMenuItem.setActionCommand("delete");
+        deletePopupMenuItem.addActionListener(actionListener);
+        popupMenu.add(deletePopupMenuItem);
 
-        menuItem = new JMenuItem("Umbenennen", 'U');
+        renamePopupMenuItem = new JMenuItem("Umbenennen", 'U');
         itemIcon = new ImageIcon(getClass().getResource("/pics/rename16x16.png"));
         KeyStroke f2KeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
-        menuItem.setIcon(itemIcon);
-        menuItem.setAccelerator(f2KeyStroke);
-        menuItem.setActionCommand("rename");
-        menuItem.addActionListener(actionListener);
-        popupMenu.add(menuItem);
-
-        popupMenu.setEnabled(false);
+        renamePopupMenuItem.setIcon(itemIcon);
+        renamePopupMenuItem.setAccelerator(f2KeyStroke);
+        renamePopupMenuItem.setActionCommand("rename");
+        renamePopupMenuItem.addActionListener(actionListener);
+        popupMenu.add(renamePopupMenuItem);
     }
 
     /**
@@ -501,26 +529,28 @@ public class SBView {
     }
 
     /**
-     * Wenn kein Baumelement markiert ist, kann mittels dieser Methode das
-     * Popup-Menü und das Bearbeiten-Menü aktiviert und deaktiviert werden.
+     * Wenn kein Baumelement markiert ist, kann mittels dieser Methode MenuItems
+     * des Popup-Menüs und das Bearbeiten-Menüs aktiviert und deaktiviert werden.
      *
-     * @param enabled Menü aktivieren oder deaktivieren
+     * @param study Studiengang-MenuItem aktivieren oder deaktivieren
+     * @param semester Semester-MenuItem aktivieren oder deaktivieren
+     * @param module Modul-MenuItem aktivieren oder deaktivieren
+     * @param delete Löschen-MenuItem aktivieren oder deaktivieren
+     * @param rename Umbenennen-MenuItem aktivieren oder deaktivieren
      */
-    public void setEditMenuEnabled(boolean enabled) {
-        editMenu.setEnabled(enabled);
-        popupMenu.setEnabled(enabled);
-    }
-
-    /**
-     * Wenn ein Studiengang im Baum markiert ist, kann mittels dieser Methode
-     * das MenuItem zum Hinzufügen von Modulen deaktiviert werden.
-     *
-     * @param enabled Menü aktivieren oder deaktivieren
-     */
-    public void setModuleMenuItemEnabled(boolean enabled) {
-        moduleBarMenuItem.setEnabled(enabled);
-        modulePopupMenuItem.setEnabled(enabled);
-
+    public void setEditMenuEnabled(boolean add, boolean study, boolean semester, boolean module, boolean delete, boolean rename) {
+        addBarMenu.setEnabled(add);
+        addPopupMenu.setEnabled(add);
+        studyBarMenuItem.setEnabled(study);
+        studyPopupMenuItem.setEnabled(study);
+        semesterBarMenuItem.setEnabled(semester);
+        semesterPopupMenuItem.setEnabled(semester);
+        moduleBarMenuItem.setEnabled(module);
+        modulePopupMenuItem.setEnabled(module);
+        deleteBarMenuItem.setEnabled(delete);
+        deletePopupMenuItem.setEnabled(delete);
+        renameBarMenuItem.setEnabled(rename);
+        renamePopupMenuItem.setEnabled(rename);
     }
 
     /**

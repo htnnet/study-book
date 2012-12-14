@@ -115,9 +115,9 @@ public class SBModulePanel extends JPanel {
         this.layoutModulePanel();
 
 
-        String[] inputString = {"Risse", "231a", "7575673", "trris@bla.de",
-         "Klausur", "34d", "18.02.2012", "23:00", "5", "4.0", "Labor", "57b",
-         "", "", "20", "1.0", "Hallo\nWelt!"};
+        String[] inputString = {"", "", "", "",
+         "", "", "", "", "", "", "", "",
+         "", "", "", "", ""};
 
         this.setFields(inputString);
 
@@ -236,7 +236,7 @@ public class SBModulePanel extends JPanel {
         // Eingabebeschränkungen
         academicNameDocument = new SBFieldDocument(50);
         academicRoomDocument = new SBFieldDocument(50);
-        academicTelDocument = new SBFieldDocument(50, "+-()/1234567890");
+        academicTelDocument = new SBFieldDocument(50, " +-()/1234567890");
         academicMailDocument = new SBFieldDocument(50);
         examOneTypeDocument = new SBFieldDocument(50);
         examOneRoomDocument = new SBFieldDocument(50);
@@ -299,14 +299,14 @@ public class SBModulePanel extends JPanel {
 
         formattedField = ((JSpinner.NumberEditor) examOneCreditsSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
-        numberFormatter = (NumberFormatter) formattedField.getFormatter();
-        numberFormatter.setAllowsInvalid(false);
+        //numberFormatter = (NumberFormatter) formattedField.getFormatter();
+        //numberFormatter.setAllowsInvalid(false);
 
         formattedField = ((JSpinner.NumberEditor) examOneGradeSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
         numberFormatter = (NumberFormatter) formattedField.getFormatter();
         numberFormatter.setFormat(decimalFormat);
-        numberFormatter.setAllowsInvalid(false);
+        //numberFormatter.setAllowsInvalid(false);
 
         formattedField = ((JSpinner.DateEditor) examTwoTimeSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
@@ -315,14 +315,14 @@ public class SBModulePanel extends JPanel {
 
         formattedField = ((JSpinner.NumberEditor) examTwoCreditsSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
-        numberFormatter = (NumberFormatter) formattedField.getFormatter();
-        numberFormatter.setAllowsInvalid(false);
+        //numberFormatter = (NumberFormatter) formattedField.getFormatter();
+        //numberFormatter.setAllowsInvalid(false);
 
         formattedField = ((JSpinner.NumberEditor) examTwoGradeSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
         numberFormatter = (NumberFormatter) formattedField.getFormatter();
         numberFormatter.setFormat(decimalFormat);
-        numberFormatter.setAllowsInvalid(false);
+        //numberFormatter.setAllowsInvalid(false);
 
 
         // Den Spinner-Elementen für die Zeit und die Note Startwerte mitgeben
@@ -525,13 +525,13 @@ public class SBModulePanel extends JPanel {
         this.examOneTypeField.setText(fields[4]);
         this.examOneRoomField.setText(fields[5]);
         this.examOneTimeSpinner.setValue(this.getTime(fields[7]));
-        this.examOneCreditsSpinner.setValue(Integer.parseInt(fields[8]));
-        this.examOneGradeSpinner.setValue(Float.parseFloat(fields[9]));
+        this.examOneCreditsSpinner.setValue(Integer.parseInt(this.getCredits(fields[8])));
+        this.examOneGradeSpinner.setValue(Float.parseFloat(this.getGrade(fields[9])));
         this.examTwoTypeField.setText(fields[10]);
         this.examTwoRoomField.setText(fields[11]);
         this.examTwoTimeSpinner.setValue(this.getTime(fields[13]));
-        this.examTwoCreditsSpinner.setValue(Integer.parseInt(fields[14]));
-        this.examTwoGradeSpinner.setValue(Float.parseFloat(fields[15]));
+        this.examTwoCreditsSpinner.setValue(Integer.parseInt(this.getCredits(fields[14])));
+        this.examTwoGradeSpinner.setValue(Float.parseFloat(this.getGrade(fields[15])));
         this.noteArea.setText(fields[16]);
 
         // Falls das Setzen des Datums nicht funktionieren sollte
@@ -542,7 +542,31 @@ public class SBModulePanel extends JPanel {
         }
     }
 
-     /**
+    /**
+     * Methode die sicherstellt, dass keine leeren Noten gesetzt werden können.
+     * @param gradeString die zu setzende Note
+     * @return die korrigierte Note
+     */
+    private String getGrade(String gradeString) {
+        if (gradeString.equals("")) {
+            gradeString = "1.0";
+        }
+        return gradeString;
+    }
+
+    /**
+     * Methode die sicherstellt, dass keine leeren Credits gesetzt werden können.
+     * @param creditsString die zu setzenden Credits
+     * @return die korrigierten Credits
+     */
+    private String getCredits(String creditsString) {
+        if (creditsString.equals("")) {
+            creditsString = "0";
+        }
+        return creditsString;
+    }
+
+    /**
      * Methode, die die Datumsangaben als String einliest und sie für
      * die DatePicker als Date-Objekt zurückliefert.
      *
