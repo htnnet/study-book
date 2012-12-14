@@ -201,12 +201,12 @@ public class SBView {
                 DefaultMutableTreeNode currentTreeNode = (DefaultMutableTreeNode) value;
                 int pathLength = currentTreeNode.getPath().length;
 
-                SBNodeStruct userObject = (SBNodeStruct) currentTreeNode.getUserObject();
+                //SBNodeStruct userObject = (SBNodeStruct) currentTreeNode.getUserObject();
                 ImageIcon studyIcon = new ImageIcon(getClass().getResource("/pics/sb_icon.gif"));
                 ImageIcon semesterIcon = new ImageIcon(getClass().getResource("/pics/semester16x16.png"));
                 ImageIcon moduleIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
 
-                int level = userObject.getLevel();
+               // int level = userObject.getLevel();
                 //System.out.println(userObject.toString() + ": \nPfadlänge: " + pathLength + " | Level. " + level );
 
                 switch (pathLength) {

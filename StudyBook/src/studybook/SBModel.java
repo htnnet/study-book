@@ -19,6 +19,7 @@ public class SBModel {
     private Connection conn = null;
     private SBSQL db;
     private String profilname;
+    private boolean connected = false;
 
     public SBModel() {
         this.db = new SBSQL();
@@ -37,27 +38,26 @@ public class SBModel {
                 + "VALUES (" + semesterID + ");");
     }
 
-    public boolean dbconnect(SBView view) {
+    public void dbconnect(SBView view) {
         if (!new File(this.profilname + ".sbprofile").exists()) {
-            return false;
+            connected = false;
         } else {
             db.connect(profilname + ".sbprofile");
             view.setFrameTitle("StudyBook - " + this.profilname + ".sbprofile");
-            return true;
+            connected = true;
         }
+        System.out.println(connected+" mit"+profilname);
     }
 
     public void saveStudyPanel(String fields[], SBView view) {
-        if (!this.dbconnect(view)) {
-            view.showStatusError("Profil konnte nicht geladen werden!");
-        } else {
-            db.query("UPDATE allgemeindaten SET studentName = '" + fields[0] + "',"
-                    + "studentMatnum='" + fields[1] + "',"
-                    + "studentBirth='" + fields[2] + "',"
-                    + "studyName='" + fields[3] + "',"
-                    + "studyAcad='" + fields[4] + "',"
-                    + "studyStart='" + fields[5] + "';");
-        }
+        if(!connected) this.dbconnect(view); 
+        db.query("UPDATE allgemeindaten SET studentName = '" + fields[0] + "',"
+                + "studentMatnum='" + fields[1] + "',"
+                + "studentBirth='" + fields[2] + "',"
+                + "studyName='" + fields[3] + "',"
+                + "studyAcad='" + fields[4] + "',"
+                + "studyStart='" + fields[5] + "';");
+        
     }
 
     public void createProfile(String name) {
@@ -76,13 +76,13 @@ public class SBModel {
                 + "'academicTel' varchar(100) NOT NULL,"
                 + "'academicMail' varchar(100) NOT NULL,"
                 + "'examOneType' varchar(100) NOT NULL,"
-                + "'examOneRoom' varchar(20) NOT NULL"
+                + "'examOneRoom' varchar(20) NOT NULL,"
                 + "'examOneDate' varchar(100) NOT NULL,"
                 + "'examOneTime' varchar(100) NOT NULL,"
                 + "'examOneCredits' varchar(100) NOT NULL,"
                 + "'examOneGrade' varchar(100) NOT NULL,"
                 + "'examTwoType' varchar(100) NOT NULL,"
-                + "'examTwoRoom' varchar(20) NOT NULL"
+                + "'examTwoRoom' varchar(20) NOT NULL,"
                 + "'examTwoDate' varchar(100) NOT NULL,"
                 + "'examTwoTime' varchar(100) NOT NULL,"
                 + "'examTwoCredits' varchar(100) NOT NULL,"
@@ -95,7 +95,8 @@ public class SBModel {
     }
 
     public String[] getStudyPanelValues(SBView view) {
-        if (!this.dbconnect(view)) {
+        if(!connected) this.dbconnect(view);
+        if (!connected) {
             view.showStatusError("Profil konnte nicht geladen werden!");
             return null;
         } else {
@@ -104,7 +105,9 @@ public class SBModel {
                 while (rs.next()) {
                     String fields[] = {rs.getString("studentname"), rs.getString("studentmatnum"), rs.getString("studentbirth"),
                         rs.getString("studyname"), rs.getString("studyacad"), rs.getString("studystart")};
+                    System.out.println(fields[0]);
                     return fields;
+                    
                 }
                 return null;
             } catch (SQLException e) {

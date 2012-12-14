@@ -19,12 +19,9 @@ import java.util.logging.Logger;
  */
 public class SBSQL {
 
-    private Connection conn = null;
+    private Connection conn;
     private Statement stat = null;
-    private ResultSet resultSet;
 
-    public SBSQL() {
-    }
 
     /**
      * Stellt eine Verbindung zur angegebenen Profildatei mittels ihres Pfades
@@ -35,14 +32,15 @@ public class SBSQL {
     public void connect(String profilePath) {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.conn = DriverManager.getConnection("jdbc:sqlite:" + profilePath);
+            this.conn = DriverManager.getConnection("jdbc:sqlite:"+profilePath);
+            stat = conn.createStatement();
         } catch (Exception e) {
             System.err.println(e);
         }
     }
 
     /**
-     * Schließt die Verbindung zur Profildatei/Datebankdatei.
+     * Schließt die Verbindung zur Profildatei/Datenbankdatei.
      */
     public void close() {
         try {
@@ -58,7 +56,6 @@ public class SBSQL {
      */
     public void query(String query) {
         try {
-            Statement stat = conn.createStatement();
             stat.executeUpdate(query);
         } catch (SQLException e) {
             System.err.println(e);
@@ -72,13 +69,12 @@ public class SBSQL {
      * @return der durch den Befehl geholte Datensatz
      */
     public ResultSet getResultSet(String query) {
+        ResultSet resultSet = null;
         try {
-            stat = conn.createStatement();
             resultSet = stat.executeQuery(query);
         } catch (SQLException e) {
             System.err.println(e);
         }
         return resultSet;
-
     }
 }

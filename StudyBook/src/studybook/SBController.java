@@ -2,15 +2,11 @@ package studybook;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Vector;
-import javax.swing.tree.TreePath;
 
 /**
  * Ist für die reibungslose Interkommunikation zwischen der grafischen
@@ -51,13 +47,15 @@ public class SBController {
         v.add(new SBNodeStruct("INFORM", 4, 3));
         v.add(new SBNodeStruct("2. Semester", 1, 2));
         v.add(new SBNodeStruct("3. Semester", 2, 2));
-
+        v.add(new SBNodeStruct("Informatik M.Sc.", 1, 1));
+        v.add(new SBNodeStruct("1. Semester", 0, 2));
+        v.add(new SBNodeStruct("Informatik M.Sc.", 1, 1));
+        
         this.loadSettings();
         view = new SBView(this);
         view.createView();
         view.reloadTree(v);
 
-        view.reloadTree(v);
         view.layoutView();
         this.showStudyPanel();
 
@@ -128,7 +126,7 @@ public class SBController {
             } catch (IOException e) {
             }
         }
-        this.save();
+        
     }
 
     public void reloadTree() {
@@ -150,12 +148,15 @@ public class SBController {
         view.reloadTree(v);
     }
 
+    public void addSemester(int studyId) {
+        //model.addSemester(studyId);
+    }
+    
     public void save() {
         switch (activePanel) {
             case "sbstudypanel":
                 System.err.println("save studyPanel");
                 model.saveStudyPanel(sbstudypanel.getFields(), view);
-                view.showStatusError("Profil konnte nicht geladen werden!");
                 break;
             case "sbmodulepanel":
                 break;
@@ -164,6 +165,7 @@ public class SBController {
 
     public void exit() {
         this.saveSettings();
+        this.save();
         System.exit(0);
     }
 
