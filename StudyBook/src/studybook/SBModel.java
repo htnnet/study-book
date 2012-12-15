@@ -188,6 +188,27 @@ public class SBModel {
         return v;
     }
 
+    public void renameStudy(int studyID,String studyName,SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("UPDATE studiengaenge SET name='"+studyName+"' WHERE id="+studyID+";");
+    }
+    
+    public void renameSemester(int semesterID,String semesterName,SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("UPDATE semester SET name='"+semesterName+"' WHERE id="+semesterID+";");
+    }
+    
+    public void renameModule(int moduleID,String moduleName,SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("UPDATE module SET name='"+moduleName+"' WHERE id="+moduleID+";");
+    }
+    
     public void deleteStudy(int studyID,SBView view) {
         if (!connected) {
             this.dbconnect(view);
