@@ -67,7 +67,8 @@ public class SBController {
     public void showSemesterPanel(int semesterID) {
         view.setEditMenuEnabled(true, false, false, true, true, true);
         this.save();
-
+        model.getSemesterPanelValues(semesterID, view);
+       // sbmodulpanel.setFields(model.getSemesterPanelValues(semesterID,view));
         view.setRightPanel(sbsemesterpanel);
         //sbsemesterpanel.getTable().populateTimeTable(cellvalues);
         activePanel = "sbsemesterpanel";
@@ -121,25 +122,18 @@ public class SBController {
     }
 
     public int addStudy() {
-        model.addStudy();
-        //int studyID = model.addStudy();
-        //return studyID;
-        return 1;
+        int studyID = model.addStudy();
+        return studyID;
     }
 
     public int addSemester(int studyID) {
-        model.addSemester(studyID);
-        //int semesterID = model.addSemester(studyID);
-        //return semesterID;
-        return 1;
+        int semesterID = model.addSemester(studyID);
+        return semesterID;
     }
 
     public int addModule(int semesterID) {
-        model.addModule(semesterID);
-        System.out.append("module - "+semesterID);
-        //int moduleID = model.addSemester(semesterID);
-        //return moduleID;
-        return 1;
+        int moduleID = model.addModule(semesterID);
+        return moduleID;
     }
 
     public void deleteStudy(int studyID) {
