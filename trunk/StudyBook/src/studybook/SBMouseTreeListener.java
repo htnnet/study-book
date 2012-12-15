@@ -66,26 +66,23 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     @Override
     public void valueChanged(TreeSelectionEvent event) {
         int pathLength = event.getPath().getPathCount();
+        
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
 
-        System.out.println(pathLength);
 
         // In Abhängigkeit von der Länge von Pathlength Panel aufrufen.
         switch (pathLength) {
             case 2:
-
-                controller.showStudyPanel();
-                //controller.showStudyPanel(nodeInfo.getId());
+                controller.showStudyPanel(nodeInfo.getId());
                 break;
-
             case 3:
-                controller.showSemesterPanel();
-                //controller.showSemesterPanel(nodeInfo.getId());
+                controller.showSemesterPanel(nodeInfo.getId());
+                break;
+            case 4:
+                controller.showModulePanel(nodeInfo.getId());
                 break;
 
-            case 4:
-                controller.showModulePanel();
-                //controller.showModulePanel(nodeInfo.getId());
-                break;
         }
 
     }
@@ -122,7 +119,6 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
             node = (DefaultMutableTreeNode) (node.getChildAt(index));
         } catch (NullPointerException exception) {
         } catch (ArrayIndexOutOfBoundsException exception) {
-
         }
 
         SBNodeStruct struct = (SBNodeStruct) node.getUserObject();

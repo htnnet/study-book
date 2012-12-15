@@ -49,7 +49,6 @@ public class SBSemesterPanel extends JPanel {
             TableColumn column = timeTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(50);
         }
-
         timeTable.setDefaultRenderer(String.class, new SBTableRenderer());
         timeTable.getTableHeader().setReorderingAllowed(false);
         timeScrollPane = new JScrollPane(timeTable);

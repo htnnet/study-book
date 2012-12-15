@@ -154,7 +154,6 @@ public class SBView {
             MutableTreeNode parent = (MutableTreeNode)(currentNode.getParent());
             if (parent != null) {
                 this.treeModel.removeNodeFromParent(currentNode);
-                return;
             }
         }
     }

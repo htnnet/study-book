@@ -29,6 +29,9 @@ public class SBController {
     private boolean initialized = true;
     private boolean profile_changed = false;
     private boolean profileSaveAs = false;
+    private int activeStudyID = 0;
+    private int activeModuleID = 0;
+    private int activeSemesterID = 0;
 
     public SBController(SBModel model) {
         this.model = model;
@@ -36,59 +39,49 @@ public class SBController {
     }
 
     private void initialize() {
-        Vector<SBNodeStruct> v = new Vector<SBNodeStruct>();
-        v.add(new SBNodeStruct("root", 0, 0));
-        v.add(new SBNodeStruct("Technische Informatik B.Sc.", 0, 1));
-        v.add(new SBNodeStruct("1. Semester", 0, 2));
-        v.add(new SBNodeStruct("MATHE2", 0, 3));
-        v.add(new SBNodeStruct("ENGL", 1, 3));
-        v.add(new SBNodeStruct("GELEK1", 2, 3));
-        v.add(new SBNodeStruct("PROG1", 3, 3));
-        v.add(new SBNodeStruct("INFORM", 4, 3));
-        v.add(new SBNodeStruct("2. Semester", 1, 2));
-        v.add(new SBNodeStruct("3. Semester", 2, 2));
-        v.add(new SBNodeStruct("Informatik M.Sc.", 1, 1));
-        v.add(new SBNodeStruct("1. Semester", 0, 2));
-        v.add(new SBNodeStruct("Informatik M.Sc.", 1, 1));
 
         this.loadSettings();
+        
         view = new SBView(this);
         view.createView();
-        view.reloadTree(v);
-
+        view.reloadTree(model.getTreeVector(view));
         view.layoutView();
-        this.showStudyPanel();
 
         initialized = false;
     }
+    
 
-    public void showStudyPanel() {
+    public void showStudyPanel(int studyID) {
         view.setEditMenuEnabled(true, false, true, false, true, true);
-
         if (!initialized && !profile_changed) {
             this.save();
         }
-
-        sbstudypanel.setFields(model.getStudyPanelValues(view));
+        sbstudypanel.setFields(model.getStudyPanelValues(studyID,view));
         profile_changed = false;
-        activePanel = "sbstudypanel";
         view.setRightPanel(sbstudypanel);
+        activePanel = "sbstudypanel";
+        activeStudyID = studyID;
     }
 
-    public void showSemesterPanel() {
+    public void showSemesterPanel(int semesterID) {
         view.setEditMenuEnabled(true, false, false, true, true, true);
         this.save();
+        
         view.setRightPanel(sbsemesterpanel);
         //sbsemesterpanel.getTable().populateTimeTable(cellvalues);
         activePanel = "sbsemesterpanel";
+        activeSemesterID = semesterID;
+        
     }
 
-    public void showModulePanel() {
+    public void showModulePanel(int moduleID) {
         view.setEditMenuEnabled(false, false, false, false, true, true);
         this.save();
+        sbmodulepanel.setFields(model.getModulePanelValues(moduleID,view));
         view.setRightPanel(sbmodulepanel);
         //sbmodulepanel.getTable().populateGradeTable(cellvalues);
         activePanel = "sbmodulepanel";
+        activeModuleID = moduleID;
     }
 
     public void showHelpPanel() {
@@ -125,24 +118,41 @@ public class SBController {
         }
 
     }
-
-    public void reloadTree() {
-        //Vector<SBNodeStruct> v = model.getTree();
-
-        //view.reloadTree(v);
+    
+    public void addStudy() {
+        model.addStudy();
     }
-
-    public void addSemester(int studyId) {
-        //model.addSemester(studyId);
+    
+    public void addSemester(int studyID) {
+        model.addSemester(studyID);
+        //view.reloadTree(model.getTreeVector(view));
+    }
+    
+    public void addModule(int semesterID) {
+        model.addModule(semesterID);
+    }
+    
+    public void deleteStudy(int studyID) {
+        model.deleteStudy(studyID,view);
+    }
+    
+    public void deleteSemester(int semesterID) {
+        model.deleteSemester(semesterID,view);
+    }
+    
+    public void deleteModule(int moduleID) {
+        model.deleteModule(moduleID,view);
     }
 
     public void save() {
         switch (activePanel) {
             case "sbstudypanel":
                 System.err.println("save studyPanel");
-                model.saveStudyPanel(sbstudypanel.getFields(), view);
+                model.saveStudyPanel(sbstudypanel.getFields(), activeStudyID, view);
                 break;
             case "sbmodulepanel":
+                System.err.println("save modulePanel");
+                model.saveModulePanel(sbmodulepanel.getFields(), activeModuleID, view);
                 break;
         }
     }
@@ -169,25 +179,18 @@ public class SBController {
     public void changeProfile(String path) {
         System.out.println("changeprofile " + path);
         this.save();
-        model.setProfile(path.substring(0, path.length() - 10));
+        model.changeProfile(path.substring(0, path.length() - 10));
         profile_changed = true;
-        this.showStudyPanel();
+        view.reloadTree(model.getTreeVector(view));
+        //LEERES PANEL HIER ERZEUGEN
     }
 
     public void newProfile(String name) {
         model.createProfile(name);
-        //!!!!!!!!!ACHTUNG MUSS HIER ENTFERNT WERDEN BEI ERSTELLUNG VON MODULEN UEBER BAUM
-        this.addModule(1);
         this.changeProfile(name + ".sbprofile");
     }
 
-    public void addModule(int semesterID) {
-        ////////////Nicht dynamisch, da Semester noch nicht implementiert!
-        if (semesterID == 1) {
-            //Erstelle neues Modul
-            model.addModule(semesterID);
-        }
-    }
+
 
 
 
