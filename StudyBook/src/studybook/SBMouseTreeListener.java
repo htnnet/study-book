@@ -66,10 +66,15 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     @Override
     public void valueChanged(TreeSelectionEvent event) {
         int pathLength = event.getPath().getPathCount();
-        
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-        SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
 
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+
+        if (node == null) {
+            System.out.println("ist null");
+            return;
+        }
+
+        SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
 
         // In Abhängigkeit von der Länge von Pathlength Panel aufrufen.
         switch (pathLength) {
@@ -82,54 +87,120 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
             case 4:
                 controller.showModulePanel(nodeInfo.getId());
                 break;
-
         }
-
     }
 
+    /**
+     * Wird ausgelöst, wenn der Name eines Baumelements verändert wird
+     *
+     * @param event das TreeModel-Event
+     */
     @Override
-    public void treeNodesChanged(TreeModelEvent e) {
+    public void treeNodesChanged(TreeModelEvent event) {
         DefaultMutableTreeNode node;
-        node = (DefaultMutableTreeNode) (e.getTreePath().getLastPathComponent());
+        node = (DefaultMutableTreeNode) (event.getTreePath().getLastPathComponent());
+
 
         try {
-            int index = e.getChildIndices()[0];
+            int index = event.getChildIndices()[0];
             node = (DefaultMutableTreeNode) (node.getChildAt(index));
         } catch (NullPointerException exc) {
         }
 
         SBNodeStruct struct = (SBNodeStruct) node.getUserObject();
-        controller.renameNode(struct.getId());
-        System.out.println("Neuer Name: " + struct);
+        int level = struct.getLevel();
+        int id = struct.getId();
+        String name = struct.toString();
+
+        switch (level) {
+            case 1:
+                this.controller.renameStudy(id, name);
+                break;
+            case 2:
+                this.controller.renameSemester(id, name);
+                break;
+            case 3:
+                this.controller.renameModule(id, name);
+                break;
+        }
     }
 
+    /**
+     * Wird aufgerufen, wenn eine neues Baumelement hinzugefügt wird.
+     *
+     * @param event das TreeModel-Event
+     */
     @Override
-    public void treeNodesInserted(TreeModelEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void treeNodesRemoved(TreeModelEvent e) {
-
+    public void treeNodesInserted(TreeModelEvent event) {
+        int id = 0;
+        SBNodeStruct struct;
+        SBNodeStruct parentStruct;
         DefaultMutableTreeNode node;
-        node = (DefaultMutableTreeNode) (e.getTreePath().getLastPathComponent());
+        DefaultMutableTreeNode parentNode;
+        node = (DefaultMutableTreeNode) (event.getTreePath().getLastPathComponent());
 
         try {
-            int index = e.getChildIndices()[0];
+            int index = event.getChildIndices()[0];
+            node = (DefaultMutableTreeNode) (node.getChildAt(index));
+        } catch (NullPointerException exc) {
+        }
+
+        parentNode = (DefaultMutableTreeNode) node.getParent();
+        struct = (SBNodeStruct) node.getUserObject();
+        int level = struct.getLevel();
+        switch (level) {
+            case 1:
+                id = this.controller.addStudy();
+                break;
+            case 2:
+                parentStruct = (SBNodeStruct) parentNode.getUserObject();
+                id = this.controller.addSemester(parentStruct.getId());
+                break;
+            case 3:
+                parentStruct = (SBNodeStruct) parentNode.getUserObject();
+                id = this.controller.addModule(parentStruct.getId());
+                break;
+        }
+
+        struct.setId(id);
+    }
+
+    @Override
+    public void treeNodesRemoved(TreeModelEvent event) {
+
+        DefaultMutableTreeNode node;
+        node = (DefaultMutableTreeNode) (event.getTreePath().getLastPathComponent());
+
+        try {
+            int index = event.getChildIndices()[0];
             node = (DefaultMutableTreeNode) (node.getChildAt(index));
         } catch (NullPointerException exception) {
         } catch (ArrayIndexOutOfBoundsException exception) {
         }
 
         SBNodeStruct struct = (SBNodeStruct) node.getUserObject();
-        controller.removeNode(struct.getId());
-        System.out.println("Gelöscht:" + struct);
+        int level = struct.getLevel();
+        int id = struct.getId();
 
+        switch (level) {
+            case 1:
+                System.out.println("Gelöscht" + struct.toString() + "; ID: " + id);
+                this.controller.deleteStudy(id);
+                break;
+            case 2:
+                System.out.println("Gelöscht" + struct.toString() + "; ID: " + id);
+                this.controller.deleteSemester(id);
+                break;
+            case 3:
+                System.out.println("Gelöscht" + struct.toString() + "; ID: " + id);
+                this.controller.deleteModule(id);
+                break;
+        }
 
     }
 
     @Override
-    public void treeStructureChanged(TreeModelEvent e) {
+    public void treeStructureChanged(TreeModelEvent event) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }
