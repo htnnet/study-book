@@ -66,38 +66,26 @@ public class SBController {
         activeStudyID = studyID;
 
         // TESTDATEN AUS DER DATENBANK
-        String[][] cells = {{"GELEK2", "6", "2.5"},
+        /*String[][] cells = {{"GELEK2", "6", "2.5"},
                             {"Klausur", "3", "3.0"},
                             {"Labor", "3", "2.0"}
-                            };
+                            };*/
 
-        sbstudypanel.getGradeTable().populateTable(cells);
-
-
+        sbstudypanel.getGradeTable().populateTable(model.getGradeTable(studyID, view));
     }
 
     public void showSemesterPanel(int semesterID) {
         view.setEditMenuEnabled(true, false, false, true, true, true);
         this.save();
-        model.getSemesterPanelValues(semesterID, view);
-       // sbmodulpanel.setFields(model.getSemesterPanelValues(semesterID,view));
+        
+
+        sbsemesterpanel.getTimeTable().populateTable(model.getSemesterPanelValues(semesterID, view));
+
+        // DATEN AUS DEM STUNDENPLAN HOLEN UND AUSGEBEN
+        sbsemesterpanel.getTimeTable().getTimeTableValues();
         view.setRightPanel(sbsemesterpanel);
         activePanel = "sbsemesterpanel";
         activeSemesterID = semesterID;
-
-        // TESTDATEN AUS DER DATENBANK
-        String[][] cells = {{"a", "b", "c", "d", "e", "f", "g", "h"},
-            {"i", "j", "k", "l", "m", "n", "o", "p"}};
-
-        sbsemesterpanel.getTimeTable().populateTable(cells);
-
-        // DATEN AUS DEM STUNDENPLAN HOLEN UND AUSGEBEN
-        String[][] data = sbsemesterpanel.getTimeTable().getTimeTableValues();
-
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data[i].length; j++)
-                System.out.println(data[i][j]);
-        }
     }
 
     public void showModulePanel(int moduleID) {
@@ -194,6 +182,10 @@ public class SBController {
             case "sbmodulepanel":
                 System.err.println("save modulePanel");
                 model.saveModulePanel(sbmodulepanel.getFields(), activeModuleID, view);
+                break;
+            case "sbsemesterpanel":
+                System.err.println("save semesterPanel");
+                model.saveSemesterPanel(sbsemesterpanel.getTimeTable().getTimeTableValues(), activeSemesterID, view);
                 break;
         }
     }

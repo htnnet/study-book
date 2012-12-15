@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 /**
@@ -120,6 +121,39 @@ public class SBModel {
                 + "examTwoDate='" + fields[12] + "', examTwoTime='" + fields[13] + "', examTwoCredits='" + fields[14] + "',"
                 + "examTwoGrade='" + fields[15] + "', note='" + fields[16] + "'"
                 + " WHERE id=" + moduleID + ";");
+    }
+
+    public void saveSemesterPanel(String fields[][], int semesterID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        StringBuilder zeile[] = new StringBuilder[10];
+        for (int i = 0; i < 10; i++) {
+            zeile[i] = new StringBuilder();
+        }
+        int aktuelle_zeile = 0;
+        for (int i = 0; i < 80; i++) {
+            if (Integer.parseInt(fields[i][0]) > aktuelle_zeile) {
+                aktuelle_zeile++;
+            }
+            if (fields[i][2] == null) {
+                fields[i][2] = "";
+            }
+            zeile[aktuelle_zeile].append(fields[i][2] + "::::");
+        }
+        String zeilen_string[] = new String[10];
+        for (int i = 0; i < 10; i++) {
+            zeilen_string[i] = zeile[i].toString().substring(0, zeile[i].toString().length() - 4);
+        }
+        System.out.println(zeile[0].toString());
+        String query = "UPDATE semester SET zeile0='" + zeilen_string[0] + "',"
+                + "zeile1 = '" + zeilen_string[1].toString() + "', zeile2 = '" + zeilen_string[2].toString() + "',"
+                + "zeile3 = '" + zeilen_string[3].toString() + "', zeile4 = '" + zeilen_string[4].toString() + "',"
+                + "zeile5 = '" + zeilen_string[5].toString() + "', zeile6 = '" + zeilen_string[6].toString() + "',"
+                + "zeile7 = '" + zeilen_string[7].toString() + "', zeile8 = '" + zeilen_string[8].toString() + "',"
+                + "zeile9 = '" + zeilen_string[9].toString() + "' WHERE id=" + semesterID + ";";
+        db.query(query);
+        System.out.println(query);
     }
 
     public void createProfile(String name) {
@@ -263,23 +297,49 @@ public class SBModel {
         if (!connected) {
             this.dbconnect(view);
         }
-        if (!connected) {
-            view.showStatusError("Profil konnte nicht geladen werden!");
-            return null;
-        } else {
-            try {
-                ResultSet rs = db.getResultSet("SELECT * FROM studiengaenge WHERE id=" + studyID + ";"); //Alles von der Tabelle studiengaenge holen
-                while (rs.next()) {
-                    String fields[] = {rs.getString("studentName"), rs.getString("studentMatnum"), rs.getString("studentBirth"),
-                        rs.getString("studyAcad"), rs.getString("studyName"), rs.getString("studyStart")};
-                    return fields;
+        try {
+            ResultSet rs = db.getResultSet("SELECT * FROM studiengaenge WHERE id=" + studyID + ";"); //Alles von der Tabelle studiengaenge holen
+            while (rs.next()) {
+                String fields[] = {rs.getString("studentName"), rs.getString("studentMatnum"), rs.getString("studentBirth"),
+                    rs.getString("studyAcad"), rs.getString("studyName"), rs.getString("studyStart")};
+                return fields;
 
-                }
-                return null;
-            } catch (SQLException e) {
-                System.err.println(e);
-                return null;
             }
+            return null;
+        } catch (SQLException e) {
+            System.err.println(e);
+            return null;
+        }
+
+    }
+
+    public String[][] getGradeTable(int studyID, SBView view) {
+        try {
+            ResultSet studyRS = db.getResultSet("SELECT id FROM semester WHERE studyID="+studyID+";");
+            ArrayList<Integer> moduleIDs = new ArrayList<>();
+            while(studyRS.next()) {
+                moduleIDs.add(Integer.parseInt(studyRS.getString("id")));
+            }
+            StringBuilder examTypeSB = new StringBuilder();
+            StringBuilder examCreditsSB = new StringBuilder();
+            StringBuilder examGradeSB = new StringBuilder();
+            for(int i=0;i<moduleIDs.size();i++) {
+                ResultSet rs = db.getResultSet("SELECT examOneType,examOneCredits,examOneGrade,examTwoType,examTwoCredits,examTwoGrade FROM module WHERE semesterID=" + moduleIDs.get(i) + ";"); 
+                while (rs.next()) {
+                    examTypeSB.append(rs.getString("examOneType")+"::::"+rs.getString("examTwoType")+"::::");
+                    examCreditsSB.append(rs.getString("examOneCredits")+"::::"+rs.getString("examTwoCredits")+"::::");
+                    examGradeSB.append(rs.getString("examOneGrade")+"::::"+rs.getString("examTwoGrade")+"::::");
+                }
+            }
+            String examType = examTypeSB.toString().substring(0,examTypeSB.toString().length()-4);
+            String examCredits = examCreditsSB.toString().substring(0,examCreditsSB.toString().length()-4);
+            String examGrade = examGradeSB.toString().substring(0,examGradeSB.toString().length()-4);
+            String[][] fields = {examType.split("::::"),examCredits.split("::::"),examGrade.split("::::")};
+            
+            return fields;
+        } catch (SQLException e) {
+            System.err.println(e);
+            return null;
         }
     }
 
@@ -309,33 +369,32 @@ public class SBModel {
             }
         }
     }
-    
+
     public String[][] getSemesterPanelValues(int semesterID, SBView view) {
         if (!connected) {
             this.dbconnect(view);
         }
-            try {
-                ResultSet rs = db.getResultSet("SELECT zeile0,zeile1,zeile2,zeile3,zeile4,zeile5,zeile6,zeile7,zeile8,zeile9 FROM semester WHERE id=" + semesterID + ";"); //Alles von der Tabelle semester holen
-                while (rs.next()) {
-                    String[] zeile0 = rs.getString("zeile0").split("::::");
-                    String[] zeile1 = rs.getString("zeile1").split("::::");
-                    String[] zeile2 = rs.getString("zeile2").split("::::");
-                    String[] zeile3 = rs.getString("zeile3").split("::::");
-                    String[] zeile4 = rs.getString("zeile4").split("::::");
-                    String[] zeile5 = rs.getString("zeile5").split("::::");
-                    String[] zeile6 = rs.getString("zeile6").split("::::");
-                    String[] zeile7 = rs.getString("zeile7").split("::::");
-                    String[] zeile8 = rs.getString("zeile8").split("::::");
-                    String[] zeile9 = rs.getString("zeile9").split("::::");
-                    String fields[][] = {zeile0, zeile1,zeile2,zeile3,zeile4,zeile5,zeile6,zeile7,zeile8,zeile9};
-                    System.out.println(fields[1].toString());
-                    return fields;
-                }
-                return null;
-            } catch (SQLException e) {
-                System.err.println(e);
-                return null;
+        try {
+            ResultSet rs = db.getResultSet("SELECT zeile0,zeile1,zeile2,zeile3,zeile4,zeile5,zeile6,zeile7,zeile8,zeile9 FROM semester WHERE id=" + semesterID + ";"); //Alles von der Tabelle semester holen
+            while (rs.next()) {
+                String[] zeile0 = rs.getString("zeile0").split("::::");
+                String[] zeile1 = rs.getString("zeile1").split("::::");
+                String[] zeile2 = rs.getString("zeile2").split("::::");
+                String[] zeile3 = rs.getString("zeile3").split("::::");
+                String[] zeile4 = rs.getString("zeile4").split("::::");
+                String[] zeile5 = rs.getString("zeile5").split("::::");
+                String[] zeile6 = rs.getString("zeile6").split("::::");
+                String[] zeile7 = rs.getString("zeile7").split("::::");
+                String[] zeile8 = rs.getString("zeile8").split("::::");
+                String[] zeile9 = rs.getString("zeile9").split("::::");
+                String fields[][] = {zeile0, zeile1, zeile2, zeile3, zeile4, zeile5, zeile6, zeile7, zeile8, zeile9};
+                return fields;
             }
-        
+            return null;
+        } catch (SQLException e) {
+            System.err.println(e);
+            return null;
+        }
+
     }
 }
