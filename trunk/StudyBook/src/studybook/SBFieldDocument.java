@@ -58,7 +58,7 @@ public class SBFieldDocument extends PlainDocument {
     @Override
     public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
 
-        System.out.println(this.getText(0, this.getLength()));
+        //System.out.println(this.getText(0, this.getLength()));
         /*
          * if ((this.getLength() < minLength) && (str.trim().length() == 0 ||
          * str.equals(""))){ System.out.println("verboten");

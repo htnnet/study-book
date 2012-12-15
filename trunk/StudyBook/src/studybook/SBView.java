@@ -101,7 +101,6 @@ public class SBView {
         this.createTree();
         this.createStatusBar();
 
-
         mainFrame.setContentPane(mainPanel);
         this.setEditMenuEnabled(true, true, false, false, false, false);
     }

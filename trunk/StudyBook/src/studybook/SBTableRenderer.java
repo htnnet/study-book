@@ -4,6 +4,7 @@
  */
 package studybook;
 
+import java.awt.Color;
 import java.awt.Component;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -27,6 +28,17 @@ class SBTableRenderer extends JTextArea implements TableCellRenderer {
 
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
+
+        //JTextArea textArea = new JTextArea();
+
+        Color alternateColor = new Color(252,242,206);
+        Color whiteColor = Color.WHITE;
+
+        Color bg = (row % 2 == 0 ? alternateColor : whiteColor);
+
+        this.setOpaque(true);
+        this.setBackground(bg);
+
         if (isSelected) {
             setForeground(table.getSelectionForeground());
             setBackground(table.getSelectionBackground());

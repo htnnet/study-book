@@ -58,10 +58,22 @@ public class SBController {
             this.save();
         }
         sbstudypanel.setFields(model.getStudyPanelValues(studyID,view));
+
         profile_changed = false;
         view.setRightPanel(sbstudypanel);
+
         activePanel = "sbstudypanel";
         activeStudyID = studyID;
+
+        // TESTDATEN AUS DER DATENBANK
+        String[][] cells = {{"GELEK2", "6", "2.5"},
+                            {"Klausur", "3", "3.0"},
+                            {"Labor", "3", "2.0"}
+                            };
+
+        sbstudypanel.getGradeTable().populateTable(cells);
+
+
     }
 
     public void showSemesterPanel(int semesterID) {
@@ -70,10 +82,22 @@ public class SBController {
         model.getSemesterPanelValues(semesterID, view);
        // sbmodulpanel.setFields(model.getSemesterPanelValues(semesterID,view));
         view.setRightPanel(sbsemesterpanel);
-        //sbsemesterpanel.getTable().populateTimeTable(cellvalues);
         activePanel = "sbsemesterpanel";
         activeSemesterID = semesterID;
 
+        // TESTDATEN AUS DER DATENBANK
+        String[][] cells = {{"a", "b", "c", "d", "e", "f", "g", "h"},
+            {"i", "j", "k", "l", "m", "n", "o", "p"}};
+
+        sbsemesterpanel.getTimeTable().populateTable(cells);
+
+        // DATEN AUS DEM STUNDENPLAN HOLEN UND AUSGEBEN
+        String[][] data = sbsemesterpanel.getTimeTable().getTimeTableValues();
+
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++)
+                System.out.println(data[i][j]);
+        }
     }
 
     public void showModulePanel(int moduleID) {
