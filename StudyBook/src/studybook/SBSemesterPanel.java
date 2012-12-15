@@ -20,7 +20,7 @@ public class SBSemesterPanel extends JPanel {
     private Border timeCompBorder;
     private JScrollPane timeScrollPane;
     private DefaultTableModel timeTableModel;
-    private JTable timeTable;
+    private SBTable timeTable;
 
     public SBSemesterPanel() {
         this.createSemesterPanel();
@@ -57,7 +57,6 @@ public class SBSemesterPanel extends JPanel {
         timeCompBorder = BorderFactory.createCompoundBorder(timeTitledBorder, margin);
 
         this.setBorder(timeCompBorder);
-
     }
 
     /**
@@ -74,7 +73,7 @@ public class SBSemesterPanel extends JPanel {
      *
      * @return der Stundenplan
      */
-    public JTable getTimeTable() {
-        return timeTable;
+    public SBTable getTimeTable() {
+        return this.timeTable;
     }
 }

@@ -219,8 +219,9 @@ public class SBStudyPanel extends JPanel {
         this.add(progressPanel, BorderLayout.CENTER);
     }
 
+
     /**
-     * Getter-Methode für die Tabelle, die den Notenüberblick beinhaltet.
+     * Gibt die Notenübersicht in Form einer JTable zurück
      *
      * @return die Notentabelle
      */

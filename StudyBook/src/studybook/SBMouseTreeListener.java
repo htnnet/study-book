@@ -70,7 +70,6 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
         if (node == null) {
-            System.out.println("ist null");
             return;
         }
 
