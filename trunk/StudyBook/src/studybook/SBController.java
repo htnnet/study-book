@@ -136,6 +136,7 @@ public class SBController {
 
     public int addModule(int semesterID) {
         model.addModule(semesterID);
+        System.out.append("module - "+semesterID);
         //int moduleID = model.addSemester(semesterID);
         //return moduleID;
         return 1;
@@ -155,15 +156,15 @@ public class SBController {
 
 
     public void renameStudy(int studyID, String studyName) {
-        //model.renameStudy(studyID, studyName, view);
+        model.renameStudy(studyID, studyName, view);
     }
 
     public void renameSemester(int semesterID, String semesterName) {
-        //model.renameSemester(semesterID, semesterName view);
+        model.renameSemester(semesterID, semesterName, view);
     }
 
     public void renameModule(int moduleID, String moduleName) {
-        //model.renameStudy(moduleID, moduleName, view);
+        model.renameModule(moduleID, moduleName, view);
     }
 
     public void save() {
