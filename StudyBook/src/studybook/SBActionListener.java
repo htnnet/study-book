@@ -79,9 +79,9 @@ public class SBActionListener implements ActionListener {
                 //---Datei---
                 // Neues Profil
                 case "new":
-                    String name = JOptionPane.showInputDialog(null, "Profilname: ", "Neues Profil anlegen", 1);
-                    if (name != null) {
-                        controller.newProfile(name);
+                    check = fileChooser.showSaveDialog(null);
+                    if (check == JFileChooser.APPROVE_OPTION) {
+                        controller.newProfile(fileChooser.getSelectedFile().getPath());
                     }
                     break;
 
@@ -116,11 +116,14 @@ public class SBActionListener implements ActionListener {
                 // Studiengang
                 case "study":
                     System.out.println("neuer Studiengang");
-                    //controller.addStudy();
+
+                    controller.addStudy();
+
                     break;
 
                 // Semester
                 case "semester":
+
                     node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
                     nodeInfo = (SBNodeStruct) node.getUserObject();
                     controller.addSemester(nodeInfo.getId());
@@ -130,7 +133,7 @@ public class SBActionListener implements ActionListener {
                 case "module":
                     node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
                     nodeInfo = (SBNodeStruct) node.getUserObject();
-                    controller.addSemester(nodeInfo.getId());
+                    controller.addModule(nodeInfo.getId());
                     break;
 
                 // Löschen
