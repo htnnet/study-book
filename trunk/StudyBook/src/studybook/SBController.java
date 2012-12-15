@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
+import javax.swing.JPanel;
 
 /**
  * Ist für die reibungslose Interkommunikation zwischen der grafischen
@@ -41,7 +42,7 @@ public class SBController {
     private void initialize() {
 
         this.loadSettings();
-        
+
         view = new SBView(this);
         view.createView();
         view.reloadTree(model.getTreeVector(view));
@@ -49,7 +50,7 @@ public class SBController {
 
         initialized = false;
     }
-    
+
 
     public void showStudyPanel(int studyID) {
         view.setEditMenuEnabled(true, false, true, false, true, true);
@@ -66,12 +67,12 @@ public class SBController {
     public void showSemesterPanel(int semesterID) {
         view.setEditMenuEnabled(true, false, false, true, true, true);
         this.save();
-        
+
         view.setRightPanel(sbsemesterpanel);
         //sbsemesterpanel.getTable().populateTimeTable(cellvalues);
         activePanel = "sbsemesterpanel";
         activeSemesterID = semesterID;
-        
+
     }
 
     public void showModulePanel(int moduleID) {
@@ -118,30 +119,51 @@ public class SBController {
         }
 
     }
-    
-    public void addStudy() {
+
+    public int addStudy() {
         model.addStudy();
+        //int studyID = model.addStudy();
+        //return studyID;
+        return 1;
     }
-    
-    public void addSemester(int studyID) {
+
+    public int addSemester(int studyID) {
         model.addSemester(studyID);
-        //view.reloadTree(model.getTreeVector(view));
+        //int semesterID = model.addSemester(studyID);
+        //return semesterID;
+        return 1;
     }
-    
-    public void addModule(int semesterID) {
+
+    public int addModule(int semesterID) {
         model.addModule(semesterID);
+        //int moduleID = model.addSemester(semesterID);
+        //return moduleID;
+        return 1;
     }
-    
+
     public void deleteStudy(int studyID) {
         model.deleteStudy(studyID,view);
     }
-    
+
     public void deleteSemester(int semesterID) {
         model.deleteSemester(semesterID,view);
     }
-    
+
     public void deleteModule(int moduleID) {
         model.deleteModule(moduleID,view);
+    }
+
+
+    public void renameStudy(int studyID, String studyName) {
+        //model.renameStudy(studyID, studyName, view);
+    }
+
+    public void renameSemester(int semesterID, String semesterName) {
+        //model.renameSemester(semesterID, semesterName view);
+    }
+
+    public void renameModule(int moduleID, String moduleName) {
+        //model.renameStudy(moduleID, moduleName, view);
     }
 
     public void save() {
@@ -182,7 +204,7 @@ public class SBController {
         model.changeProfile(path.substring(0, path.length() - 10));
         profile_changed = true;
         view.reloadTree(model.getTreeVector(view));
-        //LEERES PANEL HIER ERZEUGEN
+        view.setRightPanel(new JPanel());
     }
 
     public void newProfile(String name) {
@@ -191,25 +213,4 @@ public class SBController {
     }
 
 
-
-
-
-    /**
-     * Lässt das Baumelement sowohl im Tree selbst als auch in der Datenbank
-     * verschwinden.
-     *
-     * @param nodeId die ID des Baumelements
-     */
-    public void removeNode(int nodeId) {
-        //model.removeNode(nodeId);
-    }
-
-    /**
-     * Veranlasst das Umbennen eines Baumelements in in der Datenbank.
-     *
-     * @param nodeId die ID des Baumelements
-     */
-    public void renameNode(int nodeId) {
-        //model.renameNode(nodeId);
-    }
 }

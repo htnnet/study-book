@@ -39,12 +39,12 @@ public class SBModel {
         db.query("INSERT INTO studiengaenge (name)"
                 + "VALUES ('Neuer Studiengang');");
     }
-    
+
     public void addSemester(int studyID) {
         db.query("INSERT INTO semester (studyID,name)"
                 + "VALUES ("+studyID+",'Neues Semester');");
     }
-    
+
     public void addModule(int semesterID) {
         db.query("INSERT INTO module (semesterID,name)"
                 + "VALUES (" + semesterID + ",'Neues Modul');");
@@ -60,7 +60,7 @@ public class SBModel {
         }
 
     }
-    
+
     public void changeProfile(String profilePath) {
         this.setProfile(profilePath);
         db.close();
@@ -79,7 +79,7 @@ public class SBModel {
                 + "studyAcad='" + fields[4] + "',"
                 + "studyStart='" + fields[5] + "' WHERE id="+studyID+";");
     }
-    
+
     public void saveModulePanel(String fields[], int moduleID, SBView view) {
         if (!connected) {
             this.dbconnect(view);
@@ -155,7 +155,7 @@ public class SBModel {
                 ResultSet studyRS = db.getResultSet("SELECT id,name FROM studiengaenge");
                 ArrayList<String> study_arr = new ArrayList<>();
                 while (studyRS.next()) {
-                    study_arr.add(studyRS.getString("name")+"::::"+studyRS.getString("id"));                    
+                    study_arr.add(studyRS.getString("name")+"::::"+studyRS.getString("id"));
                 }
                 for(int i=0;i<study_arr.size();i++) {
                     String[] study_arr_split = study_arr.get(i).split("::::");
@@ -164,7 +164,7 @@ public class SBModel {
                     ResultSet semesterRS = db.getResultSet("SELECT id,name FROM semester WHERE studyID ='"+Integer.parseInt(study_arr_split[1])+"'");
                     ArrayList<String> semester_arr = new ArrayList<>();
                     while(semesterRS.next()) {
-                        semester_arr.add(semesterRS.getString("name")+"::::"+semesterRS.getString("id"));  
+                        semester_arr.add(semesterRS.getString("name")+"::::"+semesterRS.getString("id"));
                     }
                     for(int j=0;j<semester_arr.size();j++) {
                         String[] semester_arr_split = semester_arr.get(j).split("::::");
@@ -173,7 +173,7 @@ public class SBModel {
                         ResultSet moduleRS = db.getResultSet("SELECT id,name FROM module WHERE semesterID ='"+Integer.parseInt(semester_arr_split[1])+"'");
                         ArrayList<String> module_arr = new ArrayList<>();
                         while(moduleRS.next()) {
-                            module_arr.add(moduleRS.getString("name")+"::::"+moduleRS.getString("id"));  
+                            module_arr.add(moduleRS.getString("name")+"::::"+moduleRS.getString("id"));
                         }
                         for(int k=0;k<module_arr.size();k++) {
                             String[] module_arr_split = module_arr.get(k).split("::::");
@@ -187,26 +187,26 @@ public class SBModel {
         }
         return v;
     }
-    
+
     public void deleteStudy(int studyID,SBView view) {
         if (!connected) {
             this.dbconnect(view);
         }
         db.query("DELETE FROM studiengaenge WHERE id="+studyID+";");
     }
-    
+
     public void deleteSemester(int semesterID,SBView view) {
         if (!connected) {
             this.dbconnect(view);
         }
-        db.query("DELETE FROM studiengaenge WHERE id="+semesterID+";");
+        db.query("DELETE FROM semester WHERE id="+semesterID+";");
     }
-    
+
     public void deleteModule(int moduleID,SBView view) {
         if (!connected) {
             this.dbconnect(view);
         }
-        db.query("DELETE FROM studiengaenge WHERE id="+moduleID+";");
+        db.query("DELETE FROM module WHERE id="+moduleID+";");
     }
 
     public String[] getStudyPanelValues(int studyID,SBView view) {
@@ -232,7 +232,7 @@ public class SBModel {
             }
         }
     }
-    
+
     public String[] getModulePanelValues(int moduleID,SBView view) {
         if (!connected) {
             this.dbconnect(view);
@@ -246,9 +246,10 @@ public class SBModel {
                 while (rs.next()) {
                     String fields[] = {rs.getString("academicName"), rs.getString("academicRoom"), rs.getString("academicTel"),
                         rs.getString("academicMail"), rs.getString("examOneType"), rs.getString("examOneRoom"),
-                        rs.getString("examOneTime"), rs.getString("examOneCredits"), rs.getString("examOneGrade"),
-                        rs.getString("examTwoType"), rs.getString("examTwoRoom"), rs.getString("examTwoTime"),
-                        rs.getString("examTwoCredits"), rs.getString("examTwoGrade"), rs.getString("note")};
+                        rs.getString("examOneDate"), rs.getString("examOneTime"), rs.getString("examOneCredits"),
+                        rs.getString("examOneGrade"), rs.getString("examTwoType"), rs.getString("examTwoRoom"),
+                        rs.getString("examTwoDate"), rs.getString("examTwoTime"), rs.getString("examTwoCredits"),
+                        rs.getString("examTwoGrade"), rs.getString("note")};
                     return fields;
                 }
                 return null;

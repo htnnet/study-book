@@ -24,6 +24,36 @@ public class SBNodeStruct {
     }
 
     /**
+     * Konstruktor zum Hinzufügen eines neuen Elements, dessen ID noch nicht
+     * bekannt ist und noch von der Datenbank vergeben werden muss.
+     * @param name der Name des Baumelements
+     * @param level die Verschachtelungstiefe
+     */
+    public SBNodeStruct(String name, int level) {
+        this.name = new String(name);
+        this.level = level;
+    }
+
+
+
+    /**
+     * Hiermit kann die Verschachtelungstiefe des Baumelements zurückgeliefert
+     * werden.
+     * @param level die Verschachtelungstiefe des Baumelements
+     */
+    public int getLevel() {
+        return this.level;
+    }
+
+    /**
+     * Zum Setzen der ID des Baumelements nachdem er hinzugefügt wurde.
+     * @param id die ID des Baumelements.
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
      * Zum Setzen des Namens nach Änderung im Tree.
      * @param name der neue Name
      */
@@ -46,13 +76,5 @@ public class SBNodeStruct {
      */
     public int getId() {
         return this.id;
-    }
-
-     /**
-     * Zum Holen der Verschachtelungstiefe.
-     * @return die Verschachtelungstiefe
-     */
-    public int getLevel() {
-        return this.level;
     }
 }

@@ -103,9 +103,7 @@ public class SBView {
 
 
         mainFrame.setContentPane(mainPanel);
-
-
-
+        this.setEditMenuEnabled(true, true, false, false, false, false);
     }
 
     /**
@@ -142,16 +140,14 @@ public class SBView {
         mainFrame.setLocationRelativeTo(null);  // Zentrieren
     }
 
-
     /**
      * Baumelement und Unterblätter entfernen.
      */
     public void removeNode() {
         TreePath currentSelection = tree.getSelectionPath();
         if (currentSelection != null) {
-            DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)
-                         (currentSelection.getLastPathComponent());
-            MutableTreeNode parent = (MutableTreeNode)(currentNode.getParent());
+            DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+            MutableTreeNode parent = (MutableTreeNode) (currentNode.getParent());
             if (parent != null) {
                 this.treeModel.removeNodeFromParent(currentNode);
             }
@@ -160,12 +156,14 @@ public class SBView {
 
     /**
      * Befüllt das JTree mit neuen Daten.
+     *
      * @param nodes
      */
     public void reloadTree(Vector<SBNodeStruct> nodes) {
         //TreePath lastSelected
         treeRoot = this.addTreeNodes(nodes, nodes.get(0), 1);
         treeModel = new DefaultTreeModel(treeRoot) {
+
             @Override
             public void valueForPathChanged(final TreePath path, final Object newValue) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
@@ -173,7 +171,7 @@ public class SBView {
                 oldValue.setName(newValue.toString());
 
                 super.valueForPathChanged(path, oldValue);
-        }
+            }
         };
 
 
@@ -181,8 +179,8 @@ public class SBView {
         tree.setModel(treeModel);
 
         // alles aufklappen
-        for (int i = 0; i < tree.getRowCount() ; i++) {
-            tree.expandRow( i );
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            tree.expandRow(i);
         }
         treeModel.addTreeModelListener(mouseTreeListener);
     }
@@ -203,6 +201,7 @@ public class SBView {
 
         // Render erstellen für die Icons
         DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer() {
+
             @Override
             public Component getTreeCellRendererComponent(JTree tree,
                     Object value, boolean sel, boolean expanded, boolean leaf,
@@ -215,7 +214,7 @@ public class SBView {
                 ImageIcon semesterIcon = new ImageIcon(getClass().getResource("/pics/semester16x16.png"));
                 ImageIcon moduleIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
 
-               // int level = userObject.getLevel();
+                // int level = userObject.getLevel();
                 //System.out.println(userObject.toString() + ": \nPfadlänge: " + pathLength + " | Level. " + level );
 
                 switch (pathLength) {
@@ -250,23 +249,25 @@ public class SBView {
 
         TreeCellEditor fieldEditor = new DefaultCellEditor(nodeField);
         TreeCellEditor editor = new DefaultTreeCellEditor(tree, treeRenderer, fieldEditor) {
+
             @Override
             protected void determineOffset(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
 
-	    if (renderer != null) {
-	        JLabel l = (JLabel)renderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf,
-                        row,tree.hasFocus() && tree.getLeadSelectionRow() == row);
-	        editingIcon = l.getIcon();
+                if (renderer != null) {
+                    JLabel l = (JLabel) renderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf,
+                            row, tree.hasFocus() && tree.getLeadSelectionRow() == row);
+                    editingIcon = l.getIcon();
 
-	        if (editingIcon != null) {
-	            offset = renderer.getIconTextGap() + editingIcon.getIconWidth();
-	        } else
-	            offset = renderer.getIconTextGap();
-	   } else {
-	       editingIcon = null;
-	       offset = 0;
-	   }
-	}
+                    if (editingIcon != null) {
+                        offset = renderer.getIconTextGap() + editingIcon.getIconWidth();
+                    } else {
+                        offset = renderer.getIconTextGap();
+                    }
+                } else {
+                    editingIcon = null;
+                    offset = 0;
+                }
+            }
         };
 
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -278,11 +279,50 @@ public class SBView {
     }
 
     /**
+     * Blätter zum momentan ausgewählten Parten hinzufügen.
+     */
+    public DefaultMutableTreeNode addTreeNode(Object child) {
+        DefaultMutableTreeNode parentNode = null;
+        TreePath parentPath = tree.getSelectionPath();
+
+        if (parentPath == null) {
+            parentNode = treeRoot;
+        } else {
+            parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
+        }
+
+        return addTreeNode(parentNode, child, true);
+    }
+
+    public DefaultMutableTreeNode addTreeNode(DefaultMutableTreeNode parent, Object child) {
+        return addTreeNode(parent, child, false);
+    }
+
+    public DefaultMutableTreeNode addTreeNode(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
+        DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
+
+        if (parent == null) {
+            parent = treeRoot;
+        }
+
+        // Änderungen vornhemen
+        treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
+
+        // Falls das neue Baumelement nicht mehr zu sehen ist, hinscrollen
+        if (shouldBeVisible) {
+            tree.scrollPathToVisible(new TreePath(childNode.getPath()));
+        }
+        return childNode;
+    }
+
+    /**
      * Fügt dem JTree Elemente in Form von SBNodeStruct-Objekten aus einem
      * Vector hinzu.
+     *
      * @param nodes Vector mit den SBNodeStruct-Objekten
      * @param parent parent-element
-     * @param start gibt die Stelle an, an der der Vector nodes abgearbeitet wird
+     * @param start gibt die Stelle an, an der der Vector nodes abgearbeitet
+     * wird
      * @return
      */
     private DefaultMutableTreeNode addTreeNodes(Vector<SBNodeStruct> nodes, SBNodeStruct parent, int start) {
@@ -529,7 +569,8 @@ public class SBView {
 
     /**
      * Wenn kein Baumelement markiert ist, kann mittels dieser Methode MenuItems
-     * des Popup-Menüs und das Bearbeiten-Menüs aktiviert und deaktiviert werden.
+     * des Popup-Menüs und das Bearbeiten-Menüs aktiviert und deaktiviert
+     * werden.
      *
      * @param study Studiengang-MenuItem aktivieren oder deaktivieren
      * @param semester Semester-MenuItem aktivieren oder deaktivieren
@@ -568,6 +609,7 @@ public class SBView {
 
     /**
      * Gibt das HelpPanel zurück.
+     *
      * @return das HelpPanel
      */
     public SBHelpPanel getHelpPanel() {
@@ -576,20 +618,25 @@ public class SBView {
 
     /**
      * Gibt das StudyPanel zurück.
+     *
      * @return das HelpPanel
      */
     public SBStudyPanel getStudyPanel() {
         return this.studyPanel;
     }
-     /**
+
+    /**
      * Gibt das SemesterPanel zurück.
+     *
      * @return das SemesterPanel
      */
     public SBSemesterPanel getSemesterPanel() {
         return this.semesterPanel;
     }
-        /**
+
+    /**
      * Gibt das ModulePanel zurück.
+     *
      * @return das ModulePanel
      */
     public SBModulePanel getModulePanel() {
@@ -598,6 +645,7 @@ public class SBView {
 
     /**
      * Gibt den Tree zurück.
+     *
      * @return der Tree
      */
     public JTree getTree() {

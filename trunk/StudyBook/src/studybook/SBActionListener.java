@@ -33,7 +33,6 @@ public class SBActionListener implements ActionListener {
         this.controller = controller;
         this.fileChooser = fileChooser;
         this.setupFileChooser();
-
     }
 
     /**
@@ -69,9 +68,6 @@ public class SBActionListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         this.tree = view.getTree();
         Object obj = e.getSource();
-        DefaultMutableTreeNode parentNode;
-        DefaultMutableTreeNode node;
-        SBNodeStruct nodeInfo;
         view.hideStatusError();
         if (obj instanceof JMenuItem) {
             String cmd = e.getActionCommand();
@@ -115,25 +111,17 @@ public class SBActionListener implements ActionListener {
                 // -Hinzufügen-
                 // Studiengang
                 case "study":
-                    System.out.println("neuer Studiengang");
-
-                    controller.addStudy();
-
-                    break;
+                    view.addTreeNode(new SBNodeStruct("Neuer Studiengang", 1));
+             break;
 
                 // Semester
                 case "semester":
-
-                    node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-                    nodeInfo = (SBNodeStruct) node.getUserObject();
-                    controller.addSemester(nodeInfo.getId());
+                    view.addTreeNode(new SBNodeStruct("Neues Semester", 2));
                     break;
 
                 // Modul
                 case "module":
-                    node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-                    nodeInfo = (SBNodeStruct) node.getUserObject();
-                    controller.addModule(nodeInfo.getId());
+                    view.addTreeNode(new SBNodeStruct("Neues Modul", 3));
                     break;
 
                 // Löschen
