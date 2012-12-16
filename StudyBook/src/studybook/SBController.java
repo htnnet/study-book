@@ -26,7 +26,7 @@ public class SBController {
     private SBHelpPanel sbhelppanel = new SBHelpPanel();
     private SBModulePanel sbmodulepanel = new SBModulePanel();
     private SBSemesterPanel sbsemesterpanel = new SBSemesterPanel();
-    private String activePanel = "sbstudypanel"; //Startpanel festlegen
+    private String activePanel = ""; //Startpanel festlegen
     private boolean initialized = true;
     private boolean profile_changed = false;
     private boolean profileSaveAs = false;
@@ -41,12 +41,13 @@ public class SBController {
 
     private void initialize() {
 
-        this.loadSettings();
+        
 
         view = new SBView(this);
         view.createView();
         view.reloadTree(model.getTreeVector(view));
         view.layoutView();
+        this.loadSettings();
 
         initialized = false;
     }
@@ -116,6 +117,8 @@ public class SBController {
                 model.setProfile(line);
             }
         } catch (FileNotFoundException e) {
+            view.setRightPanel(sbhelppanel);
+            activePanel = "sbhelppanel";
         } catch (IOException e) {
         }
     }
@@ -128,6 +131,8 @@ public class SBController {
                 out.flush();
                 out.close();
             } catch (IOException e) {
+            } catch (NullPointerException e) {
+                System.err.println(e);
             }
         }
 
