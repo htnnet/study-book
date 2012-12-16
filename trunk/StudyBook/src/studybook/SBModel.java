@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Vector;
 
 /**
@@ -348,6 +347,8 @@ public class SBModel {
             StringBuilder examTypeSB = new StringBuilder();
             StringBuilder examCreditsSB = new StringBuilder();
             StringBuilder examGradeSB = new StringBuilder();
+            int allCredits = 0;
+            float grade = 0;
             for (int i = 0; i < moduleIDs.size(); i++) {
                 ResultSet rs = db.getResultSet("SELECT examOneType,examOneCredits,examOneGrade,examTwoType,examTwoCredits,examTwoGrade FROM module WHERE semesterID=" + moduleIDs.get(i) + ";");
                 while (rs.next()) {
@@ -359,18 +360,29 @@ public class SBModel {
                     }
                     if (!rs.getString("examOneCredits").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) {
                         examCreditsSB.append(rs.getString("examOneCredits") + "::::");
+                        int examOneCreditsInt = Integer.parseInt(rs.getString("examOneCredits"));
+                        allCredits += examOneCreditsInt;
                     }
                     if (!rs.getString("examTwoCredits").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) {
                         examCreditsSB.append(rs.getString("examTwoCredits") + "::::");
+                        int examTwoCreditsInt = Integer.parseInt(rs.getString("examTwoCredits"));
+                        allCredits += examTwoCreditsInt;
                     }
                     if (!rs.getString("examOneGrade").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) {
                         examGradeSB.append(rs.getString("examOneGrade") + "::::");
+                        int examOneCreditsInt = Integer.parseInt(rs.getString("examOneCredits"));
+                        double examOneGradeFloat = Float.parseFloat("examOneGrade");
+                        grade += (examOneCreditsInt * examOneGradeFloat);
                     }
                     if (!rs.getString("examTwoGrade").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) {
                         examGradeSB.append(rs.getString("examTwoGrade") + "::::");
+                        int examTwoCreditsInt = Integer.parseInt(rs.getString("examTwoCredits"));
+                        double examTwoGradeFloat = Float.parseFloat("examTwoGrade");
+                        grade += (examTwoCreditsInt * examTwoGradeFloat);
                     }
                 }
             }
+            System.out.println(allCredits);
             String examType = "";
             if (examTypeSB.toString().length() >= 4) {
                 examType = examTypeSB.toString().substring(0, examTypeSB.toString().length() - 4);
@@ -396,6 +408,13 @@ public class SBModel {
             }
             String[] fields_alone = fields.split("::::");
             ArrayList<String[]> fieldsAL = new ArrayList<>();
+            try {
+                grade = grade/allCredits;
+            } catch(ArithmeticException e) {
+                System.err.println("Durch 0 Credits geteil!");
+            }
+            String[] firstRow = {"Gesamt",allCredits+"",grade+""};
+            fieldsAL.add(firstRow);
             for (int i = 0; i < fields_alone.length; i++) {
                 fieldsAL.add(fields_alone[i].split(","));
             }
