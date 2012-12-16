@@ -25,6 +25,7 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     private SBView view;
     private JTree tree;
     private JPopupMenu popupMenu;
+    private int currentID;
 
     /**
      * Konstruktor der Klasse "SBMouseTreeListener".
@@ -72,9 +73,12 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         if (node == null) {
             return;
         }
-
+        
+        
         SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
-
+        System.out.println(nodeInfo.toString());
+        currentID = nodeInfo.getId();
+        
         // In Abhängigkeit von der Länge von Pathlength Panel aufrufen.
         switch (pathLength) {
             case 2:
@@ -166,10 +170,11 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
 
     @Override
     public void treeNodesRemoved(TreeModelEvent event) {
-
+        int pathLength = event.getTreePath().getPathCount();
+ 
         DefaultMutableTreeNode node;
         node = (DefaultMutableTreeNode) (event.getTreePath().getLastPathComponent());
-
+        
         try {
             int index = event.getChildIndices()[0];
             node = (DefaultMutableTreeNode) (node.getChildAt(index));
@@ -177,22 +182,22 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         } catch (ArrayIndexOutOfBoundsException exception) {
         }
 
-        SBNodeStruct struct = (SBNodeStruct) node.getUserObject();
-        int level = struct.getLevel();
-        int id = struct.getId();
-
-        switch (level) {
+        
+        switch (pathLength) {
             case 1:
-                System.out.println("Gelöscht" + struct.toString() + "; ID: " + id);
-                this.controller.deleteStudy(id);
+                //System.out.println("Gelöscht" + struct.toString() + "; ID: " + id);
+                System.out.println("studiengang: " + currentID);
+                this.controller.deleteStudy(currentID);
                 break;
             case 2:
-                System.out.println("Gelöscht" + struct.toString() + "; ID: " + id);
-                this.controller.deleteSemester(id);
+                //System.out.println("Semester Gelöscht" + struct.toString() + "; ID: " + id);
+                System.out.println("semester: " + currentID);
+                this.controller.deleteSemester(currentID);
                 break;
             case 3:
-                System.out.println("Gelöscht" + struct.toString() + "; ID: " + id);
-                this.controller.deleteModule(id);
+                //System.out.println("Modul Gelöscht" + struct.toString() + "; ID: " + id);
+                System.out.println("modul: " + currentID);
+                this.controller.deleteModule(currentID);
                 break;
         }
 

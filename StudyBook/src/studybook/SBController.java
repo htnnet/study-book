@@ -2,11 +2,11 @@ package studybook;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Vector;
 import javax.swing.JPanel;
 
 /**
@@ -45,19 +45,47 @@ public class SBController {
 
         view = new SBView(this);
         view.createView();
-        view.reloadTree(model.getTreeVector(view));
         view.layoutView();
         this.loadSettings();
+        view.reloadTree(model.getTreeVector(view));
+        
+        view.setEditMenuEnabled(false, false, false, false, false, false);
+        if(this.checkInstance()) {
+            view.showStatusError("StudyBook bereits geöffnet! Bitte alle StudyBook Fenster schließen und neu starten!");
+        }
+        
 
         initialized = false;
     }
-
+    
+    private boolean checkInstance() {
+         try {
+            BufferedReader in = new BufferedReader(new FileReader(".sblock"));
+            return true;
+        } catch (FileNotFoundException e) {
+            try {
+                BufferedWriter out = new BufferedWriter(new FileWriter(".sblock"));
+                out.flush();
+                out.close();
+            } catch (IOException e2) {
+            }
+            return false;
+        }
+    }
+    
+    private void removeInstance() {
+        File lock = new File(".sblock");
+        if(lock.exists()) {
+            lock.delete();
+        }
+    }
 
     public void showStudyPanel(int studyID) {
         view.setEditMenuEnabled(true, false, true, false, true, true);
         if (!initialized && !profile_changed) {
             this.save();
         }
+        sbstudypanel.getGradeTable().emptyCells();
         sbstudypanel.setFields(model.getStudyPanelValues(studyID,view));
 
         profile_changed = false;
@@ -66,12 +94,6 @@ public class SBController {
         activePanel = "sbstudypanel";
         activeStudyID = studyID;
 
-        // TESTDATEN AUS DER DATENBANK
-        /*String[][] cells = {{"GELEK2", "6", "2.5"},
-                            {"Klausur", "3", "3.0"},
-                            {"Labor", "3", "2.0"}
-                            };*/
-
         sbstudypanel.getGradeTable().populateTable(model.getGradeTable(studyID, view));
     }
 
@@ -79,7 +101,7 @@ public class SBController {
         view.setEditMenuEnabled(true, false, false, true, true, true);
         this.save();
         
-
+        sbsemesterpanel.getTimeTable().emptyCells();
         sbsemesterpanel.getTimeTable().populateTable(model.getSemesterPanelValues(semesterID, view));
 
         // DATEN AUS DEM STUNDENPLAN HOLEN UND AUSGEBEN
@@ -94,13 +116,13 @@ public class SBController {
         this.save();
         sbmodulepanel.setFields(model.getModulePanelValues(moduleID,view));
         view.setRightPanel(sbmodulepanel);
-        //sbmodulepanel.getTable().populateGradeTable(cellvalues);
         activePanel = "sbmodulepanel";
         activeModuleID = moduleID;
     }
 
     public void showHelpPanel() {
         this.save();
+        view.getTree().setSelectionRow(-1);
         view.setRightPanel(sbhelppanel);
         activePanel = "sbhelppanel";
     }
@@ -114,9 +136,11 @@ public class SBController {
             BufferedReader in = new BufferedReader(new FileReader("settings.sbc"));
             String line = null;
             while ((line = in.readLine()) != null) {
-                model.setProfile(line);
+                File profileFile = new File(line+".sbprofile");
+                if(profileFile.exists()) this.loadProfile(line);
             }
         } catch (FileNotFoundException e) {
+            System.err.println(e);
             view.setRightPanel(sbhelppanel);
             activePanel = "sbhelppanel";
         } catch (IOException e) {
@@ -139,17 +163,17 @@ public class SBController {
     }
 
     public int addStudy() {
-        int studyID = model.addStudy();
+        int studyID = model.addStudy(view);
         return studyID;
     }
 
     public int addSemester(int studyID) {
-        int semesterID = model.addSemester(studyID);
+        int semesterID = model.addSemester(studyID,view);
         return semesterID;
     }
 
     public int addModule(int semesterID) {
-        int moduleID = model.addModule(semesterID);
+        int moduleID = model.addModule(semesterID,view);
         return moduleID;
     }
 
@@ -179,6 +203,7 @@ public class SBController {
     }
 
     public void save() {
+        this.checkInstance();
         switch (activePanel) {
             case "sbstudypanel":
                 System.err.println("save studyPanel");
@@ -198,6 +223,7 @@ public class SBController {
     public void exit() {
         this.saveSettings();
         this.save();
+        this.removeInstance();
         System.exit(0);
     }
 
@@ -213,7 +239,14 @@ public class SBController {
     public String getActivePanel() {
         return activePanel;
     }
-
+    
+    private void loadProfile(String path) {
+        model.setProfile(path);
+        view.reloadTree(model.getTreeVector(view));
+        view.setEditable(true);
+        view.setEditMenuEnabled(true, true, false, false, false, false);
+    }
+    
     public void changeProfile(String path) {
         System.out.println("changeprofile " + path);
         this.save();
@@ -221,6 +254,8 @@ public class SBController {
         profile_changed = true;
         view.reloadTree(model.getTreeVector(view));
         view.setRightPanel(new JPanel());
+        view.setEditable(true);
+        view.setEditMenuEnabled(true, true, false, false, false, false);
     }
 
     public void newProfile(String name) {
