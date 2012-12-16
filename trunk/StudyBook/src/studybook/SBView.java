@@ -55,6 +55,7 @@ public class SBView {
     private JLabel statusBar;
     private SBFieldDocument nodeDocument;
     private JTextField nodeField;
+    private boolean editable = false;
 
     /**
      * Konstruktor der Klasse "SBView"
@@ -102,7 +103,6 @@ public class SBView {
         this.createStatusBar();
 
         mainFrame.setContentPane(mainPanel);
-        this.setEditMenuEnabled(true, true, false, false, false, false);
     }
 
     /**
@@ -114,6 +114,10 @@ public class SBView {
     public void setFrameTitle(String title) {
         mainFrame.setTitle(title);
         mainFrame.revalidate();
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     /**
@@ -578,18 +582,33 @@ public class SBView {
      * @param rename Umbenennen-MenuItem aktivieren oder deaktivieren
      */
     public void setEditMenuEnabled(boolean add, boolean study, boolean semester, boolean module, boolean delete, boolean rename) {
-        addBarMenu.setEnabled(add);
-        addPopupMenu.setEnabled(add);
-        studyBarMenuItem.setEnabled(study);
-        studyPopupMenuItem.setEnabled(study);
-        semesterBarMenuItem.setEnabled(semester);
-        semesterPopupMenuItem.setEnabled(semester);
-        moduleBarMenuItem.setEnabled(module);
-        modulePopupMenuItem.setEnabled(module);
-        deleteBarMenuItem.setEnabled(delete);
-        deletePopupMenuItem.setEnabled(delete);
-        renameBarMenuItem.setEnabled(rename);
-        renamePopupMenuItem.setEnabled(rename);
+        if (this.editable) {
+            addBarMenu.setEnabled(add);
+            addPopupMenu.setEnabled(add);
+            studyBarMenuItem.setEnabled(study);
+            studyPopupMenuItem.setEnabled(study);
+            semesterBarMenuItem.setEnabled(semester);
+            semesterPopupMenuItem.setEnabled(semester);
+            moduleBarMenuItem.setEnabled(module);
+            modulePopupMenuItem.setEnabled(module);
+            deleteBarMenuItem.setEnabled(delete);
+            deletePopupMenuItem.setEnabled(delete);
+            renameBarMenuItem.setEnabled(rename);
+            renamePopupMenuItem.setEnabled(rename);
+        } else {
+            addBarMenu.setEnabled(false);
+            addPopupMenu.setEnabled(false);
+            studyBarMenuItem.setEnabled(false);
+            studyPopupMenuItem.setEnabled(false);
+            semesterBarMenuItem.setEnabled(false);
+            semesterPopupMenuItem.setEnabled(false);
+            moduleBarMenuItem.setEnabled(false);
+            modulePopupMenuItem.setEnabled(false);
+            deleteBarMenuItem.setEnabled(false);
+            deletePopupMenuItem.setEnabled(false);
+            renameBarMenuItem.setEnabled(false);
+            renamePopupMenuItem.setEnabled(false);
+        }
     }
 
     /**

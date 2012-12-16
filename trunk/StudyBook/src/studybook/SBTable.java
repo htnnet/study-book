@@ -19,6 +19,17 @@ public class SBTable extends JTable {
         this.tableModel = tableModel;
     }
 
+    public void emptyCells() {
+        int rowCount = tableModel.getRowCount();
+        int colCount = tableModel.getColumnCount();
+        
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < colCount; j++) {
+                this.setValueAt("", i, j);
+            }
+        }
+    }
+    
     public void populateTable(String[][] cells) {
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
