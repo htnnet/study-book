@@ -94,14 +94,6 @@ public class SBActionListener implements ActionListener {
                     controller.save();
                     break;
 
-                // Profil speichern unter...
-                case "saveas":
-                    check = fileChooser.showSaveDialog(null);
-                    if (check == JFileChooser.APPROVE_OPTION) {
-                        controller.saveProfile(fileChooser.getSelectedFile().getPath());
-                    }
-                    break;
-
                 // Beenden
                 case "exit":
                     controller.exit();

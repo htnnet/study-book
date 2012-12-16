@@ -23,149 +23,18 @@ public class SBModel {
     private String profilname;
     private boolean connected = false;
 
+    /**
+     * Konstruktor der Klasse "SBModel"
+     */
     public SBModel() {
         this.db = new SBSQL();
     }
 
-    public void setProfile(String profilname) {
-        this.profilname = profilname;
-    }
-
-    public String getProfile() {
-        return this.profilname;
-    }
-
-    public int addStudy(SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("INSERT INTO studiengaenge (name)"
-                + "VALUES ('Neuer Studiengang');");
-        int id = 0;
-        ResultSet idRS = db.getResultSet("SELECT MAX(id) AS id FROM studiengaenge");
-        try {
-            while (idRS.next()) {
-                id = Integer.parseInt(idRS.getString("id"));
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
-        return id;
-    }
-
-    public int addSemester(int studyID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("INSERT INTO semester (studyID,name)"
-                + "VALUES (" + studyID + ",'Neues Semester');");
-        int id = 0;
-        ResultSet idRS = db.getResultSet("SELECT MAX(id) AS id FROM semester");
-        try {
-            while (idRS.next()) {
-                id = Integer.parseInt(idRS.getString("id"));
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
-        return id;
-    }
-
-    public int addModule(int semesterID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("INSERT INTO module (semesterID,name)"
-                + "VALUES (" + semesterID + ",'Neues Modul');");
-        int id = 0;
-        ResultSet idRS = db.getResultSet("SELECT MAX(id) AS id FROM module");
-        try {
-            while (idRS.next()) {
-                id = Integer.parseInt(idRS.getString("id"));
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
-        return id;
-    }
-
-    public void dbconnect(SBView view) {
-        if (!new File(this.profilname + ".sbprofile").exists()) {
-            connected = false;
-        } else {
-            db.connect(profilname + ".sbprofile");
-            view.setFrameTitle("StudyBook - " + this.profilname + ".sbprofile");
-            connected = true;
-        }
-
-    }
-
-    public void changeProfile(String profilePath) {
-        this.setProfile(profilePath);
-        if (connected) {
-            db.close();
-        }
-        connected = false;
-    }
-
-    public void saveStudyPanel(String fields[], int studyID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("UPDATE studiengaenge SET studentName='" + fields[0] + "',"
-                + "studentMatnum='" + fields[1] + "',"
-                + "studentBirth='" + fields[2] + "',"
-                + "studyName='" + fields[3] + "',"
-                + "studyAcad='" + fields[4] + "',"
-                + "studyStart='" + fields[5] + "' WHERE id=" + studyID + ";");
-    }
-
-    public void saveModulePanel(String fields[], int moduleID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("UPDATE module SET academicName='" + fields[0] + "', academicRoom='" + fields[1] + "', academicTel='" + fields[2] + "',"
-                + "academicMail='" + fields[3] + "', examOneType='" + fields[4] + "', examOneRoom='" + fields[5] + "',"
-                + "examOneDate='" + fields[6] + "', examOneTime='" + fields[7] + "', examOneCredits='" + fields[8] + "',"
-                + "examOneGrade='" + fields[9] + "', examTwoType='" + fields[10] + "', examTwoRoom='" + fields[11] + "',"
-                + "examTwoDate='" + fields[12] + "', examTwoTime='" + fields[13] + "', examTwoCredits='" + fields[14] + "',"
-                + "examTwoGrade='" + fields[15] + "', note='" + fields[16] + "'"
-                + " WHERE id=" + moduleID + ";");
-    }
-
-    public void saveSemesterPanel(String fields[][], int semesterID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        StringBuilder zeile[] = new StringBuilder[10];
-        for (int i = 0; i < 10; i++) {
-            zeile[i] = new StringBuilder();
-        }
-        int aktuelle_zeile = 0;
-        for (int i = 0; i < 80; i++) {
-            if (Integer.parseInt(fields[i][0]) > aktuelle_zeile) {
-                aktuelle_zeile++;
-            }
-            if (fields[i][2] == null) {
-                fields[i][2] = "";
-            }
-            zeile[aktuelle_zeile].append(fields[i][2] + "::::");
-        }
-        String zeilen_string[] = new String[10];
-        for (int i = 0; i < 10; i++) {
-            zeilen_string[i] = zeile[i].toString().substring(0, zeile[i].toString().length() - 4);
-        }
-        System.out.println(zeile[0].toString());
-        String query = "UPDATE semester SET zeile0='" + zeilen_string[0] + "',"
-                + "zeile1 = '" + zeilen_string[1].toString() + "', zeile2 = '" + zeilen_string[2].toString() + "',"
-                + "zeile3 = '" + zeilen_string[3].toString() + "', zeile4 = '" + zeilen_string[4].toString() + "',"
-                + "zeile5 = '" + zeilen_string[5].toString() + "', zeile6 = '" + zeilen_string[6].toString() + "',"
-                + "zeile7 = '" + zeilen_string[7].toString() + "', zeile8 = '" + zeilen_string[8].toString() + "',"
-                + "zeile9 = '" + zeilen_string[9].toString() + "' WHERE id=" + semesterID + ";";
-        db.query(query);
-        System.out.println(query);
-    }
-
+    /**
+     * Methode zum Erstellen eines Neuen Profils
+     *
+     * @param name Pfad zum neuen Profil
+     */
     public void createProfile(String name) {
         db.connect(name + ".sbprofile");
         db.query("CREATE TABLE IF NOT EXISTS 'studiengaenge' ("
@@ -214,6 +83,307 @@ public class SBModel {
                 + "'note' varchar(10000) DEFAULT '' NOT NULL);");
     }
 
+    /**
+     * Methode zum Wechseln des Profils zur Laufzeit
+     *
+     * @param profilePath Pfad zur neuen Profildatei
+     */
+    public void changeProfile(String profilePath) {
+        this.setProfile(profilePath);
+        if (connected) {
+            db.close();
+        }
+        connected = false;
+    }
+
+    /**
+     * Setter-Methode für das Setzen des Profilnamens
+     *
+     * @param profilname Profilname des zu ladenden Profils
+     */
+    public void setProfile(String profilname) {
+        this.profilname = profilname;
+    }
+
+    /**
+     * Getter-Methode zum Holen des aktuellen Profilnamens
+     *
+     * @return Aktueller Profilname
+     */
+    public String getProfile() {
+        return this.profilname;
+    }
+
+    /**
+     * Methode zum Herstellen der Verbindung mit der SQLite-Datenbank
+     *
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void dbconnect(SBView view) {
+        if (!new File(this.profilname + ".sbprofile").exists()) {
+            connected = false;
+        } else {
+            db.connect(profilname + ".sbprofile");
+            view.setFrameTitle("StudyBook - " + this.profilname + ".sbprofile");
+            connected = true;
+        }
+    }
+
+    /**
+     * Methode zum Erstellen eines neuen Studiengangs
+     *
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     * @return ID des erstellten Datensatzes
+     */
+    public int addStudy(SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("INSERT INTO studiengaenge (name)"
+                + "VALUES ('Neuer Studiengang');");
+        int id = 0;
+        ResultSet idRS = db.getResultSet("SELECT MAX(id) AS id FROM studiengaenge");
+        try {
+            while (idRS.next()) {
+                id = Integer.parseInt(idRS.getString("id"));
+            }
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+        return id;
+    }
+
+    /**
+     * Methode zum Erstellen eines neuen Semesters
+     *
+     * @param studyID ID des Studiengangs, zu dem das Semester gehört
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     * @return ID des erstellten Datensatzes
+     */
+    public int addSemester(int studyID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("INSERT INTO semester (studyID,name)"
+                + "VALUES (" + studyID + ",'Neues Semester');");
+        int id = 0;
+        ResultSet idRS = db.getResultSet("SELECT MAX(id) AS id FROM semester");
+        try {
+            while (idRS.next()) {
+                id = Integer.parseInt(idRS.getString("id"));
+            }
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+        return id;
+    }
+
+    /**
+     * Methode zum Erstellen eines neuen Moduls
+     *
+     * @param semesterID ID des Semester, zu dem das Modul gehört
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     * @return ID des erstellten Datensatzes
+     */
+    public int addModule(int semesterID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("INSERT INTO module (semesterID,name)"
+                + "VALUES (" + semesterID + ",'Neues Modul');");
+        int id = 0;
+        ResultSet idRS = db.getResultSet("SELECT MAX(id) AS id FROM module");
+        try {
+            while (idRS.next()) {
+                id = Integer.parseInt(idRS.getString("id"));
+            }
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+        return id;
+    }
+
+    /**
+     * Methode zum Umbennenen eines Studiengangs
+     *
+     * @param studyID ID des Studiengangs, welcher umbenannt werden soll
+     * @param studyName Neuer Name
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void renameStudy(int studyID, String studyName, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("UPDATE studiengaenge SET name='" + studyName + "' WHERE id=" + studyID + ";");
+    }
+
+    /**
+     * Methode zum Umbennenen eines Semesters
+     *
+     * @param semesterID ID des Semesters, welches umbenannt werden soll
+     * @param semesterName Neuer Name
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void renameSemester(int semesterID, String semesterName, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("UPDATE semester SET name='" + semesterName + "' WHERE id=" + semesterID + ";");
+    }
+
+    /**
+     * Methode zum Umbennenen eines Moduls
+     *
+     * @param moduleID ID des Moduls, welches umbenannt werden soll
+     * @param moduleName Neuer Name
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void renameModule(int moduleID, String moduleName, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("UPDATE module SET name='" + moduleName + "' WHERE id=" + moduleID + ";");
+    }
+
+    /**
+     * Methode zum Löschen eines Studiengangs inklusive Löschung aller darunter
+     * liegenden Elemente
+     *
+     * @param studyID ID des Studiengangs, welcher gelöscht werden soll
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void deleteStudy(int studyID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        ResultSet semesterRS = db.getResultSet("SELECT id FROM semester WHERE studyID=" + studyID + ";");
+        ArrayList<Integer> semesterAL = new ArrayList<>();
+        try {
+            while (semesterRS.next()) {
+                semesterAL.add(Integer.parseInt(semesterRS.getString("id")));
+            }
+        } catch (SQLException e) {
+            System.err.println(e);
+        }
+        for (int i = 0; i < semesterAL.size(); i++) {
+            db.query("DELETE FROM module WHERE semesterID=" + semesterAL.get(i) + ";");
+        }
+        db.query("DELETE FROM semester WHERE studyID=" + studyID + ";");
+        db.query("DELETE FROM studiengaenge WHERE id=" + studyID + ";");
+    }
+
+    /**
+     * Methode zum Löschen eines Semester inklusive Löschung aller zugehörigen
+     * Module
+     *
+     * @param semesterID ID des Semesters, welches gelöscht werden soll
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void deleteSemester(int semesterID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("DELETE FROM module WHERE semesterID=" + semesterID + ";");
+        db.query("DELETE FROM semester WHERE id=" + semesterID + ";");
+    }
+
+    /**
+     * Methode zum Löschen eines Moduls
+     *
+     * @param moduleID ID des Moduls, welches gelöscht werden soll
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void deleteModule(int moduleID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("DELETE FROM module WHERE id=" + moduleID + ";");
+    }
+
+    /**
+     * Methode zum Speichern aller Werte des Study Panels
+     *
+     * @param fields String-Array mit den Werten des Study Panels
+     * @param studyID ID des Studiengangs, zu dem das Study Panel gehört
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void saveStudyPanel(String fields[], int studyID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("UPDATE studiengaenge SET studentName='" + fields[0] + "',"
+                + "studentMatnum='" + fields[1] + "',"
+                + "studentBirth='" + fields[2] + "',"
+                + "studyName='" + fields[3] + "',"
+                + "studyAcad='" + fields[4] + "',"
+                + "studyStart='" + fields[5] + "' WHERE id=" + studyID + ";");
+    }
+
+    /**
+     * Methode zum Speichern des Stundenplans vom Semesterpanel
+     *
+     * @param fields Zwei-Dimensionales Array mit den Inhalten der Zellen vom
+     * Stundenplan
+     * @param semesterID ID des Semesters, zu dem das Semester Panel gehört
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void saveSemesterPanel(String fields[][], int semesterID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        StringBuilder zeile[] = new StringBuilder[10];
+        for (int i = 0; i < 10; i++) {
+            zeile[i] = new StringBuilder();
+        }
+        int aktuelle_zeile = 0;
+        for (int i = 0; i < 80; i++) {
+            if (Integer.parseInt(fields[i][0]) > aktuelle_zeile) {
+                aktuelle_zeile++;
+            }
+            if (fields[i][2] == null) {
+                fields[i][2] = "";
+            }
+            zeile[aktuelle_zeile].append(fields[i][2] + "::::");
+        }
+        String zeilen_string[] = new String[10];
+        for (int i = 0; i < 10; i++) {
+            zeilen_string[i] = zeile[i].toString().substring(0, zeile[i].toString().length() - 4);
+        }
+        String query = "UPDATE semester SET zeile0='" + zeilen_string[0] + "',"
+                + "zeile1 = '" + zeilen_string[1].toString() + "', zeile2 = '" + zeilen_string[2].toString() + "',"
+                + "zeile3 = '" + zeilen_string[3].toString() + "', zeile4 = '" + zeilen_string[4].toString() + "',"
+                + "zeile5 = '" + zeilen_string[5].toString() + "', zeile6 = '" + zeilen_string[6].toString() + "',"
+                + "zeile7 = '" + zeilen_string[7].toString() + "', zeile8 = '" + zeilen_string[8].toString() + "',"
+                + "zeile9 = '" + zeilen_string[9].toString() + "' WHERE id=" + semesterID + ";";
+        db.query(query);
+    }
+
+    /**
+     * Methode zum Speichern aller Werte des Modul Panels
+     *
+     * @param fields String-Array mit den Werten des Modul Panels
+     * @param moduleID ID des Moduls, zu dem das Modul Panel gehört
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     */
+    public void saveModulePanel(String fields[], int moduleID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        db.query("UPDATE module SET academicName='" + fields[0] + "', academicRoom='" + fields[1] + "', academicTel='" + fields[2] + "',"
+                + "academicMail='" + fields[3] + "', examOneType='" + fields[4] + "', examOneRoom='" + fields[5] + "',"
+                + "examOneDate='" + fields[6] + "', examOneTime='" + fields[7] + "', examOneCredits='" + fields[8] + "',"
+                + "examOneGrade='" + fields[9] + "', examTwoType='" + fields[10] + "', examTwoRoom='" + fields[11] + "',"
+                + "examTwoDate='" + fields[12] + "', examTwoTime='" + fields[13] + "', examTwoCredits='" + fields[14] + "',"
+                + "examTwoGrade='" + fields[15] + "', note='" + fields[16] + "'"
+                + " WHERE id=" + moduleID + ";");
+    }
+
+    /**
+     * Getter-Methode zum Auslesen der Baumelemente
+     *
+     * @param view SBView Objekt zum Anzeigen von Meldungen
+     * @return Vector mit den sortieren Baumelementen
+     */
     public Vector<SBNodeStruct> getTreeVector(SBView view) {
         Vector<SBNodeStruct> v = new Vector<>();
         v.add(new SBNodeStruct("root", 0, 0));
@@ -261,62 +431,14 @@ public class SBModel {
         return v;
     }
 
-    public void renameStudy(int studyID, String studyName, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("UPDATE studiengaenge SET name='" + studyName + "' WHERE id=" + studyID + ";");
-    }
-
-    public void renameSemester(int semesterID, String semesterName, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("UPDATE semester SET name='" + semesterName + "' WHERE id=" + semesterID + ";");
-    }
-
-    public void renameModule(int moduleID, String moduleName, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("UPDATE module SET name='" + moduleName + "' WHERE id=" + moduleID + ";");
-    }
-
-    public void deleteStudy(int studyID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        ResultSet semesterRS = db.getResultSet("SELECT id FROM semester WHERE studyID=" + studyID + ";");
-        ArrayList<Integer> semesterAL = new ArrayList<>();
-        try {
-            while (semesterRS.next()) {
-                semesterAL.add(Integer.parseInt(semesterRS.getString("id")));
-            }
-        } catch (SQLException e) {
-            System.err.println(e);
-        }
-        for(int i=0;i<semesterAL.size();i++) {
-            db.query("DELETE FROM module WHERE semesterID="+semesterAL.get(i)+";");
-        }
-        db.query("DELETE FROM semester WHERE studyID="+studyID+";");
-        db.query("DELETE FROM studiengaenge WHERE id=" + studyID + ";");
-    }
-
-    public void deleteSemester(int semesterID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("DELETE FROM module WHERE semesterID="+semesterID+";");
-        db.query("DELETE FROM semester WHERE id=" + semesterID + ";");
-    }
-
-    public void deleteModule(int moduleID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        db.query("DELETE FROM module WHERE id=" + moduleID + ";");
-    }
-
+    /**
+     * Getter-Methode zum Holen aller Werte des zugehörigen Studiengangs aus der
+     * Datenbank
+     *
+     * @param studyID ID des Studiengangs, dessen Daten geholt werden sollen
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     * @return String Array mit den Daten für die Felder des Study Panels
+     */
     public String[] getStudyPanelValues(int studyID, SBView view) {
         if (!connected) {
             this.dbconnect(view);
@@ -337,6 +459,14 @@ public class SBModel {
 
     }
 
+    /**
+     * Getter-Methode zum Holen und Erstellen der Notenübersicht im Study Panel
+     *
+     * @param studyID ID des Studiengangs, dessen Notenübersicht erstellt werden
+     * soll
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     * @return Zwei dimensionales String Array mit den geholten Werten
+     */
     public String[][] getGradeTable(int studyID, SBView view) {
         try {
             ResultSet studyRS = db.getResultSet("SELECT id FROM semester WHERE studyID=" + studyID + ";");
@@ -370,7 +500,6 @@ public class SBModel {
                     }
                     if (!rs.getString("examOneGrade").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) {
                         examGradeSB.append(rs.getString("examOneGrade") + "::::");
-                        System.out.println(rs.getString("examOneGrade"));
                         int examOneCreditsInt = Integer.parseInt(rs.getString("examOneCredits"));
                         double examOneGradeFloat = Float.parseFloat(rs.getString("examOneGrade"));
                         grade += (examOneCreditsInt * examOneGradeFloat);
@@ -400,7 +529,7 @@ public class SBModel {
             String[] examCreditsArr = examCredits.split("::::");
             String[] examGradeArr = examGrade.split("::::");
             for (int i = 0; i < examType.split("::::").length; i++) {
-                fieldSB.append(examTypeArr[i] + "," + examCreditsArr[i] + "," + (Math.rint(Float.parseFloat(examGradeArr[i])*10)/10) + "::::");
+                fieldSB.append(examTypeArr[i] + "," + examCreditsArr[i] + "," + (Math.rint(Float.parseFloat(examGradeArr[i]) * 10) / 10) + "::::");
             }
             String fields = "";
             if (fieldSB.toString().length() >= 4) {
@@ -409,11 +538,11 @@ public class SBModel {
             String[] fields_alone = fields.split("::::");
             ArrayList<String[]> fieldsAL = new ArrayList<>();
             try {
-                grade = grade/allCredits;
-            } catch(ArithmeticException e) {
+                grade = grade / allCredits;
+            } catch (ArithmeticException e) {
                 System.err.println("Durch 0 Credits geteilt!");
             }
-            String[] firstRow = {"Gesamt",allCredits+"",(Math.rint(grade*10)/10)+""};
+            String[] firstRow = {"Gesamt", allCredits + "", (Math.rint(grade * 10) / 10) + ""};
             fieldsAL.add(firstRow);
             for (int i = 0; i < fields_alone.length; i++) {
                 fieldsAL.add(fields_alone[i].split(","));
@@ -426,33 +555,14 @@ public class SBModel {
         }
     }
 
-    public String[] getModulePanelValues(int moduleID, SBView view) {
-        if (!connected) {
-            this.dbconnect(view);
-        }
-        if (!connected) {
-            view.showStatusError("Profil konnte nicht geladen werden!");
-            return null;
-        } else {
-            try {
-                ResultSet rs = db.getResultSet("SELECT * FROM module WHERE id=" + moduleID + ";"); //Alles von der Tabelle module holen
-                while (rs.next()) {
-                    String fields[] = {rs.getString("academicName"), rs.getString("academicRoom"), rs.getString("academicTel"),
-                        rs.getString("academicMail"), rs.getString("examOneType"), rs.getString("examOneRoom"),
-                        rs.getString("examOneDate"), rs.getString("examOneTime"), rs.getString("examOneCredits"),
-                        rs.getString("examOneGrade"), rs.getString("examTwoType"), rs.getString("examTwoRoom"),
-                        rs.getString("examTwoDate"), rs.getString("examTwoTime"), rs.getString("examTwoCredits"),
-                        rs.getString("examTwoGrade"), rs.getString("note")};
-                    return fields;
-                }
-                return null;
-            } catch (SQLException e) {
-                System.err.println(e);
-                return null;
-            }
-        }
-    }
-
+    /**
+     * Getter-Methode zum Holen des Stundenplans für ein Semester
+     *
+     * @param semesterID ID des Semester, dessen Stundenplan gefüllt werden soll
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     * @return Zwei dimensionales String Array gefüllt mit den Werten für den
+     * Stundenplan
+     */
     public String[][] getSemesterPanelValues(int semesterID, SBView view) {
         if (!connected) {
             this.dbconnect(view);
@@ -481,5 +591,39 @@ public class SBModel {
             return null;
         }
 
+    }
+
+    /**
+     * Getter-Methode zum Holen aller Werte für ein Modul Panel
+     *
+     * @param moduleID ID des Moduls, dessen Panel gefüllt werden soll
+     * @param view SBView Objekt zur Ausgabe von Meldungen
+     * @return Werte, mit denen das Module Panel gefüllt werden soll
+     */
+    public String[] getModulePanelValues(int moduleID, SBView view) {
+        if (!connected) {
+            this.dbconnect(view);
+        }
+        if (!connected) {
+            view.showStatusError("Profil konnte nicht geladen werden!");
+            return null;
+        } else {
+            try {
+                ResultSet rs = db.getResultSet("SELECT * FROM module WHERE id=" + moduleID + ";"); //Alles von der Tabelle module holen
+                while (rs.next()) {
+                    String fields[] = {rs.getString("academicName"), rs.getString("academicRoom"), rs.getString("academicTel"),
+                        rs.getString("academicMail"), rs.getString("examOneType"), rs.getString("examOneRoom"),
+                        rs.getString("examOneDate"), rs.getString("examOneTime"), rs.getString("examOneCredits"),
+                        rs.getString("examOneGrade"), rs.getString("examTwoType"), rs.getString("examTwoRoom"),
+                        rs.getString("examTwoDate"), rs.getString("examTwoTime"), rs.getString("examTwoCredits"),
+                        rs.getString("examTwoGrade"), rs.getString("note")};
+                    return fields;
+                }
+                return null;
+            } catch (SQLException e) {
+                System.err.println(e);
+                return null;
+            }
+        }
     }
 }
