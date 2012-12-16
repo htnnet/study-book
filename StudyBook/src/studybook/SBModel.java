@@ -370,19 +370,19 @@ public class SBModel {
                     }
                     if (!rs.getString("examOneGrade").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) {
                         examGradeSB.append(rs.getString("examOneGrade") + "::::");
+                        System.out.println(rs.getString("examOneGrade"));
                         int examOneCreditsInt = Integer.parseInt(rs.getString("examOneCredits"));
-                        double examOneGradeFloat = Float.parseFloat("examOneGrade");
+                        double examOneGradeFloat = Float.parseFloat(rs.getString("examOneGrade"));
                         grade += (examOneCreditsInt * examOneGradeFloat);
                     }
                     if (!rs.getString("examTwoGrade").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) {
                         examGradeSB.append(rs.getString("examTwoGrade") + "::::");
                         int examTwoCreditsInt = Integer.parseInt(rs.getString("examTwoCredits"));
-                        double examTwoGradeFloat = Float.parseFloat("examTwoGrade");
+                        double examTwoGradeFloat = Float.parseFloat(rs.getString("examTwoGrade"));
                         grade += (examTwoCreditsInt * examTwoGradeFloat);
                     }
                 }
             }
-            System.out.println(allCredits);
             String examType = "";
             if (examTypeSB.toString().length() >= 4) {
                 examType = examTypeSB.toString().substring(0, examTypeSB.toString().length() - 4);
@@ -400,7 +400,7 @@ public class SBModel {
             String[] examCreditsArr = examCredits.split("::::");
             String[] examGradeArr = examGrade.split("::::");
             for (int i = 0; i < examType.split("::::").length; i++) {
-                fieldSB.append(examTypeArr[i] + "," + examCreditsArr[i] + "," + examGradeArr[i] + "::::");
+                fieldSB.append(examTypeArr[i] + "," + examCreditsArr[i] + "," + (Math.rint(Float.parseFloat(examGradeArr[i])*10)/10) + "::::");
             }
             String fields = "";
             if (fieldSB.toString().length() >= 4) {
@@ -411,9 +411,9 @@ public class SBModel {
             try {
                 grade = grade/allCredits;
             } catch(ArithmeticException e) {
-                System.err.println("Durch 0 Credits geteil!");
+                System.err.println("Durch 0 Credits geteilt!");
             }
-            String[] firstRow = {"Gesamt",allCredits+"",grade+""};
+            String[] firstRow = {"Gesamt",allCredits+"",(Math.rint(grade*10)/10)+""};
             fieldsAL.add(firstRow);
             for (int i = 0; i < fields_alone.length; i++) {
                 fieldsAL.add(fields_alone[i].split(","));
