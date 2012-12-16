@@ -326,17 +326,36 @@ public class SBModel {
             for(int i=0;i<moduleIDs.size();i++) {
                 ResultSet rs = db.getResultSet("SELECT examOneType,examOneCredits,examOneGrade,examTwoType,examTwoCredits,examTwoGrade FROM module WHERE semesterID=" + moduleIDs.get(i) + ";"); 
                 while (rs.next()) {
-                    examTypeSB.append(rs.getString("examOneType")+"::::"+rs.getString("examTwoType")+"::::");
-                    examCreditsSB.append(rs.getString("examOneCredits")+"::::"+rs.getString("examTwoCredits")+"::::");
-                    examGradeSB.append(rs.getString("examOneGrade")+"::::"+rs.getString("examTwoGrade")+"::::");
+                    if(!rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) examTypeSB.append(rs.getString("examOneType")+"::::");
+                    if(!rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) examTypeSB.append(rs.getString("examTwoType")+"::::");
+                    if(!rs.getString("examOneCredits").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) examCreditsSB.append(rs.getString("examOneCredits")+"::::");
+                    if(!rs.getString("examTwoCredits").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) examCreditsSB.append(rs.getString("examTwoCredits")+"::::");
+                    if(!rs.getString("examOneGrade").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) examGradeSB.append(rs.getString("examOneGrade")+"::::");
+                    if(!rs.getString("examTwoGrade").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) examGradeSB.append(rs.getString("examTwoGrade")+"::::");
                 }
             }
-            String examType = examTypeSB.toString().substring(0,examTypeSB.toString().length()-4);
-            String examCredits = examCreditsSB.toString().substring(0,examCreditsSB.toString().length()-4);
-            String examGrade = examGradeSB.toString().substring(0,examGradeSB.toString().length()-4);
-            String[][] fields = {examType.split("::::"),examCredits.split("::::"),examGrade.split("::::")};
-            
-            return fields;
+            String examType = "";
+            if(examTypeSB.toString().length() >= 4) examType = examTypeSB.toString().substring(0,examTypeSB.toString().length()-4);
+            String examCredits = "";
+            if(examCreditsSB.toString().length() >= 4) examCredits = examCreditsSB.toString().substring(0,examCreditsSB.toString().length()-4);
+            String examGrade = "";
+            if(examGradeSB.toString().length() >= 4) examGrade = examGradeSB.toString().substring(0,examGradeSB.toString().length()-4);
+            StringBuilder fieldSB = new StringBuilder();
+            String[] examTypeArr = examType.split("::::");
+            String[] examCreditsArr = examCredits.split("::::");
+            String[] examGradeArr = examGrade.split("::::");
+            for(int i=0;i<examType.split("::::").length;i++) {
+                fieldSB.append(examTypeArr[i]+","+examCreditsArr[i]+","+examGradeArr[i]+"::::");
+            }
+            String fields = "";
+            if(fieldSB.toString().length() >= 4) fields = fieldSB.toString().substring(0,fieldSB.toString().length()-4);
+            String[] fields_alone = fields.split("::::");
+            ArrayList<String[]> fieldsAL = new ArrayList<>();
+            for(int i=0;i<fields_alone.length;i++) {
+                fieldsAL.add(fields_alone[i].split(","));
+            }
+            String[][] fields_arr = fieldsAL.toArray(new String[fieldsAL.size()][]);
+            return fields_arr;
         } catch (SQLException e) {
             System.err.println(e);
             return null;
