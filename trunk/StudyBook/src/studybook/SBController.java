@@ -60,21 +60,25 @@ public class SBController {
     
     private boolean checkInstance() {
          try {
-            BufferedReader in = new BufferedReader(new FileReader(".sblock"));
+            BufferedReader in = new BufferedReader(new FileReader("lock.sblock"));
+            in.close();
+            File lock = new File("lock.sblock");
             return true;
         } catch (FileNotFoundException e) {
             try {
-                BufferedWriter out = new BufferedWriter(new FileWriter(".sblock"));
+                BufferedWriter out = new BufferedWriter(new FileWriter("lock.sblock"));
                 out.flush();
                 out.close();
             } catch (IOException e2) {
             }
             return false;
+        } catch(IOException e) {
+            return false;
         }
     }
     
     private void removeInstance() {
-        File lock = new File(".sblock");
+        File lock = new File("lock.sblock");
         if(lock.exists()) {
             lock.delete();
         }
@@ -139,8 +143,8 @@ public class SBController {
                 File profileFile = new File(line+".sbprofile");
                 if(profileFile.exists()) this.loadProfile(line);
             }
+            in.close();
         } catch (FileNotFoundException e) {
-            System.err.println(e);
             view.setRightPanel(sbhelppanel);
             activePanel = "sbhelppanel";
         } catch (IOException e) {
