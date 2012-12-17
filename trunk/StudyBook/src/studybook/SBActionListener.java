@@ -104,7 +104,7 @@ public class SBActionListener implements ActionListener {
                 // Studiengang
                 case "study":
                     view.addTreeNode(new SBNodeStruct("Neuer Studiengang", 1));
-             break;
+                    break;
 
                 // Semester
                 case "semester":
@@ -133,7 +133,7 @@ public class SBActionListener implements ActionListener {
 
                 // Über
                 case "about":
-                    controller.showAboutPanel();
+                    controller.showAboutDialog();
                     break;
             }
         }

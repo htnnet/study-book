@@ -529,7 +529,7 @@ public class SBModel {
             String[] examCreditsArr = examCredits.split("::::");
             String[] examGradeArr = examGrade.split("::::");
             for (int i = 0; i < examType.split("::::").length; i++) {
-                fieldSB.append(examTypeArr[i] + "," + examCreditsArr[i] + "," + (Math.rint(Float.parseFloat(examGradeArr[i]) * 10) / 10) + "::::");
+                fieldSB.append("        " + examTypeArr[i] + ",        " + examCreditsArr[i] + ",        " + (Math.rint(Float.parseFloat(examGradeArr[i]) * 10) / 10) + "::::");
             }
             String fields = "";
             if (fieldSB.toString().length() >= 4) {
@@ -542,7 +542,7 @@ public class SBModel {
             } catch (ArithmeticException e) {
                 System.err.println("Durch 0 Credits geteilt!");
             }
-            String[] firstRow = {"Gesamt", allCredits + "", (Math.rint(grade * 10) / 10) + ""};
+            String[] firstRow = {"Gesamt:", allCredits + "", (Math.rint(grade * 10) / 10) + ""};
             fieldsAL.add(firstRow);
             for (int i = 0; i < fields_alone.length; i++) {
                 fieldsAL.add(fields_alone[i].split(","));
