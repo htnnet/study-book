@@ -480,31 +480,31 @@ public class SBModel {
             int allCredits = 0;
             float grade = 0;
             for (int i = 0; i < moduleIDs.size(); i++) {
-                ResultSet rs = db.getResultSet("SELECT examOneType,examOneCredits,examOneGrade,examTwoType,examTwoCredits,examTwoGrade FROM module WHERE semesterID=" + moduleIDs.get(i) + ";");
+                ResultSet rs = db.getResultSet("SELECT examOneType,examOneCredits,examOneGrade,examTwoType,examTwoCredits,examTwoGrade,name FROM module WHERE semesterID=" + moduleIDs.get(i) + ";");
                 while (rs.next()) {
-                    if (!rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) {
-                        examTypeSB.append(rs.getString("examOneType") + "::::");
+                    if (!rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0") && Float.parseFloat(rs.getString("examOneGrade")) <= 4.0) {
+                        examTypeSB.append(rs.getString("name")+": "+rs.getString("examOneType") + "::::");
                     }
-                    if (!rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) {
-                        examTypeSB.append(rs.getString("examTwoType") + "::::");
+                    if (!rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0") && Float.parseFloat(rs.getString("examTwoGrade")) <= 4.0) {
+                        examTypeSB.append(rs.getString("name")+": "+rs.getString("examTwoType") + "::::");
                     }
-                    if (!rs.getString("examOneCredits").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) {
+                    if (!rs.getString("examOneCredits").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0") && Float.parseFloat(rs.getString("examOneGrade")) <= 4.0) {
                         examCreditsSB.append(rs.getString("examOneCredits") + "::::");
                         int examOneCreditsInt = Integer.parseInt(rs.getString("examOneCredits"));
                         allCredits += examOneCreditsInt;
                     }
-                    if (!rs.getString("examTwoCredits").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) {
+                    if (!rs.getString("examTwoCredits").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0") && Float.parseFloat(rs.getString("examTwoGrade")) <= 4.0) {
                         examCreditsSB.append(rs.getString("examTwoCredits") + "::::");
                         int examTwoCreditsInt = Integer.parseInt(rs.getString("examTwoCredits"));
                         allCredits += examTwoCreditsInt;
                     }
-                    if (!rs.getString("examOneGrade").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0")) {
+                    if (!rs.getString("examOneGrade").equals("") && !rs.getString("examOneType").equals("") && !rs.getString("examOneCredits").equals("0") && Float.parseFloat(rs.getString("examOneGrade")) <= 4.0) {
                         examGradeSB.append(rs.getString("examOneGrade") + "::::");
                         int examOneCreditsInt = Integer.parseInt(rs.getString("examOneCredits"));
                         double examOneGradeFloat = Float.parseFloat(rs.getString("examOneGrade"));
                         grade += (examOneCreditsInt * examOneGradeFloat);
                     }
-                    if (!rs.getString("examTwoGrade").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0")) {
+                    if (!rs.getString("examTwoGrade").equals("") && !rs.getString("examTwoType").equals("") && !rs.getString("examTwoCredits").equals("0") && Float.parseFloat(rs.getString("examTwoGrade")) <= 4.0) {
                         examGradeSB.append(rs.getString("examTwoGrade") + "::::");
                         int examTwoCreditsInt = Integer.parseInt(rs.getString("examTwoCredits"));
                         double examTwoGradeFloat = Float.parseFloat(rs.getString("examTwoGrade"));
@@ -529,7 +529,10 @@ public class SBModel {
             String[] examCreditsArr = examCredits.split("::::");
             String[] examGradeArr = examGrade.split("::::");
             for (int i = 0; i < examType.split("::::").length; i++) {
-                fieldSB.append("        " + examTypeArr[i] + ",        " + examCreditsArr[i] + ",        " + (Math.rint(Float.parseFloat(examGradeArr[i]) * 10) / 10) + "::::");
+                try {
+                    fieldSB.append("    " + examTypeArr[i] + ",    " + examCreditsArr[i] + ",    " + (Math.rint(Float.parseFloat(examGradeArr[i]) * 10) / 10) + "::::");
+                } catch(NumberFormatException e) {
+                }
             }
             String fields = "";
             if (fieldSB.toString().length() >= 4) {
@@ -542,8 +545,10 @@ public class SBModel {
             } catch (ArithmeticException e) {
                 System.err.println("Durch 0 Credits geteilt!");
             }
-            String[] firstRow = {"Gesamt:", allCredits + "", (Math.rint(grade * 10) / 10) + ""};
-            fieldsAL.add(firstRow);
+            if(allCredits > 0) {
+                String[] firstRow = {"Gesamt:", allCredits + "", (Math.rint(grade * 10) / 10) + ""};
+                fieldsAL.add(firstRow);
+            }
             for (int i = 0; i < fields_alone.length; i++) {
                 fieldsAL.add(fields_alone[i].split(","));
             }
