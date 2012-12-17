@@ -138,7 +138,7 @@ public class SBStudyPanel extends JPanel {
     private void createTextFields() {
         // Einschränkungen für Textfelder festlegen
         studentNameDocument = new SBFieldDocument(50);
-        studentMatDocument = new SBFieldDocument(50, "1234567890");
+        studentMatDocument = new SBFieldDocument(50, "1234567890-: ");
         studyDegreeDocument = new SBFieldDocument(50);
         studyAcadDocument = new SBFieldDocument(50);
 
@@ -170,22 +170,12 @@ public class SBStudyPanel extends JPanel {
         gradeTable = new SBTable(tableModel);
         gradeTable.setEnabled(false);
 
-        // CellRenderer
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        //rightRenderer.setFont();
-
         // Header
         JTableHeader gradeTableHeader = gradeTable.getTableHeader();
         gradeTableHeader.setReorderingAllowed(false);
         gradeTableHeader.setResizingAllowed(false);
         Font font = gradeTableHeader.getFont();
         gradeTableHeader.setFont(font.deriveFont(Font.BOLD));
-
-        // Cells
-        TableColumnModel columnModel = gradeTable.getColumnModel();
-        //columnModel.getColumn(1).setCellRenderer(rightRenderer);
-        //columnModel.getColumn(2).setCellRenderer(rightRenderer);
 
         gradeScrollPane = new JScrollPane(gradeTable);
     }

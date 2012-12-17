@@ -530,7 +530,7 @@ public class SBModel {
             String[] examGradeArr = examGrade.split("::::");
             for (int i = 0; i < examType.split("::::").length; i++) {
                 try {
-                    fieldSB.append("    " + examTypeArr[i] + ",    " + examCreditsArr[i] + ",    " + (Math.rint(Float.parseFloat(examGradeArr[i]) * 10) / 10) + "::::");
+                    fieldSB.append("     " + examTypeArr[i] + ",     " + examCreditsArr[i] + ",     " + (Math.rint(Float.parseFloat(examGradeArr[i]) * 10) / 10) + "::::");
                 } catch(NumberFormatException e) {
                 }
             }
@@ -546,7 +546,7 @@ public class SBModel {
                 System.err.println("Durch 0 Credits geteilt!");
             }
             if(allCredits > 0) {
-                String[] firstRow = {"Gesamt:", allCredits + "", (Math.rint(grade * 10) / 10) + ""};
+                String[] firstRow = {" Gesamt:", " " + allCredits, " " + (Math.rint(grade * 10) / 10) };
                 fieldsAL.add(firstRow);
             }
             for (int i = 0; i < fields_alone.length; i++) {

@@ -6,6 +6,7 @@ package studybook;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -22,10 +23,11 @@ public class SBTableEditor extends AbstractCellEditor implements TableCellEditor
     private SBFieldDocument cellDocument;
     private SBFieldDocument timeDocument;
     private JScrollPane scrollPane;
+    private Font font;
 
     public SBTableEditor() {
-        cellDocument = new SBFieldDocument(200);
-        timeDocument = new SBFieldDocument(20, "0123456789:- ");
+        cellDocument = new SBFieldDocument(100);
+        timeDocument = new SBFieldDocument(50);
         textArea = new JTextArea();
         scrollPane = new JScrollPane(textArea);
 
@@ -34,6 +36,9 @@ public class SBTableEditor extends AbstractCellEditor implements TableCellEditor
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         if (column == 0) {
             textArea.setDocument(timeDocument);
+            String fontName = textArea.getFont().getFontName();
+            font = new Font(fontName, Font.BOLD, 14);
+            textArea.setFont(font);
         } else if (column == 7) {
             textArea.setDocument(cellDocument);
             textArea.setForeground(Color.red);

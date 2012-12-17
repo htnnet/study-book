@@ -2,6 +2,8 @@ package studybook;
 
 import com.michaelbaranov.microba.calendar.DatePicker;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.border.Border;
 import javax.swing.*;
@@ -65,6 +67,7 @@ public class SBModulePanel extends JPanel {
     private JLabel examTwoTimeLabel;
     private JLabel examTwoCreditsLabel;
     private JLabel examTwoGradeLabel;
+    private Font labelFont;
     private SBFieldDocument academicNameDocument;
     private SBFieldDocument academicRoomDocument;
     private SBFieldDocument academicTelDocument;
@@ -111,23 +114,6 @@ public class SBModulePanel extends JPanel {
     public SBModulePanel() {
         this.createModulePanel();
         this.layoutModulePanel();
-
-
-        String[] inputString = {"", "", "", "",
-         "", "", "", "", "", "", "", "",
-         "", "", "", "", ""};
-
-        this.setFields(inputString);
-
-        /*
-        String[] outputString = this.getFields();
-        for (int i = 0; i < outputString.length; i++) {
-            System.out.println(outputString[i]);
-        }
-        *
-        */
-
-
     }
 
     /**
@@ -297,14 +283,12 @@ public class SBModulePanel extends JPanel {
 
         formattedField = ((JSpinner.NumberEditor) examOneCreditsSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
-        //numberFormatter = (NumberFormatter) formattedField.getFormatter();
-        //numberFormatter.setAllowsInvalid(false);
+
 
         formattedField = ((JSpinner.NumberEditor) examOneGradeSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
         numberFormatter = (NumberFormatter) formattedField.getFormatter();
         numberFormatter.setFormat(decimalFormat);
-        //numberFormatter.setAllowsInvalid(false);
 
         formattedField = ((JSpinner.DateEditor) examTwoTimeSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
@@ -313,14 +297,11 @@ public class SBModulePanel extends JPanel {
 
         formattedField = ((JSpinner.NumberEditor) examTwoCreditsSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
-        //numberFormatter = (NumberFormatter) formattedField.getFormatter();
-        //numberFormatter.setAllowsInvalid(false);
 
         formattedField = ((JSpinner.NumberEditor) examTwoGradeSpinner.getEditor()).getTextField();
         formattedField.setHorizontalAlignment(JTextField.LEFT);
         numberFormatter = (NumberFormatter) formattedField.getFormatter();
         numberFormatter.setFormat(decimalFormat);
-        //numberFormatter.setAllowsInvalid(false);
 
 
         // Den Spinner-Elementen für die Zeit und die Note Startwerte mitgeben
