@@ -48,7 +48,7 @@ public class SBActionListener implements ActionListener {
 
             @Override
             public String getDescription() {
-                return "StudyBook Profile (*.sbprofile)";
+                return "StudyBook Profil (*.sbprofile)";
             }
         };
         fileChooser = new JFileChooser();
@@ -74,7 +74,12 @@ public class SBActionListener implements ActionListener {
                 case "new":
                     check = fileChooser.showSaveDialog(null);
                     if (check == JFileChooser.APPROVE_OPTION) {
-                        controller.newProfile(fileChooser.getSelectedFile().getPath());
+                        File profileFile = new File(fileChooser.getSelectedFile().getPath()+".sbprofile");
+                        if(profileFile.exists()) {
+                            view.showStatusError("Es existiert bereits ein Profil mit diesem Namen!");
+                        } else {
+                            controller.newProfile(fileChooser.getSelectedFile().getPath());
+                        }
                     }
                     break;
 
