@@ -1,6 +1,5 @@
 package studybook;
 
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import javax.swing.*;
@@ -9,15 +8,14 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 /**
  * Empfängt die vom Nutzer getätigten Mauseingaben in dem JTree und reagiert
  * entsprechend.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionListener, TreeModelListener {
 
@@ -77,7 +75,6 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
 
 
         SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
-        System.out.println(nodeInfo.toString());
 
         currentId = nodeInfo.getId();
         oldName = nodeInfo.toString();
@@ -197,15 +194,12 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
 
         switch (pathLength) {
             case 1:
-                System.out.println("studiengang: " + currentId);
                 this.controller.deleteStudy(currentId);
                 break;
             case 2:
-                System.out.println("semester: " + currentId);
                 this.controller.deleteSemester(currentId);
                 break;
             case 3:
-                System.out.println("modul: " + currentId);
                 this.controller.deleteModule(currentId);
                 break;
         }

@@ -13,8 +13,8 @@ import java.util.Vector;
  * werden können.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBModel {
 

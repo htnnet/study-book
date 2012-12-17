@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import javax.swing.border.Border;
 import javax.swing.*;
-import java.awt.Font;
 import java.beans.PropertyVetoException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -13,15 +12,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import javax.print.attribute.AttributeSet;
 import javax.swing.text.*;
 
 /**
  * Das Panel für die Modulverwaltung.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBModulePanel extends JPanel {
 

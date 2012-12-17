@@ -5,8 +5,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Enthält Methoden mit denen eine SQL-Datenbankverbindung hergestellt, Daten
@@ -14,8 +12,8 @@ import java.util.logging.Logger;
  *
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBSQL {
 
