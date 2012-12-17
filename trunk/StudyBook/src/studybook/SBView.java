@@ -136,8 +136,8 @@ public class SBView {
         mainFrame.add(statusBar, BorderLayout.SOUTH);
         mainFrame.add(splitPane, BorderLayout.CENTER);
 
-        mainFrame.setSize(1024, 786);
-        mainFrame.setMinimumSize(new Dimension(1024, 786));
+        mainFrame.setSize(800, 600);
+        mainFrame.setMinimumSize(new Dimension(800, 600));
         mainFrame.setResizable(true);
         mainFrame.setVisible(true);
         mainFrame.setLocationRelativeTo(null);  // Zentrieren
