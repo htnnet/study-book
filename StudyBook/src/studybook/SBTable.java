@@ -3,19 +3,19 @@ package studybook;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.util.Locale;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 
 /**
+ *BESCHREIBUNG!!!!!!!!!!!!!!!!
  *
- * @author Alex
+ *
+ * @author StudyBook-Crew
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBTable extends JTable {
 

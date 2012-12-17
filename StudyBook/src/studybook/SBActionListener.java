@@ -5,19 +5,16 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 /**
  * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und reagiert
  * entsprechend.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBActionListener implements ActionListener {
 
