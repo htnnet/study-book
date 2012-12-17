@@ -1,9 +1,16 @@
 package studybook;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.util.Locale;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 /**
@@ -22,14 +29,14 @@ public class SBTable extends JTable {
     public void emptyCells() {
         int rowCount = tableModel.getRowCount();
         int colCount = tableModel.getColumnCount();
-        
+
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < colCount; j++) {
                 this.setValueAt("", i, j);
             }
         }
     }
-    
+
     public void populateTable(String[][] cells) {
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
@@ -57,6 +64,40 @@ public class SBTable extends JTable {
         return tableData;
     }
 
-    private void colorizeOddRows() {
+    /**
+     * Zum Einfärben von jeder zweiten Zeile.
+     * @param renderer
+     * @param Index_row
+     * @param Index_col
+     * @return
+     */
+    @Override
+    public Component prepareRenderer(TableCellRenderer renderer, int Index_row, int Index_col) {
+        Font font;
+        Component comp = super.prepareRenderer(renderer, Index_row, Index_col);
+        if (Index_col == 0 && comp instanceof JTextArea) {
+            comp.setBackground(new Color(245, 245, 250));
+            String fontName = comp.getFont().getFontName();
+            font = new Font(fontName, Font.BOLD, 14);
+            comp.setFont(font);
+
+        } else if (Index_col == 6) {
+            comp.setBackground(new Color(238, 243, 250));
+
+        } else if (Index_col == 7) {
+            comp.setBackground(new Color(238, 243, 250));
+            comp.setForeground(Color.RED);
+
+        } else if (Index_row % 2 == 1 && comp instanceof JLabel) {
+            comp.setBackground(new Color(245, 245, 250));
+
+        } else if (Index_row == 0 && comp instanceof JLabel) {
+            font = comp.getFont();
+            comp.setFont(font.deriveFont(Font.BOLD));
+        } else {
+            comp.setBackground(Color.white);
+        }
+        return comp;
     }
 }
+

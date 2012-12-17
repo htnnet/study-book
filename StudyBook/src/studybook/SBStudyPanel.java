@@ -7,10 +7,12 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import com.michaelbaranov.microba.calendar.DatePicker;
+import java.awt.Font;
 import java.beans.PropertyVetoException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import javax.swing.table.*;
 
 /**
  * Enthält das Panel für die Studiengangverwaltung.
@@ -167,7 +169,24 @@ public class SBStudyPanel extends JPanel {
         tableModel = new DefaultTableModel(columns, 30);
         gradeTable = new SBTable(tableModel);
         gradeTable.setEnabled(false);
-        gradeTable.getTableHeader().setReorderingAllowed(false) ;
+
+        // CellRenderer
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        //rightRenderer.setFont();
+
+        // Header
+        JTableHeader gradeTableHeader = gradeTable.getTableHeader();
+        gradeTableHeader.setReorderingAllowed(false);
+        gradeTableHeader.setResizingAllowed(false);
+        Font font = gradeTableHeader.getFont();
+        gradeTableHeader.setFont(font.deriveFont(Font.BOLD));
+
+        // Cells
+        TableColumnModel columnModel = gradeTable.getColumnModel();
+        //columnModel.getColumn(1).setCellRenderer(rightRenderer);
+        //columnModel.getColumn(2).setCellRenderer(rightRenderer);
+
         gradeScrollPane = new JScrollPane(gradeTable);
     }
     /**

@@ -13,7 +13,6 @@ import javax.swing.text.PlainDocument;
  * @since 2012-10-14
  */
 public class SBFieldDocument extends PlainDocument {
-
     private int maxLength;
     private String acceptedChars;
 
@@ -37,34 +36,17 @@ public class SBFieldDocument extends PlainDocument {
         this.acceptedChars = acceptedChars;
     }
 
-    public void remove(int offset, int length) throws BadLocationException {
-        int currentLength = getLength();
-        String currentContent = getText(0, currentLength);
-        System.out.println(currentContent);
-
-        super.remove(offset, length);
-
-    }
-
     /**
      * Überschriebene Methode von PlainDocument, mit der man das Eingabe-
      * verhalten steuern kann.
      *
-     * @param offset Der startende Offset
-     * @param str Der vom Benutzer eingegebene Text
+     * @param offset der startende Offset
+     * @param str der vom Benutzer eingegebene Text
      * @param a Attribute des eingegebenen Textes
      * @throws BadLocationException
      */
     @Override
     public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
-
-        //System.out.println(this.getText(0, this.getLength()));
-        /*
-         * if ((this.getLength() < minLength) && (str.trim().length() == 0 ||
-         * str.equals(""))){ System.out.println("verboten");
-         *
-         * }
-         */
         // Falls es "verbotene" Zeichen gibt, werden sie hier herausgefiltert
         if (acceptedChars != null) {
             for (int i = 0; i < str.length(); i++) {
@@ -75,12 +57,9 @@ public class SBFieldDocument extends PlainDocument {
         }
 
         // Längenüberschreitung prüfen
-
         if ((this.getLength() + str.length() > maxLength) || this.getLength() + str.length() < 1) {
         } else {
             super.insertString(offset, str, a);
         }
-
-
     }
 }

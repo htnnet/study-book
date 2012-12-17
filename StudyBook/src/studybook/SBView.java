@@ -136,8 +136,8 @@ public class SBView {
         mainFrame.add(statusBar, BorderLayout.SOUTH);
         mainFrame.add(splitPane, BorderLayout.CENTER);
 
-        mainFrame.setSize(800, 600);
-        mainFrame.setMinimumSize(new Dimension(800, 600));
+        mainFrame.setSize(1024, 786);
+        mainFrame.setMinimumSize(new Dimension(1024, 786));
         mainFrame.setResizable(true);
         mainFrame.setVisible(true);
         mainFrame.setLocationRelativeTo(null);  // Zentrieren
@@ -192,9 +192,9 @@ public class SBView {
      * Methode zum Erstellen eines Baumes, der zur Navigation zwischen der
      * Studiengang-,Semester- und Modulverwatlung dient.
      */
-    private void createTree() { //Baum erstellen
-        //treeRoot = new DefaultMutableTreeNode("root");
-        tree = new JTree();
+    private void createTree() {
+        treeRoot = new DefaultMutableTreeNode("root");
+        tree = new JTree(treeRoot);
         tree.setEditable(true);
         treePane = new JScrollPane(tree);
         tree.setRootVisible(false);
@@ -392,13 +392,6 @@ public class SBView {
         menuItem.setIcon(itemIcon);
         menuItem.setAccelerator(ctrlSKeyStroke);
         menuItem.setActionCommand("save");
-        menuItem.addActionListener(actionListener);
-        menu.add(menuItem);
-
-        menuItem = new JMenuItem("Profil speichern unter...", 'u');
-        itemIcon = new ImageIcon(getClass().getResource("/pics/saveas16x16.png"));
-        menuItem.setIcon(itemIcon);
-        menuItem.setActionCommand("saveas");
         menuItem.addActionListener(actionListener);
         menu.add(menuItem);
 
