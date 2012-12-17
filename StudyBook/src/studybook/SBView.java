@@ -95,7 +95,7 @@ public class SBView {
         leftPanel = new JPanel();
         leftPanel.setMinimumSize(new Dimension(200, 200));
         rightPanel = new JPanel();
-        rightPanel.setMinimumSize(new Dimension(500, 500));
+        rightPanel.setMinimumSize(new Dimension(570, 500));
 
         this.createMenuBar();
         this.createPopupMenu();
@@ -136,8 +136,8 @@ public class SBView {
         mainFrame.add(statusBar, BorderLayout.SOUTH);
         mainFrame.add(splitPane, BorderLayout.CENTER);
 
-        mainFrame.setSize(800, 600);
-        mainFrame.setMinimumSize(new Dimension(800, 600));
+        mainFrame.setSize(900, 600);
+        mainFrame.setMinimumSize(new Dimension(870, 600));
         mainFrame.setResizable(true);
         mainFrame.setVisible(true);
         mainFrame.setLocationRelativeTo(null);  // Zentrieren
