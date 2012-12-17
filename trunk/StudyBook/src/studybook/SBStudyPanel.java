@@ -166,7 +166,8 @@ public class SBStudyPanel extends JPanel {
      */
     private void createTable() {
         String[] columns = {"Leistung", "Credits", "Note"};
-        tableModel = new DefaultTableModel(columns, 30);
+        int GRADEROWS = 25;
+        tableModel = new DefaultTableModel(columns, GRADEROWS);
         gradeTable = new SBTable(tableModel);
         gradeTable.setEnabled(false);
 

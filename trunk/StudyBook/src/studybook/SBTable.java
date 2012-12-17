@@ -10,7 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 /**
- *BESCHREIBUNG!!!!!!!!!!!!!!!!
+ * BESCHREIBUNG!!!!!!!!!!!!!!!!
  *
  *
  * @author StudyBook-Crew
@@ -38,7 +38,14 @@ public class SBTable extends JTable {
     }
 
     public void populateTable(String[][] cells) {
+        int rowCount = tableModel.getRowCount();
+
         for (int i = 0; i < cells.length; i++) {
+
+            //
+            if (i == (rowCount - 1)) {
+                this.tableModel.addRow(new String[]{"", "", ""});
+            }
             for (int j = 0; j < cells[i].length; j++) {
                 this.setValueAt(cells[i][j], i, j);
             }
@@ -66,6 +73,7 @@ public class SBTable extends JTable {
 
     /**
      * Zum Einfärben von jeder zweiten Zeile.
+     *
      * @param renderer
      * @param Index_row
      * @param Index_col
@@ -100,4 +108,3 @@ public class SBTable extends JTable {
         return comp;
     }
 }
-

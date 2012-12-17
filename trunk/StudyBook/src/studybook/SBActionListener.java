@@ -75,7 +75,7 @@ public class SBActionListener implements ActionListener {
                     check = fileChooser.showSaveDialog(null);
                     if (check == JFileChooser.APPROVE_OPTION) {
                         File profileFile = new File(fileChooser.getSelectedFile().getPath()+".sbprofile");
-                        if(profileFile.exists()) {
+                        if(profileFile.exists()) { // falls die Datei schon existiert
                             view.showStatusError("Es existiert bereits ein Profil mit diesem Namen!");
                         } else {
                             controller.newProfile(fileChooser.getSelectedFile().getPath());
