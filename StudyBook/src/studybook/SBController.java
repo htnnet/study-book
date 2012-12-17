@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
@@ -210,7 +212,7 @@ public class SBController {
      * Methode zum Anzeigen des Über-Dialogs
      */
     public void showAboutDialog() {
-        System.out.println("About");
+        view.showAboutDialog(); 
     }
 
     /**

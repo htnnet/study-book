@@ -281,6 +281,13 @@ public class SBView {
         tree.addTreeSelectionListener(mouseTreeListener);
     }
 
+    public void showAboutDialog() {
+        JDialog aboutDialog = new SBAboutDialog(this.mainFrame);
+        aboutDialog.setResizable(false);
+        aboutDialog.setLocationRelativeTo(null);
+        aboutDialog.setVisible(true);
+    }
+
     /**
      * Blätter zum momentan ausgewählten Parten hinzufügen.
      */
@@ -468,7 +475,7 @@ public class SBView {
         menuItem.addActionListener(actionListener);
         menu.add(menuItem);
 
-        menuItem = new JMenuItem("Über", 'Ü');
+        menuItem = new JMenuItem("Über StudyBook", 'Ü');
         itemIcon = new ImageIcon(getClass().getResource("/pics/about16x16.png"));
         menuItem.setIcon(itemIcon);
         menuItem.setActionCommand("about");
