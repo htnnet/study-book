@@ -6,11 +6,10 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JTree;
-import javax.swing.filechooser.FileFilter;
 
 /**
- * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und reagiert
- * entsprechend.
+ * Empfängt die vom Nutzer getätigten Eingaben in der MenuBar und dem
+ * Kontextmenü und reagiert entsprechend.
  *
  * @author StudyBook-Crew
  * @version 1.0
@@ -24,40 +23,23 @@ public class SBActionListener implements ActionListener {
     private JFileChooser fileChooser;
     private int check;
 
+    /**
+     * Konstruktor der Klasse SBActionListener, der die View erhält, um
+     * Fehlermeldungen in der StatusBar ausgeben zu können und den Controller
+     * erhält, um auf Eingaben entsprechend reagieren zu können.
+     *
+     * @param view das View-Objekt
+     * @param controller das Controller-Objekt
+     */
     public SBActionListener(SBView view, SBController controller) {
         this.view = view;
-
         this.controller = controller;
-        this.fileChooser = fileChooser;
-        this.setupFileChooser();
+        fileChooser = view.getFileChooser();
     }
 
     /**
-     * Erstellt einen JFileChosser mit dessen Hilfe Dateien zum Öffnen und
-     * Zielorte zum Abspeichern ausgewählt werden können.
-     */
-    private void setupFileChooser() {
-        // FileFilter erstellen, umungewollte Dateien in der
-        // Verzeichnisauflistung herauszufiltern
-        FileFilter fileFilter = new FileFilter() {
-
-            @Override
-            public boolean accept(File file) {
-                return file.getName().toLowerCase().endsWith(".sbprofile") || file.isDirectory();
-            }
-
-            @Override
-            public String getDescription() {
-                return "StudyBook Profil (*.sbprofile)";
-            }
-        };
-        fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(fileFilter);
-        fileChooser.setAcceptAllFileFilterUsed(false);
-    }
-
-    /**
-     * Reagiert auf das Anklicken eines MenuItems in der MenuBar.
+     * Reagiert auf das Anklicken eines MenuItems in der MenuBar und in dem
+     * Popup-Menu.
      *
      * @param event das Action-Event
      */
@@ -74,8 +56,8 @@ public class SBActionListener implements ActionListener {
                 case "new":
                     check = fileChooser.showSaveDialog(null);
                     if (check == JFileChooser.APPROVE_OPTION) {
-                        File profileFile = new File(fileChooser.getSelectedFile().getPath()+".sbprofile");
-                        if(profileFile.exists()) { // falls die Datei schon existiert
+                        File profileFile = new File(fileChooser.getSelectedFile().getPath() + ".sbprofile");
+                        if (profileFile.exists()) { // falls die Datei schon existiert
                             view.showStatusError("Es existiert bereits ein Profil mit diesem Namen!");
                         } else {
                             controller.newProfile(fileChooser.getSelectedFile().getPath());

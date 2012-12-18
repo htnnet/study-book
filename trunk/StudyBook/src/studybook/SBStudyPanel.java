@@ -18,8 +18,8 @@ import javax.swing.table.*;
  * Enthält das Panel für die Studiengangverwaltung.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBStudyPanel extends JPanel {
 
@@ -58,6 +58,7 @@ public class SBStudyPanel extends JPanel {
     private SimpleDateFormat dateFormat;
     private DatePicker studentBirthPicker;
     private DatePicker studyStartPicker;
+    final int ROWS = 25;
 
     /**
      * Konstruktor der Klasse SBStudyPanel.
@@ -150,7 +151,7 @@ public class SBStudyPanel extends JPanel {
     }
 
     /**
-     * Erzeugt GUI-Komponenten, mit denen man ein Datum für den Geburtstag das
+     * Erzeugt GUI-Komponenten, mit denen man ein Datum für den Geburtstag des
      * Studenten und den Studienstart festlegen kann.
      */
     private void createDatePicker() {
@@ -160,18 +161,17 @@ public class SBStudyPanel extends JPanel {
         studyStartPicker = new DatePicker(null, dateFormat, Locale.GERMAN);
     }
 
-
     /**
      * Erzeugt die Notentabelle.
      */
     private void createTable() {
         String[] columns = {"Leistung", "Credits", "Note"};
-        int GRADEROWS = 25;
-        tableModel = new DefaultTableModel(columns, GRADEROWS);
+        tableModel = new DefaultTableModel(columns, ROWS);
         gradeTable = new SBTable(tableModel);
         gradeTable.setEnabled(false);
 
-        // Header
+        // dem Benutzer nicht gestatten, die Größe der Spalten zu verändern
+        // außerdem Spaltenüberschriften zentrieren und fett darstellen lassen
         JTableHeader gradeTableHeader = gradeTable.getTableHeader();
         gradeTableHeader.setReorderingAllowed(false);
         gradeTableHeader.setResizingAllowed(false);
@@ -180,6 +180,7 @@ public class SBStudyPanel extends JPanel {
 
         gradeScrollPane = new JScrollPane(gradeTable);
     }
+
     /**
      * Damit die GUI-Komponenten an die richtige Stelle kommen.
      */
@@ -229,16 +230,6 @@ public class SBStudyPanel extends JPanel {
         this.add(progressPanel, BorderLayout.CENTER);
     }
 
-
-    /**
-     * Gibt die Notenübersicht in Form einer JTable zurück
-     *
-     * @return die Notentabelle
-     */
-    public SBTable getGradeTable() {
-        return this.gradeTable;
-    }
-
     /**
      * Getter-Methode für das Holen der Textfeldwerte.
      *
@@ -254,25 +245,6 @@ public class SBStudyPanel extends JPanel {
             this.getStringDate(studyStartPicker.getDate())
         };
         return fields;
-    }
-
-    /**
-     * Methode, die die Datumsangaben als "Date"-Objekt einliest und zur
-     * Weiterreichung an die Datenbank als String zurückliefert.
-     *
-     * @return Das Datum als String
-     * @param date Das Datum als Date-Objekt
-     */
-    private String getStringDate(Date date) {
-        String stringDate = "";
-
-        // Sicherstellen, dass bei leeren Datumsangaben und auch ein leerer
-        // String zurückgegeben wird
-        try {
-            stringDate = this.dateFormat.format(date);
-        } catch (NullPointerException exception) {
-        }
-        return stringDate;
     }
 
     /**
@@ -295,11 +267,30 @@ public class SBStudyPanel extends JPanel {
     }
 
     /**
-     * Methode, die die Datumsangaben als String einliest und sie für
-     * die DatePicker als Date-Objekt zurückliefert.
+     * Methode, die die Datumsangaben als "Date"-Objekt einliest und zur
+     * Weiterreichung an die Datenbank als String zurückliefert.
      *
-     * @return Das Datum als Date-Objekt
-     * @param stringDate Das Datum als String
+     * @return das Datum als String
+     * @param date das Datum als Date-Objekt
+     */
+    private String getStringDate(Date date) {
+        String stringDate = "";
+
+        // Sicherstellen, dass bei leeren Datumsangaben und auch ein leerer
+        // String zurückgegeben wird
+        try {
+            stringDate = this.dateFormat.format(date);
+        } catch (NullPointerException exception) {
+        }
+        return stringDate;
+    }
+
+    /**
+     * Methode, die die Datumsangaben als String einliest und sie für die
+     * DatePicker als Date-Objekt zurückliefert.
+     *
+     * @return das Datum als Date-Objekt
+     * @param stringDate das Datum als String
      */
     private Date getDate(String stringDate) {
         Date date = null;
@@ -311,5 +302,14 @@ public class SBStudyPanel extends JPanel {
         } catch (ParseException exception) {
         }
         return date;
+    }
+
+    /**
+     * Gibt die Notenübersicht in Form einer JTable zurück.
+     *
+     * @return die Notentabelle
+     */
+    public SBTable getGradeTable() {
+        return this.gradeTable;
     }
 }

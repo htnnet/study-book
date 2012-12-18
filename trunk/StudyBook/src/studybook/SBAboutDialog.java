@@ -8,11 +8,11 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 /**
- * Enthält
+ * Ein Dialog, das Informationen über das Programm "StudyBook" preisgibt.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBAboutDialog extends JDialog {
 
@@ -21,26 +21,41 @@ public class SBAboutDialog extends JDialog {
     private JLabel aboutLabel;
     private ImageIcon icon;
     private Border margin;
+    private String about;
+    final int EMPTYSPACE = 5;
 
+    /**
+     * Der Konstruktor der Klasse SBAboutDialog, der den Super-Konstruktor der
+     * Klasse JDialog aufruft.
+     *
+     * @param parent das Parent-Frame zu dem dieser Dialog gehören soll
+     */
     public SBAboutDialog(JFrame parent) {
         super(parent, "Über StudyBook", true);
         this.createAboutDialog();
         this.layoutAboutDialog();
     }
 
+    /**
+     * Die grafischen Komponenten, die diesen Dialog ausmachen, werden hier
+     * erzeugt.
+     */
     private void createAboutDialog() {
-        aboutPanel = new JPanel();
+        margin = BorderFactory.createEmptyBorder(EMPTYSPACE, EMPTYSPACE, EMPTYSPACE, EMPTYSPACE);
 
-        margin = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+        aboutPanel = new JPanel();
         aboutPanel.setBorder(margin);
 
+        // das Logo mit dem Versionstext
         icon = new ImageIcon(getClass().getResource("/pics/about.gif"));
         aboutIcon = new JLabel(icon);
         aboutIcon.setText("<HTML><b>Version 1.0<b></HTML>");
         aboutIcon.setHorizontalTextPosition(JLabel.CENTER);
         aboutIcon.setVerticalTextPosition(JLabel.BOTTOM);
 
-        String about = "<HTML><hr><h3>Autoren:</h3>"
+
+        // der Text, der die Autoren in einem JLabel mit HTML darstellt
+        about = "<HTML><hr><h3>Autoren:</h3>"
                 + "Andre Müller, Alexander Keller,<br>"
                 + "Bernd Hitzelberger, Michael Dazjuk,<br>"
                 + "Robert Heimsoth, Thomas Matern, Thomas Wolscht</HTML>";
@@ -49,15 +64,17 @@ public class SBAboutDialog extends JDialog {
 
         // Fenster-Icon setzen
         try {
-            Image img = ImageIO.read(getClass().getResource("/pics/study16x16.png"));
+            Image img = ImageIO.read(getClass().getResource("/pics/study32x32.png"));
             this.setIconImage(img);
         } catch (IOException e) {
             System.err.println(e.toString());
         }
 
-
     }
 
+    /**
+     * Bringt die grafischen Komponenten dieses Dialogs an die richtige Stelle.
+     */
     private void layoutAboutDialog() {
         aboutPanel.setLayout(new BorderLayout());
         aboutPanel.add(aboutIcon, BorderLayout.NORTH);

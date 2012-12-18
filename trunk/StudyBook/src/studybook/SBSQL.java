@@ -1,14 +1,10 @@
 package studybook;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
- * Enthält Methoden mit denen eine SQL-Datenbankverbindung hergestellt, Daten
- * verändert und ausgelesern werden können.
+ * Enthält Methoden, mit denen eine SQL-Datenbankverbindung hergestellt, Daten
+ * verändert und ausgelesen werden können.
  *
  *
  * @author StudyBook-Crew
@@ -20,7 +16,6 @@ public class SBSQL {
     private Connection conn;
     private Statement stat = null;
 
-
     /**
      * Stellt eine Verbindung zur angegebenen Profildatei mittels ihres Pfades
      * her.
@@ -30,7 +25,7 @@ public class SBSQL {
     public void connect(String profilePath) {
         try {
             Class.forName("org.sqlite.JDBC");
-            this.conn = DriverManager.getConnection("jdbc:sqlite:"+profilePath);
+            this.conn = DriverManager.getConnection("jdbc:sqlite:" + profilePath);
             stat = conn.createStatement();
         } catch (Exception e) {
             System.err.println(e);
@@ -49,7 +44,9 @@ public class SBSQL {
     }
 
     /**
-     * Führt die gewünschten Änderungen an einer Profildatei durch.
+     * Führt die gewünschten Änderungen an einer Profildatei/Datenbankdatei
+     * durch.
+     *
      * @param query der SQLite-Befehl zur Modifikation der Datenbank
      */
     public void query(String query) {
@@ -61,8 +58,9 @@ public class SBSQL {
     }
 
     /**
-     * Liefert mittels eines SQLite-Befehls den gewünschten Datenbanksatz
-     * als ResultSet zurück.
+     * Liefert mittels eines SQLite-Befehls den gewünschten Datenbanksatz als
+     * ResultSet zurück.
+     *
      * @param query SQLite-Befehl zur Anforderung von Datensätzen
      * @return der durch den Befehl geholte Datensatz
      */
