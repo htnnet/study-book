@@ -7,13 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
  * Ist für die reibungslose Interkommunikation zwischen der grafischen
- * Oberfläche und der Logik verantwortlich.
+ * Oberfläche (View) und den Daten (Model) verantwortlich.
  *
  * @author StudyBook-Crew
  * @version 1.0
@@ -23,23 +21,22 @@ public class SBController {
 
     private SBModel model;
     private SBView view;
-    private String profilname = null;
-    private JPanel emptyPanel = new JPanel();
-    private SBStudyPanel studyPanel = new SBStudyPanel();
-    private SBHelpPanel helpPanel = new SBHelpPanel();
-    private SBSemesterPanel semesterPanel = new SBSemesterPanel();
-    private SBModulePanel modulePanel = new SBModulePanel();
+    private SBHelpPanel helpPanel;
+    private SBStudyPanel studyPanel;
+    private SBSemesterPanel semesterPanel;
+    private SBModulePanel modulePanel;
+    private JPanel emptyPanel;
     private String activePanel = ""; //Startpanel festlegen
     private boolean initialized = true;
-    private boolean profile_changed = false;
-    private int activeStudyID = 0;
-    private int activeModuleID = 0;
-    private int activeSemesterID = 0;
+    private boolean profileChanged = false;
+    private int activeStudyId = 0;
+    private int activeModuleId = 0;
+    private int activeSemesterId = 0;
 
     /**
-     * Konstruktor des Controllers
+     * Konstruktor des Controllers bei dem das Programm initialisiert wird.
      *
-     * @param model Beim Programmstart erstelltes Model
+     * @param model beim Programmstart erstelltes Model
      */
     public SBController(SBModel model) {
         this.model = model;
@@ -47,28 +44,34 @@ public class SBController {
     }
 
     /**
-     * Methode zum Initialisieren des Programms bei Programmstart
+     * Methode zum Initialisieren des Programms bei Programmstart.
      */
     private void initialize() {
         view = new SBView(this);
         view.createView();
         view.layoutView();
+
+        // Panels aus der grafische Oberfläche holen
+        helpPanel = view.getHelpPanel();
+        studyPanel = view.getStudyPanel();
+        semesterPanel = view.getSemesterPanel();
+        modulePanel = view.getModulePanel();
+        emptyPanel = view.getEmptyPanel();
+
         this.loadSettings();
-        view.reloadTree(model.getTreeVector(view));
 
         view.setEditMenuEnabled(false, false, false, false, false, false);
         if (this.checkInstance()) {
             view.showStatusError("StudyBook bereits geöffnet! Bitte alle StudyBook Fenster schließen und neu starten!");
         }
-
-
         initialized = false;
     }
 
     /**
-     * Methode zum Prüfen, ob bereits eine Instanc läuft. Ansonsten wird eine Instanzprüfdatei erstellt.
+     * Methode zum Prüfen, ob bereits eine Instanz läuft. Falls nicht, wird eine
+     * Instanzprüfdatei erstellt.
      *
-     * @return true bei schon existierender Instanz, false sonst
+     * @return true bei schon existierender Instanz, sonst false
      */
     private boolean checkInstance() {
         try {
@@ -89,6 +92,9 @@ public class SBController {
         }
     }
 
+    /**
+     * Methode, die den Lock auf die jetzige Instanz wieder freigibt.
+     */
     private void removeInstance() {
         File lock = new File("lock.sblock");
         if (lock.exists()) {
@@ -97,7 +103,7 @@ public class SBController {
     }
 
     /**
-     * Methode zum Erstellen eines neuen Profils
+     * Methode zum Erstellen eines neuen Profils.
      *
      * @param name Pfad zur neuen Profildatei
      */
@@ -107,14 +113,14 @@ public class SBController {
     }
 
     /**
-     * Methode zum Wechseln des Profils
+     * Methode zum Wechseln des Profils.
      *
      * @param path Pfad zum neuen Profil
      */
     public void changeProfile(String path) {
         this.save();
         model.changeProfile(path.substring(0, path.length() - 10));
-        profile_changed = true;
+        profileChanged = true;
         view.reloadTree(model.getTreeVector(view));
         view.setRightPanel(new JPanel());
         view.setEditable(true);
@@ -122,7 +128,7 @@ public class SBController {
     }
 
     /**
-     * Methode zum Laden eines Profils
+     * Methode zum Laden eines Profils.
      *
      * @param path Pfad zur Profildatei
      */
@@ -134,35 +140,37 @@ public class SBController {
     }
 
     /**
-     * Methode zum Anzeigen des Study Panels
+     * Methode zum Anzeigen des Study-Panels
      *
-     * @param studyID ID des Studiengangs, dessen StudyPanel angezeigt werden soll
+     * @param studyId Id des Studiengangs, dessen StudyPanel angezeigt werden
+     * soll
      */
-
-
-    public void showStudyPanel(int studyID) {
+    public void showStudyPanel(int studyId) {
         view.setEditMenuEnabled(true, false, true, false, true, true);
-        if (!initialized && !profile_changed) {
+        if (!initialized && !profileChanged) {
             this.save();
         }
         studyPanel.getGradeTable().emptyCells();
-        studyPanel.setFields(model.getStudyPanelValues(studyID, view));
+        studyPanel.setFields(model.getStudyPanelValues(studyId, view));
 
-        profile_changed = false;
+        profileChanged = false;
         view.setRightPanel(studyPanel);
 
         activePanel = "studyPanel";
-        activeStudyID = studyID;
+        activeStudyId = studyId;
 
-        studyPanel.getGradeTable().populateTable(model.getGradeTable(studyID, view));
+        studyPanel.getGradeTable().populateTable(model.getGradeTable(studyId, view));
     }
 
     /**
-     * Methode zum Anzeigen des Semester Panels
+     * Methode zum Anzeigen des Semester-Panels.
      *
-     * @param semesterID ID des Semesters, dessen Semester Panel angezeigt werden soll
+     * @param semesterId Id des Semesters, dessen Semester-Panel angezeigt
+     * werden soll.
      */
-    public void showSemesterPanel(int semesterID) {
+    public void showSemesterPanel(int semesterId) {
+        // Sicherstellen bei einem Wechsel von einem Semester-Panel zum
+        // anderen das Editieren von Zellen abgeschaltet wird
         if (semesterPanel.getTimeTable().isEditing()) {
             semesterPanel.getTimeTable().getCellEditor().stopCellEditing();
         }
@@ -171,34 +179,34 @@ public class SBController {
         this.save();
 
         semesterPanel.getTimeTable().emptyCells();
-        semesterPanel.getTimeTable().populateTable(model.getSemesterPanelValues(semesterID, view));
+        semesterPanel.getTimeTable().populateTable(model.getSemesterPanelValues(semesterId, view));
 
         semesterPanel.getTimeTable().emptyCells();
-        semesterPanel.getTimeTable().populateTable(model.getSemesterPanelValues(semesterID, view));
+        semesterPanel.getTimeTable().populateTable(model.getSemesterPanelValues(semesterId, view));
 
         view.setRightPanel(semesterPanel);
         activePanel = "semesterPanel";
-        activeSemesterID = semesterID;
+        activeSemesterId = semesterId;
     }
 
     /**
-     * Methode zum Anzeigen des Module Panels
+     * Methode zum Anzeigen des Modul-Panels
      *
-     * @param moduleID ID des Moduls, dessen Module Panel angezeigt werden soll
+     * @param moduleId Id des Moduls, dessen Modul-Panel angezeigt werden soll.
      */
-    public void showModulePanel(int moduleID) {
+    public void showModulePanel(int moduleId) {
         view.setEditMenuEnabled(false, false, false, false, true, true);
         this.save();
 
-        modulePanel.setFields(model.getModulePanelValues(moduleID, view));
+        modulePanel.setFields(model.getModulePanelValues(moduleId, view));
 
         view.setRightPanel(modulePanel);
         activePanel = "modulePanel";
-        activeModuleID = moduleID;
+        activeModuleId = moduleId;
     }
 
     /**
-     * Methode zum Anzeigen des Hilfe Panels
+     * Methode zum Anzeigen des Hilfe-Panels
      */
     public void showHelpPanel() {
         view.setEditMenuEnabled(true, true, false, false, false, false);
@@ -209,127 +217,130 @@ public class SBController {
     }
 
     /**
-     * Methode zum Anzeigen des Über-Dialogs
+     * Methode zum Anzeigen des Über-Dialogs.
      */
     public void showAboutDialog() {
-        view.showAboutDialog(); 
+        view.showAboutDialog();
     }
 
     /**
      * Methode zum Erstellen eines neuen Studiengangs
      *
-     * @return ID des neu erstellten Studiengangs
+     * @return Id des neu erstellten Studiengangs
      */
     public int addStudy() {
-        int studyID = model.addStudy(view);
-        return studyID;
+        int studyId = model.addStudy(view);
+        return studyId;
     }
 
     /**
-     * Methode zum Erstellen eines neuen Semesters
+     * Methode zum Erstellen eines neuen Semesters.
      *
-     * @param studyID ID des Studiengangs, zu dem das Semester hinzugefügt werden soll
-     * @return ID des neu erstellten Semesters
+     * @param studyId Id des Studiengangs, zu dem das Semester hinzugefügt
+     * werden soll
+     * @return Id des neu erstellten Semesters
      */
-    public int addSemester(int studyID) {
-        int semesterID = model.addSemester(studyID, view);
-        return semesterID;
+    public int addSemester(int studyId) {
+        int semesterId = model.addSemester(studyId, view);
+        return semesterId;
     }
 
     /**
-     * Methode zum Erstellen eines neuen Moduls
+     * Methode zum Erstellen eines neuen Moduls.
      *
-     * @param semesterID ID des Semesters, zu dem das Modul hinzugefügt werden soll
-     * @return ID des neu erstellten Moduls
+     * @param semesterId Id des Semesters, zu dem das Modul hinzugefügt werden
+     * soll.
+     * @return Id des neu erstellten Moduls
      */
-    public int addModule(int semesterID) {
-        int moduleID = model.addModule(semesterID, view);
-        return moduleID;
+    public int addModule(int semesterId) {
+        int moduleId = model.addModule(semesterId, view);
+        return moduleId;
     }
 
     /**
-     * Methode zum Umbennen eines Studiengangs
+     * Methode zum Umbennen eines Studiengangs.
      *
-     * @param studyID ID des umzubenennenden Studiengangs
+     * @param studyId Id des umzubenennenden Studiengangs
      * @param studyName Neuer Name des Studiengangs
      */
-    public void renameStudy(int studyID, String studyName) {
-        model.renameStudy(studyID, studyName, view);
+    public void renameStudy(int studyId, String studyName) {
+        model.renameStudy(studyId, studyName, view);
     }
 
     /**
-     * Methode zum Umbennen eines Semesters
+     * Methode zum Umbennen eines Semesters.
      *
-     * @param semesterID ID des umzubenennenden Semesters
-     * @param semesterName Neuer Name des Semesters
+     * @param semesterId Id des umzubenennenden Semesters
+     * @param semesterName neuer Name des Semesters
      */
-    public void renameSemester(int semesterID, String semesterName) {
-        model.renameSemester(semesterID, semesterName, view);
+    public void renameSemester(int semesterId, String semesterName) {
+        model.renameSemester(semesterId, semesterName, view);
     }
 
     /**
-     * Methode zum Umbennen eines Moduls
+     * Methode zum Umbennen eines Moduls.
      *
-     * @param moduleID ID des umzubenennenden Moduls
-     * @param moduleName Neuer Name des Moduls
+     * @param moduleId Id des umzubenennenden Moduls
+     * @param moduleName neuer Name des Moduls
      */
-    public void renameModule(int moduleID, String moduleName) {
-        model.renameModule(moduleID, moduleName, view);
+    public void renameModule(int moduleId, String moduleName) {
+        model.renameModule(moduleId, moduleName, view);
     }
 
     /**
-     * Methode zum Löschen eines Studiengangs
+     * Methode zum Löschen eines Studiengangs.
      *
-     * @param studyID ID des zu löschenden Studiengangs
+     * @param studyId Id des zu löschenden Studiengangs.
      */
-    public void deleteStudy(int studyID) {
-        model.deleteStudy(studyID, view);
+    public void deleteStudy(int studyId) {
+        model.deleteStudy(studyId, view);
         view.setRightPanel(emptyPanel);
         view.setEditMenuEnabled(true, true, false, false, false, false);
     }
 
     /**
-     * Methode zum Löschen eines Semesters
-     * @param semesterID ID des zu löschenden Semesters
-     */
-    public void deleteSemester(int semesterID) {
-        model.deleteSemester(semesterID, view);
-        view.setRightPanel(emptyPanel);
-        view.setEditMenuEnabled(true, true, false, false, false, false);
-    }
-
-    /**
-     * Methode zum Löschen eines Moduls
+     * Methode zum Löschen eines Semesters.
      *
-     * @param moduleID ID des zu löschenden Moduls
+     * @param semesterId Id des zu löschenden Semesters
      */
-    public void deleteModule(int moduleID) {
-        model.deleteModule(moduleID, view);
+    public void deleteSemester(int semesterId) {
+        model.deleteSemester(semesterId, view);
         view.setRightPanel(emptyPanel);
         view.setEditMenuEnabled(true, true, false, false, false, false);
     }
 
     /**
-     * Methode zum Speichern der aktuellen Anzeige
+     * Methode zum Löschen eines Moduls.
+     *
+     * @param moduleId Id des zu löschenden Moduls
+     */
+    public void deleteModule(int moduleId) {
+        model.deleteModule(moduleId, view);
+        view.setRightPanel(emptyPanel);
+        view.setEditMenuEnabled(true, true, false, false, false, false);
+    }
+
+    /**
+     * Methode zum Speichern der aktuellen Anzeige.
      */
     public void save() {
         this.checkInstance();
 
         switch (activePanel) {
             case "studyPanel":
-                model.saveStudyPanel(studyPanel.getFields(), activeStudyID, view);
+                model.saveStudyPanel(studyPanel.getFields(), activeStudyId, view);
                 break;
             case "modulePanel":
-                model.saveModulePanel(modulePanel.getFields(), activeModuleID, view);
+                model.saveModulePanel(modulePanel.getFields(), activeModuleId, view);
                 break;
             case "semesterPanel":
-                model.saveSemesterPanel(semesterPanel.getTimeTable().getTimeTableValues(), activeSemesterID, view);
+                model.saveSemesterPanel(semesterPanel.getTimeTable().getTimeTableValues(), activeSemesterId, view);
                 break;
         }
     }
 
     /**
-     * Methode zum Speichern des zuletzt geladenen Profils
+     * Methode zum Speichern des zuletzt geladenen Profils.
      */
     public void saveSettings() {
         if (model.getProfile() != null) {
@@ -347,8 +358,8 @@ public class SBController {
     }
 
     /**
-     * Methode zum Laden der letzten Einstellungen.
-     * Beinhaltet Lesen des zuletzt geladenen Profils.
+     * Methode zum Laden der letzten Einstellungen. Beinhaltet das zuletzt
+     * geladene Profil.
      */
     private void loadSettings() {
         try {
@@ -358,27 +369,32 @@ public class SBController {
                 File profileFile = new File(line + ".sbprofile");
                 if (profileFile.exists()) {
                     this.loadProfile(line);
+                    view.reloadTree(model.getTreeVector(view));
+                } else {
+                    view.showStatusError("Profil \""+  line + ".sbprofile\" konnte nicht geladen werden!");
                 }
             }
             in.close();
         } catch (FileNotFoundException e) {
             view.setRightPanel(helpPanel);
-            activePanel = "sbhelppanel";
+            activePanel = "helpPanel";
+
         } catch (IOException e) {
         }
     }
 
     /**
-     * Methode zum Holen des aktiven Panels
+     * Methode zum Holen des aktiven Panels.
      *
-     * @return Name des Aktiven Panels
+     * @return Name des aktiven Panels
      */
     public String getActivePanel() {
         return activePanel;
     }
 
     /**
-     * Methode zum sauberen Beenden des Programms inklusive Speicherung der letzten Anzeige
+     * Methode zum sauberen Beenden des Programms inklusive Speicherung der
+     * letzten Anzeige
      */
     public void exit() {
         this.saveSettings();

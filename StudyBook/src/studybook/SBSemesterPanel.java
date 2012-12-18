@@ -13,18 +13,22 @@ import javax.swing.table.TableColumn;
  * Hierin befindet sich das Panel für die Semesterverwaltung.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBSemesterPanel extends JPanel {
 
+    private JScrollPane timeScrollPane;
     private Border margin;
     private Border timeTitledBorder;
     private Border timeCompBorder;
-    private JScrollPane timeScrollPane;
     private DefaultTableModel timeTableModel;
     private SBTable timeTable;
+    final int ROWS = 10;
 
+    /**
+     * Der Konstruktor der Klasse SBSemesterPanel.
+     */
     public SBSemesterPanel() {
         this.createSemesterPanel();
         this.layoutSemesterPanel();
@@ -37,7 +41,7 @@ public class SBSemesterPanel extends JPanel {
     private void createSemesterPanel() {
         String[] columns = {"Uhrzeit", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"};
 
-        timeTableModel = new DefaultTableModel(columns, 10);
+        timeTableModel = new DefaultTableModel(columns, ROWS);
         timeTable = new SBTable(timeTableModel);
 
         // alle Zellen des Stundenplans quadratisch darstellen und Renderer und Editor setzen
@@ -48,18 +52,19 @@ public class SBSemesterPanel extends JPanel {
             column.setCellEditor(new SBTableEditor());
         }
 
-        // Table Header
+        // dem Benutzer nicht gestatten die Größe der Spalten zu verändern
+        // außerdem Spaltenüberschriften zentrieren
         JTableHeader timeTableHeader = timeTable.getTableHeader();
         timeTableHeader.setReorderingAllowed(false);
         timeTableHeader.setResizingAllowed(false);
         TableCellRenderer rendererFromHeader = timeTable.getTableHeader().getDefaultRenderer();
-	JLabel headerLabel = (JLabel) rendererFromHeader;
-	headerLabel.setHorizontalAlignment(JLabel.CENTER);
+        JLabel headerLabel = (JLabel) rendererFromHeader;
+        headerLabel.setHorizontalAlignment(JLabel.CENTER);
 
+        // Spaltenüberschriften fett darstellen lassen
         String fontName = timeTableHeader.getFont().getName();
         Font font = new Font(fontName, Font.BOLD, 11);
         timeTableHeader.setFont(font);
-
 
         timeScrollPane = new JScrollPane(timeTable);
         margin = BorderFactory.createEmptyBorder(5, 5, 5, 5);

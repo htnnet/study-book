@@ -9,17 +9,18 @@ import javax.swing.text.PlainDocument;
  * JTextFields und JTextAreas festgelegt werden kann.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBFieldDocument extends PlainDocument {
+
     private int maxLength;
     private String acceptedChars;
 
     /**
      * 1. Konstruktor der Klasse SBFieldDocument.
      *
-     * @param maxLength Die maximale Anzahl an einzugebenden Zeichen
+     * @param maxLength die maximale Anzahl an einzugebenden Zeichen
      */
     public SBFieldDocument(int maxLength) {
         this.maxLength = maxLength;
@@ -28,8 +29,8 @@ public class SBFieldDocument extends PlainDocument {
     /**
      * 2. Konstruktor der Klasse SBFieldDocument.
      *
-     * @param maxLength Die maximale Anzahl an einzugebenden Zeichen
-     *
+     * @param maxLength die maximale Anzahl an einzugebenden Zeichen
+     * @param acceptedChars die erlaubten Zeichen für diese Instanz
      */
     public SBFieldDocument(int maxLength, String acceptedChars) {
         this.maxLength = maxLength;

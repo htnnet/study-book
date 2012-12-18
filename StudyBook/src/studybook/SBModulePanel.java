@@ -2,7 +2,6 @@ package studybook;
 
 import com.michaelbaranov.microba.calendar.DatePicker;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.border.Border;
@@ -168,7 +167,6 @@ public class SBModulePanel extends JPanel {
         examOneFieldPanel = new JPanel();
         examOneFieldPanel.setBorder(margin);
 
-
         examTwoPanel = new JPanel();
         examTwoTitledBorder = BorderFactory.createTitledBorder("2. Leistungsnachweis");
         examTwoCompBorder = BorderFactory.createCompoundBorder(margin, examTwoTitledBorder);
@@ -251,7 +249,7 @@ public class SBModulePanel extends JPanel {
 
     /**
      * Hier werden sogenannte "JSpinner" erzeugt über die der Benutzer die
-     * Uhrzeit, die Credit-Points und die Note entweder mittles der Maus oder
+     * Uhrzeit, die Credit-Points und die Note entweder mittels der Maus oder
      * der Tastatur einstellen kann.
      */
     private void createSpinner() {
@@ -302,7 +300,6 @@ public class SBModulePanel extends JPanel {
         formattedField.setHorizontalAlignment(JTextField.LEFT);
         numberFormatter = (NumberFormatter) formattedField.getFormatter();
         numberFormatter.setFormat(decimalFormat);
-
 
         // Den Spinner-Elementen für die Zeit und die Note Startwerte mitgeben
         initTime = new Date();
@@ -457,8 +454,8 @@ public class SBModulePanel extends JPanel {
      * Methode, die die Datumsangaben als "Date"-Objekt einliest und zur
      * Weiterreichung an die Datenbank als String zurückliefert.
      *
-     * @return Das Datum als String
-     * @param examDate Das Datum als Date-Objekt
+     * @return das Datum als String
+     * @param examDate das Datum als Date-Objekt
      */
     private String getStringDate(Date examDate) {
         String examStringDate = "";
@@ -476,8 +473,8 @@ public class SBModulePanel extends JPanel {
      * Methode, die die Zeitangaben als "Date"-Objekt einliest und zur
      * Weiterreichung an die Datenbank als String zurückliefert.
      *
-     * @return Die Zeit als String
-     * @param examTime Die Zeit als Date-Objekt
+     * @return die Zeit als String
+     * @param examTime die Zeit als Date-Objekt
      */
     private String getStringTime(Date examTime) {
         String examStringTime = "";
@@ -489,6 +486,71 @@ public class SBModulePanel extends JPanel {
         } catch (NullPointerException exception) {
         }
         return examStringTime;
+    }
+
+    /**
+     * Methode die sicherstellt, dass keine leeren Noten gesetzt werden können.
+     *
+     * @param gradeString die zu setzende Note
+     * @return die korrigierte Note
+     */
+    private String getGrade(String gradeString) {
+        if (gradeString.equals("")) {
+            gradeString = "1.0";
+        }
+        return gradeString;
+    }
+
+    /**
+     * Methode die sicherstellt, dass keine leeren Credits gesetzt werden
+     * können.
+     *
+     * @param creditsString die zu setzenden Credits
+     * @return die korrigierten Credits
+     */
+    private String getCredits(String creditsString) {
+        if (creditsString.equals("")) {
+            creditsString = "0";
+        }
+        return creditsString;
+    }
+
+    /**
+     * Methode, die die Datumsangaben als String einliest und sie für die
+     * DatePicker als Date-Objekt zurückliefert.
+     *
+     * @return das Datum als Date-Objekt
+     * @param examStringDate das Datum als String
+     */
+    private Date getDate(String examStringDate) {
+        Date examDate = null;
+
+        // Falls das Umwandeln des Strings in ein Date-Objekt nicht
+        // funktionieren sollte
+        try {
+            examDate = dateFormat.parse(examStringDate);
+        } catch (ParseException exception) {
+        }
+        return examDate;
+    }
+
+    /**
+     * Methode, die die Zeitangaben als String einliest und sie für die JSpinner
+     * als Date-Objekt zurückliefert.
+     *
+     * @return Die Zeit als Date-Objekt
+     * @param examStringTime Die Zeit String
+     */
+    private Date getTime(String examStringTime) {
+        Date examTime = initTime;
+
+        // Falls das Umwandeln des Strings in ein Date-Objekt nicht
+        // funktionieren sollte
+        try {
+            examTime = timeFormat.parse(examStringTime);
+        } catch (ParseException exception) {
+        }
+        return examTime;
     }
 
     /**
@@ -519,67 +581,5 @@ public class SBModulePanel extends JPanel {
             this.examTwoDatePicker.setDate(this.getDate(fields[12]));
         } catch (PropertyVetoException ex) {
         }
-    }
-
-    /**
-     * Methode die sicherstellt, dass keine leeren Noten gesetzt werden können.
-     * @param gradeString die zu setzende Note
-     * @return die korrigierte Note
-     */
-    private String getGrade(String gradeString) {
-        if (gradeString.equals("")) {
-            gradeString = "1.0";
-        }
-        return gradeString;
-    }
-
-    /**
-     * Methode die sicherstellt, dass keine leeren Credits gesetzt werden können.
-     * @param creditsString die zu setzenden Credits
-     * @return die korrigierten Credits
-     */
-    private String getCredits(String creditsString) {
-        if (creditsString.equals("")) {
-            creditsString = "0";
-        }
-        return creditsString;
-    }
-
-    /**
-     * Methode, die die Datumsangaben als String einliest und sie für
-     * die DatePicker als Date-Objekt zurückliefert.
-     *
-     * @return Das Datum als Date-Objekt
-     * @param examStringDate Das Datum als String
-     */
-    private Date getDate(String examStringDate) {
-        Date examDate = null;
-
-        // Falls das Umwandeln des Strings in ein Date-Objekt nicht
-        // funktionieren sollte
-        try {
-            examDate = dateFormat.parse(examStringDate);
-        } catch (ParseException exception) {
-        }
-        return examDate;
-    }
-
-     /**
-     * Methode, die die Zeitangaben als String einliest und sie für
-     * die JSpinner als Date-Objekt zurückliefert.
-     *
-     * @return Die Zeit als Date-Objekt
-     * @param examStringTime Die Zeit String
-     */
-    private Date getTime(String examStringTime) {
-        Date examTime = initTime;
-
-        // Falls das Umwandeln des Strings in ein Date-Objekt nicht
-        // funktionieren sollte
-        try {
-            examTime = timeFormat.parse(examStringTime);
-        } catch (ParseException exception) {
-        }
-        return examTime;
     }
 }

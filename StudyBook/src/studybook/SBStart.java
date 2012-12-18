@@ -6,8 +6,8 @@ import javax.swing.UIManager;
  * Enthält die main-Funktion des Programms.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBStart {
 

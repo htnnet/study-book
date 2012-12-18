@@ -10,8 +10,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * Empfängt die vom Nutzer getätigten Mauseingaben in dem JTree und reagiert
- * entsprechend.
+ * Empfängt die vom Nutzer getätigten Mauseingaben in dem JTree und
+ * Veränderungen in der Baumstrukur und reagiert entsprechend.
  *
  * @author StudyBook-Crew
  * @version 1.0
@@ -72,14 +72,12 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
             return;
         }
 
-
-
         SBNodeStruct nodeInfo = (SBNodeStruct) node.getUserObject();
 
         currentId = nodeInfo.getId();
         oldName = nodeInfo.toString();
 
-        // In Abhängigkeit von der Länge von Pathlength Panel aufrufen.
+        // In Abhängigkeit der Länge von Pathlength Panel aufrufen.
         switch (pathLength) {
             case 2:
                 controller.showStudyPanel(nodeInfo.getId());
@@ -94,7 +92,7 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     }
 
     /**
-     * Wird ausgelöst, wenn der Name eines Baumelements verändert wird
+     * Wird ausgelöst, wenn der Name eines Baumelements verändert wird.
      *
      * @param event das TreeModel-Event
      */
@@ -103,7 +101,7 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         DefaultMutableTreeNode node;
         node = (DefaultMutableTreeNode) (event.getTreePath().getLastPathComponent());
 
-
+        // Sicherstellen, dass wir das richtige Baumelement haben
         try {
             int index = event.getChildIndices()[0];
             node = (DefaultMutableTreeNode) (node.getChildAt(index));
@@ -138,7 +136,7 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
     }
 
     /**
-     * Wird aufgerufen, wenn eine neues Baumelement hinzugefügt wird.
+     * Wird aufgerufen, wenn ein neues Baumelement hinzugefügt wird.
      *
      * @param event das TreeModel-Event
      */
@@ -151,12 +149,14 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         DefaultMutableTreeNode parentNode;
         node = (DefaultMutableTreeNode) (event.getTreePath().getLastPathComponent());
 
+        // Sicherstellen, dass wir das richtige Baumelement haben
         try {
             int index = event.getChildIndices()[0];
             node = (DefaultMutableTreeNode) (node.getChildAt(index));
         } catch (NullPointerException exc) {
         }
 
+        // für das Hinzufügen von Baumelement brauchen wir stets das Oberlement
         parentNode = (DefaultMutableTreeNode) node.getParent();
         struct = (SBNodeStruct) node.getUserObject();
         int level = struct.getLevel();
@@ -177,6 +177,11 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         struct.setId(id);
     }
 
+    /**
+     * Wird aufgerufen, wenn ein Baumelement gelöscht wurde.
+     *
+     * @param event das TreeModel-Event
+     */
     @Override
     public void treeNodesRemoved(TreeModelEvent event) {
         int pathLength = event.getTreePath().getPathCount();
@@ -184,6 +189,7 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         DefaultMutableTreeNode node;
         node = (DefaultMutableTreeNode) (event.getTreePath().getLastPathComponent());
 
+        // Sicherstellen, dass wir das richtige Baumelement haben
         try {
             int index = event.getChildIndices()[0];
             node = (DefaultMutableTreeNode) (node.getChildAt(index));
@@ -191,7 +197,8 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
         } catch (ArrayIndexOutOfBoundsException exception) {
         }
 
-
+        // Mithilfe der Verschachtelungstiefe bestimmen, welche Methode aufgerufen
+        // und welches Element letztlich gelöscht werden muss
         switch (pathLength) {
             case 1:
                 this.controller.deleteStudy(currentId);
@@ -206,6 +213,13 @@ public class SBMouseTreeListener extends MouseAdapter implements TreeSelectionLi
 
     }
 
+    /**
+     * Wird aufgerufen, wenn mehrere Baumelement gleichzeitig gelöscht wurden.
+     * Diese Methode musste aufgrund des Interfaces implementiert werden, wird
+     * hier jedoch nicht verwendet, weil man nur ein Baumelement auswählen kann.
+     *
+     * @param event das TreeModel-Event
+     */
     @Override
     public void treeStructureChanged(TreeModelEvent event) {
         throw new UnsupportedOperationException("Not supported yet.");

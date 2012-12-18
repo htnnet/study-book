@@ -2,15 +2,15 @@ package studybook;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
-import javax.swing.border.Border;
 import javax.swing.*;
 
 /**
- * Das Hilfspanel.
+ * Das Hilfspanel hilft dem Benutzer sich mit dem Programm zurechtzufinden,
+ * indem es ihn mit Informationen über die Bedienung versorgt.
  *
  * @author StudyBook-Crew
- * @version 0.1
- * @since 2012-10-14
+ * @version 1.0
+ * @since 2012-12-18
  */
 public class SBHelpPanel extends JPanel {
 
@@ -18,6 +18,9 @@ public class SBHelpPanel extends JPanel {
     private JEditorPane editorPane;
     private JScrollPane editorScrollPane;
 
+    /**
+     * Konstruktor der Klasse SBHelpPanel.
+     */
     public SBHelpPanel() {
         this.createHelpPanel();
         this.layoutHelpPanel();
@@ -28,12 +31,15 @@ public class SBHelpPanel extends JPanel {
      * soll.
      */
     public void createHelpPanel() {
-        hilfe = new JLabel("Hilfe!!!");
         this.createEditorPane();
         editorScrollPane = new JScrollPane(this.editorPane);
         editorScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     }
 
+    /**
+     * Erzeugt ein EditorPane mit dem man Text mithilfe von HTML unterbringen
+     * kann.
+     */
     private void createEditorPane() {
         editorPane = new JEditorPane();
         editorPane.setEditable(false);

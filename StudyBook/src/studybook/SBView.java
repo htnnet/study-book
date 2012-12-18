@@ -5,8 +5,10 @@ import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.Vector;
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.*;
 
 /**
@@ -24,12 +26,19 @@ public class SBView {
     private SBStudyPanel studyPanel;
     private SBSemesterPanel semesterPanel;
     private SBModulePanel modulePanel;
+    private JPanel emptyPanel;
     private ActionListener actionListener;
-    private JScrollPane treePane;
     private SBMouseTreeListener mouseTreeListener;
+    private JFileChooser fileChooser;
     private JTree tree;
     private DefaultTreeModel treeModel;
     private DefaultMutableTreeNode treeRoot;
+    private SBTreeCellRenderer treeCellRenderer;
+    private TreeCellEditor fieldEditor;
+    private SBTreeCellEditor treeCelleditor;
+    private SBFieldDocument nodeDocument;
+    private JTextField nodeField;
+    private JScrollPane treePane;
     private JFrame mainFrame;
     private JSplitPane splitPane;
     private JPanel mainPanel;
@@ -53,8 +62,6 @@ public class SBView {
     private ImageIcon itemIcon;
     private JMenuItem menuItem;
     private JLabel statusBar;
-    private SBFieldDocument nodeDocument;
-    private JTextField nodeField;
     private boolean editable = false;
 
     /**
@@ -63,7 +70,6 @@ public class SBView {
      * @param controller das Controller-Objekt
      */
     public SBView(SBController controller) {
-        actionListener = new SBActionListener(this, controller); //ActionListener initialisieren
         this.controller = controller;
     }
 
@@ -80,44 +86,38 @@ public class SBView {
             System.err.println(e.toString());
         }
 
+        // Beim Schließen des Programms wird abgespeichert
         mainFrame.addWindowListener(new WindowAdapter() {
 
             public void windowClosing(WindowEvent e) {
                 controller.exit();
             }
         });
+
         mainFrame.setResizable(false);
 
         mainPanel = new JPanel();
         splitPane = new JSplitPane();
         splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 
+        // Panel mit Baum
         leftPanel = new JPanel();
         leftPanel.setMinimumSize(new Dimension(200, 200));
+
+        // Panel mit HilfsPanel, Studiengangverwaltung, Semesterverwaltung und
+        // Moduleverwaltung
         rightPanel = new JPanel();
         rightPanel.setMinimumSize(new Dimension(570, 500));
 
+        this.createFileChooser();
+        actionListener = new SBActionListener(this, controller); //ActionListener initialisieren
         this.createMenuBar();
         this.createPopupMenu();
         this.createTree();
         this.createStatusBar();
+        this.createPanels();
 
         mainFrame.setContentPane(mainPanel);
-    }
-
-    /**
-     * Setzt den Titel des Frames, um den Benutzer zu zeigen, welche Profildatei
-     * er gerade geöffnet hat und wo diese liegt.
-     *
-     * @param title der neue Titel des Frames
-     */
-    public void setFrameTitle(String title) {
-        mainFrame.setTitle(title);
-        mainFrame.revalidate();
-    }
-
-    public void setEditable(boolean editable) {
-        this.editable = editable;
     }
 
     /**
@@ -144,220 +144,39 @@ public class SBView {
     }
 
     /**
-     * Baumelement und Unterblätter entfernen.
+     * Erzeugt die Panels, die auf der rechten Seite des Programms angezeigt
+     * werden.
      */
-    public void removeNode() {
-        TreePath currentSelection = tree.getSelectionPath();
-        if (currentSelection != null) {
-            DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
-            MutableTreeNode parent = (MutableTreeNode) (currentNode.getParent());
-            if (parent != null) {
-                this.treeModel.removeNodeFromParent(currentNode);
-            }
-        }
+    private void createPanels() {
+        helpPanel = new SBHelpPanel();
+        studyPanel = new SBStudyPanel();
+        semesterPanel = new SBSemesterPanel();
+        modulePanel = new SBModulePanel();
+        emptyPanel = new JPanel();
     }
 
     /**
-     * Befüllt das JTree mit neuen Daten.
-     *
-     * @param nodes
+     * Erstellt einen JFileChosser mit dessen Hilfe Dateien zum Öffnen und
+     * Zielorte zum Abspeichern ausgewählt werden können.
      */
-    public void reloadTree(Vector<SBNodeStruct> nodes) {
-        //TreePath lastSelected
-        treeRoot = this.addTreeNodes(nodes, nodes.get(0), 1);
-        treeModel = new DefaultTreeModel(treeRoot) {
+    private void createFileChooser() {
+        // FileFilter erstellen, um ungewollte Dateien in der
+        // Verzeichnisauflistung herauszufiltern
+        FileFilter fileFilter = new FileFilter() {
 
             @Override
-            public void valueForPathChanged(final TreePath path, final Object newValue) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-                SBNodeStruct oldValue = (SBNodeStruct) node.getUserObject();
-                oldValue.setName(newValue.toString());
-
-                super.valueForPathChanged(path, oldValue);
+            public boolean accept(File file) {
+                return file.getName().toLowerCase().endsWith(".sbprofile") || file.isDirectory();
             }
-        };
-
-
-
-        tree.setModel(treeModel);
-
-        // alles aufklappen
-        for (int i = 0; i < tree.getRowCount(); i++) {
-            tree.expandRow(i);
-        }
-        treeModel.addTreeModelListener(mouseTreeListener);
-    }
-
-    /**
-     * Methode zum Erstellen eines Baumes, der zur Navigation zwischen der
-     * Studiengang-,Semester- und Modulverwatlung dient.
-     */
-    private void createTree() {
-        treeRoot = new DefaultMutableTreeNode("root");
-        tree = new JTree(treeRoot);
-        tree.setEditable(true);
-        treePane = new JScrollPane(tree);
-        tree.setRootVisible(false);
-        tree.setShowsRootHandles(true);
-        // Damit nur ein Element gleichzeitig ausgewählt werden kann.
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-        // Render erstellen für die Icons
-        DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer() {
 
             @Override
-            public Component getTreeCellRendererComponent(JTree tree,
-                    Object value, boolean sel, boolean expanded, boolean leaf,
-                    int row, boolean hasFocus) {
-                DefaultMutableTreeNode currentTreeNode = (DefaultMutableTreeNode) value;
-                int pathLength = currentTreeNode.getPath().length;
-
-                //SBNodeStruct userObject = (SBNodeStruct) currentTreeNode.getUserObject();
-                ImageIcon studyIcon = new ImageIcon(getClass().getResource("/pics/study16x16.png"));
-                ImageIcon semesterIcon = new ImageIcon(getClass().getResource("/pics/semester16x16.png"));
-                ImageIcon moduleIcon = new ImageIcon(getClass().getResource("/pics/module16x16.png"));
-
-                // int level = userObject.getLevel();
-                //System.out.println(userObject.toString() + ": \nPfadlänge: " + pathLength + " | Level. " + level );
-
-                switch (pathLength) {
-                    case 2:
-
-                        setLeafIcon(studyIcon);
-                        setOpenIcon(studyIcon);
-                        setClosedIcon(studyIcon);
-                        break;
-                    case 3:
-                        setLeafIcon(semesterIcon);
-                        setOpenIcon(semesterIcon);
-                        setClosedIcon(semesterIcon);
-                        break;
-                    case 4:
-                        setLeafIcon(moduleIcon);
-                        setOpenIcon(moduleIcon);
-                        setClosedIcon(moduleIcon);
-                        break;
-
-
-                }
-                return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            public String getDescription() {
+                return "StudyBook Profil (*.sbprofile)";
             }
         };
-
-        nodeDocument = new SBFieldDocument(50);
-
-        nodeField = new JTextField(nodeDocument, "", 0);
-
-        tree.setCellRenderer(treeRenderer); //Renderer dem Baum hinzufuegen
-
-        TreeCellEditor fieldEditor = new DefaultCellEditor(nodeField);
-        TreeCellEditor editor = new DefaultTreeCellEditor(tree, treeRenderer, fieldEditor) {
-
-            @Override
-            protected void determineOffset(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
-
-                if (renderer != null) {
-                    JLabel l = (JLabel) renderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf,
-                            row, tree.hasFocus() && tree.getLeadSelectionRow() == row);
-                    editingIcon = l.getIcon();
-
-                    if (editingIcon != null) {
-                        offset = renderer.getIconTextGap() + editingIcon.getIconWidth();
-                    } else {
-                        offset = renderer.getIconTextGap();
-                    }
-                } else {
-                    editingIcon = null;
-                    offset = 0;
-                }
-            }
-        };
-
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setInvokesStopCellEditing(true);      // Fokus-Verlust bedeutet das Ändern des Namens
-        tree.setCellEditor(editor);
-        mouseTreeListener = new SBMouseTreeListener(controller, this, tree, popupMenu);
-        tree.addMouseListener(mouseTreeListener); // SBMouseTreeListener dem Baum hinzufuegen
-        tree.addTreeSelectionListener(mouseTreeListener);
-    }
-
-    public void showAboutDialog() {
-        JDialog aboutDialog = new SBAboutDialog(this.mainFrame);
-        aboutDialog.setResizable(false);
-        aboutDialog.setLocationRelativeTo(null);
-        aboutDialog.setVisible(true);
-    }
-
-    /**
-     * Blätter zum momentan ausgewählten Parten hinzufügen.
-     */
-    public DefaultMutableTreeNode addTreeNode(Object child) {
-        DefaultMutableTreeNode parentNode = null;
-        TreePath parentPath = tree.getSelectionPath();
-
-        if (parentPath == null) {
-            parentNode = treeRoot;
-        } else {
-            parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
-        }
-
-        return addTreeNode(parentNode, child, true);
-    }
-
-    public DefaultMutableTreeNode addTreeNode(DefaultMutableTreeNode parent, Object child) {
-        return addTreeNode(parent, child, false);
-    }
-
-    public DefaultMutableTreeNode addTreeNode(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
-        DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
-
-        if (parent == null) {
-            parent = treeRoot;
-        }
-
-        // Änderungen vornhemen
-        treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
-
-        // Falls das neue Baumelement nicht mehr zu sehen ist, hinscrollen
-        if (shouldBeVisible) {
-            tree.scrollPathToVisible(new TreePath(childNode.getPath()));
-        }
-        return childNode;
-    }
-
-    /**
-     * Fügt dem JTree Elemente in Form von SBNodeStruct-Objekten aus einem
-     * Vector hinzu.
-     *
-     * @param nodes Vector mit den SBNodeStruct-Objekten
-     * @param parent parent-element
-     * @param start gibt die Stelle an, an der der Vector nodes abgearbeitet
-     * wird
-     * @return
-     */
-    private DefaultMutableTreeNode addTreeNodes(Vector<SBNodeStruct> nodes, SBNodeStruct parent, int start) {
-
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(parent);
-
-        // durch den Vektor iterieren
-        for (int i = start; i < nodes.size(); i++) {
-
-            // nur Einträge einfügen, deren Verschachtelungstiefe eine höher ist als die des parents
-            if (nodes.get(i).getLevel() == parent.getLevel() + 1) {
-
-                // Unterbaum des childs rekursiv anhängen
-                node.add(addTreeNodes(nodes, nodes.get(i), i + 1));
-            } else {
-
-                // Schleife abbrechen, wenn auf ein Element gestoßen wird, dessen
-                // Verschachtelungstiefe
-                if (nodes.get(i).getLevel() <= parent.getLevel()) {
-                    break;
-                }
-            }
-        }
-        return node;
-
+        fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(fileFilter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
     }
 
     /**
@@ -490,6 +309,7 @@ public class SBView {
      * Erstelt ein JPopupMenu, das bei einem Rechtsklick auf den Tree erscheint.
      */
     private void createPopupMenu() {
+        // Hinzufügen
         popupMenu = new JPopupMenu();
         addPopupMenu = new JMenu("Hinzufügen");
         addPopupMenu.setMnemonic('H');
@@ -518,6 +338,7 @@ public class SBView {
         addPopupMenu.add(modulePopupMenuItem);
         popupMenu.add(addPopupMenu);
 
+        // Löschen
         deletePopupMenuItem = new JMenuItem("Löschen", 'L');
         itemIcon = new ImageIcon(getClass().getResource("/pics/delete16x16.png"));
         KeyStroke deleteKeyStroke = KeyStroke.getKeyStroke("DELETE");
@@ -527,6 +348,7 @@ public class SBView {
         deletePopupMenuItem.addActionListener(actionListener);
         popupMenu.add(deletePopupMenuItem);
 
+        // Umbenennen
         renamePopupMenuItem = new JMenuItem("Umbenennen", 'U');
         itemIcon = new ImageIcon(getClass().getResource("/pics/rename16x16.png"));
         KeyStroke f2KeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
@@ -538,41 +360,17 @@ public class SBView {
     }
 
     /**
-     * Die StatusBar fungiert in erster Linie dazu dem Benutzer über
-     * aufgetretene Fehler zu unterrichten. Hierbei wird sie rot, um die Blicke
-     * des Benutzers auf sich zu lenken.
-     */
-    private void createStatusBar() {
-        statusBar = new JLabel(" ");
-        statusBar.setOpaque(true);  // für das Setzen der Hintergrundfarbe
-        statusBar.setBackground(Color.red);
-        statusBar.setForeground(Color.white);
-        statusBar.setHorizontalAlignment(SwingConstants.CENTER);
-        this.hideStatusError();
-    }
-
-    /**
-     * Lässt eine rot aufleuchtende Statusbar erscheinen, die dem Benutzer über
-     * eventuell auftretende Fehler unterrichtet.
+     * Hiermit wird gewährleistet, dass die Menüs ungewollt ausgegraut werden.
      *
-     * @param errorMessage die auszugebende Fehlermeldung
+     * @param editable Menüs ausgraubar oder nicht
      */
-    public void showStatusError(String errorMessage) {
-        statusBar.setText(errorMessage);
-        statusBar.setVisible(true);
-    }
-
-    /**
-     * Ist der Fehler behoben, so wird mittels dieser Methode die StatusBar
-     * ausgeblendet.
-     */
-    public void hideStatusError() {
-        statusBar.setVisible(false);
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     /**
      * Wenn kein Baumelement markiert ist, kann mittels dieser Methode MenuItems
-     * des Popup-Menüs und das Bearbeiten-Menüs aktiviert und deaktiviert
+     * des Popup-Menüs und des Bearbeiten-Menüs aktiviert und deaktiviert
      * werden.
      *
      * @param study Studiengang-MenuItem aktivieren oder deaktivieren
@@ -612,10 +410,211 @@ public class SBView {
     }
 
     /**
+     * Methode zum Erstellen eines Baumes, der zur Navigation zwischen der
+     * Studiengang-,Semester- und Modulverwatlung dient.
+     */
+    private void createTree() {
+        treeRoot = new DefaultMutableTreeNode("root");
+        tree = new JTree(treeRoot);
+        tree.setEditable(true);     // Baumelemente dürfen umbenannt werden
+        treePane = new JScrollPane(tree);
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        // Damit nur ein Element gleichzeitig ausgewählt werden kann.
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        // Fokus-Verlust bedeutet das Ändern des Namens
+        tree.setInvokesStopCellEditing(true);
+
+        // Zeichenlänge eines Baumelements auf 50 beschränken
+        nodeDocument = new SBFieldDocument(50);
+        nodeField = new JTextField(nodeDocument, "", 0);
+
+        treeCellRenderer = new SBTreeCellRenderer();
+        tree.setCellRenderer(treeCellRenderer);
+
+        fieldEditor = new DefaultCellEditor(nodeField);
+        treeCelleditor = new SBTreeCellEditor(tree, treeCellRenderer, fieldEditor);
+        tree.setCellEditor(treeCelleditor);
+
+        // Listener
+        mouseTreeListener = new SBMouseTreeListener(controller, this, tree, popupMenu);
+        tree.addMouseListener(mouseTreeListener); // SBMouseTreeListener dem Baum hinzufuegen
+        tree.addTreeSelectionListener(mouseTreeListener);
+    }
+
+    /**
+     * Befüllt den JTree mit neuen Daten in Form eines speziellen Vektors.
+     *
+     * @param nodes Vektor, der die hineinzufügenden Elemente enthält
+     */
+    public void reloadTree(Vector<SBNodeStruct> nodes) {
+        //TreePath lastSelected
+        treeRoot = this.addTreeNodes(nodes, nodes.get(0), 1);
+        treeModel = new DefaultTreeModel(treeRoot) {
+
+            @Override
+            public void valueForPathChanged(final TreePath path, final Object newValue) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+                SBNodeStruct oldValue = (SBNodeStruct) node.getUserObject();
+                oldValue.setName(newValue.toString());
+
+                super.valueForPathChanged(path, oldValue);
+            }
+        };
+
+
+
+        tree.setModel(treeModel);
+
+        // alles aufklappen
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            tree.expandRow(i);
+        }
+        treeModel.addTreeModelListener(mouseTreeListener);
+    }
+
+    /**
+     * Fügt dem JTree rekursiv Elemente in Form von SBNodeStruct-Objekten aus
+     * einem Vector hinzu.
+     *
+     * @param nodes Vector mit den SBNodeStruct-Objekten
+     * @param parent parent-element
+     * @param start Stelle an, an der der Vector nodes abgearbeitet wird
+     * @return die anzuhängende node
+     */
+    private DefaultMutableTreeNode addTreeNodes(Vector<SBNodeStruct> nodes, SBNodeStruct parent, int start) {
+
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(parent);
+
+        // durch den Vektor iterieren
+        for (int i = start; i < nodes.size(); i++) {
+
+            // nur Einträge einfügen, deren Verschachtelungstiefe eine höher ist, als die des parents
+            if (nodes.get(i).getLevel() == parent.getLevel() + 1) {
+
+                // Unterbaum des childs rekursiv anhängen
+                node.add(addTreeNodes(nodes, nodes.get(i), i + 1));
+            } else {
+
+                // Schleife abbrechen, wenn auf ein Element gestoßen wird, das
+                // keine Unterelemente hat
+                if (nodes.get(i).getLevel() <= parent.getLevel()) {
+                    break;
+                }
+            }
+        }
+        return node;
+    }
+
+    /**
+     * Methode zum Hinzufügen eines Baumelements.
+     *
+     * @param child das hinzuzufügende Kind-Objekt
+     * @return das hinzuzufügende Baumelement, das aus dem Objekt gewonnen wurde
+     */
+    public DefaultMutableTreeNode addTreeNode(Object child) {
+        DefaultMutableTreeNode parentNode = null;
+        TreePath parentPath = tree.getSelectionPath();
+
+        if (parentPath == null) {
+            parentNode = treeRoot;
+        } else {
+            parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
+        }
+
+        return addTreeNode(parentNode, child, true);
+    }
+
+    /**
+     * Methode zum Hinzufügen eines Baumelements, dessen Oberelement bekannt
+     * ist.
+     *
+     * @param parent das Oberlement an das das Element angefügt wird
+     * @param child das hinzuzufügende Kind-Objekt
+     * @param shouldBeVisible damit das hinzugefügte Baumelement gesehen wird
+     * @return das hinzuzufügende Baumelement
+     */
+    public DefaultMutableTreeNode addTreeNode(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
+        DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
+
+        if (parent == null) {
+            parent = treeRoot;
+        }
+
+        // Änderungen vornhemen
+        treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
+
+        // Falls das neue Baumelement nicht mehr zu sehen ist, hinscrollen
+        if (shouldBeVisible) {
+            tree.scrollPathToVisible(new TreePath(childNode.getPath()));
+        }
+        return childNode;
+    }
+
+    /**
+     * Mit dieser Methode kann ein Baumelement und seine Unterelemente entfernt
+     * werden.
+     */
+    public void removeNode() {
+        TreePath currentSelection = tree.getSelectionPath();
+        if (currentSelection != null) {
+            DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+            MutableTreeNode parent = (MutableTreeNode) (currentNode.getParent());
+            if (parent != null) {
+                this.treeModel.removeNodeFromParent(currentNode);
+            }
+        }
+    }
+
+    /**
+     * Die StatusBar fungiert in erster Linie dazu dem Benutzer über
+     * aufgetretene Fehler zu unterrichten. Hierbei wird sie rot, um die Blicke
+     * des Benutzers auf sich zu lenken.
+     */
+    private void createStatusBar() {
+        statusBar = new JLabel(" ");
+        statusBar.setOpaque(true);  // für das Setzen der Hintergrundfarbe
+        statusBar.setBackground(Color.red);
+        statusBar.setForeground(Color.white);
+        statusBar.setHorizontalAlignment(SwingConstants.CENTER);
+        this.hideStatusError();
+    }
+
+    /**
+     * Lässt eine rot aufleuchtende Statusbar erscheinen, die dem Benutzer über
+     * eventuell auftretende Fehler unterrichtet.
+     *
+     * @param errorMessage die auszugebende Fehlermeldung
+     */
+    public void showStatusError(String errorMessage) {
+        statusBar.setText(errorMessage);
+        statusBar.setVisible(true);
+    }
+
+    /**
+     * Ist der Fehler behoben, so wird mittels dieser Methode die StatusBar
+     * ausgeblendet.
+     */
+    public void hideStatusError() {
+        statusBar.setVisible(false);
+    }
+
+    /**
+     * Setzt den Titel des Frames, um den Benutzer zu zeigen, welche Profildatei
+     * er gerade geöffnet hat und wo diese liegt.
+     *
+     * @param title der neue Titel des Frames
+     */
+    public void setFrameTitle(String title) {
+        mainFrame.setTitle(title);
+        mainFrame.revalidate();
+    }
+
+    /**
      * Mithilfe dieser Methode kann das Panel auf der rechten Seite des Frames
      * mit einem beliebigen Panel versehen werden.
      *
-     * @param panel
+     * @param panel das Panel, das auf der rechten Seite dargestellt werden soll
      */
     public void setRightPanel(JPanel rightPanel) {
         // damit beim Panel-Wechsel die alte Position des Dividers gewahrt wird
@@ -623,6 +622,27 @@ public class SBView {
         rightPanel.setMinimumSize(new Dimension(500, 500));
         splitPane.setRightComponent(rightPanel);
         splitPane.setDividerLocation(dividerLocation);
+    }
+
+    /**
+     * Dient zum Anzeigen eines Panels, das Informationen über das Programm
+     * preisgibt.
+     */
+    public void showAboutDialog() {
+        JDialog aboutDialog = new SBAboutDialog(this.mainFrame);
+        aboutDialog.setResizable(false);
+        aboutDialog.setLocationRelativeTo(null);
+        aboutDialog.setVisible(true);
+    }
+
+    /**
+     * Gibt den erzeugten FileChooser zurück, der vom ActionListener verwendet
+     * wird, um entsprechende FileChooser-Dialog anzuzeigen.
+     *
+     * @return
+     */
+    public JFileChooser getFileChooser() {
+        return this.fileChooser;
     }
 
     /**
@@ -637,7 +657,7 @@ public class SBView {
     /**
      * Gibt das StudyPanel zurück.
      *
-     * @return das HelpPanel
+     * @return das StudyPanel
      */
     public SBStudyPanel getStudyPanel() {
         return this.studyPanel;
@@ -659,6 +679,16 @@ public class SBView {
      */
     public SBModulePanel getModulePanel() {
         return this.modulePanel;
+    }
+
+    /**
+     * Gibt ein leeres Panel zurück, das bei nicht ausgewählten Baumelement
+     * benötigt wird.
+     *
+     * @return eine leeres Panel
+     */
+    public JPanel getEmptyPanel() {
+        return this.emptyPanel;
     }
 
     /**
