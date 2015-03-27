@@ -1,0 +1,1 @@
+Software that helps collage students keep track of their grades, time-tables, examination dates and other additional information regarding their studies.
